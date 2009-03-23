@@ -1,0 +1,27 @@
+COMPILING AS A STATIC LIBRARY
+
+1. Ensure that a statically-built version of Qt is available.
+
+2. cd into the directory containing gandalf. This directory MUST be named
+   "gandalf" and the DEVDIR environment variable must be set to point to the
+   parent directory of the gandalf directory.
+
+3. Copy the config_mscv7.h file to config.h
+
+4. Run the Qmake command (substituting the correct QMake path):
+
+   C:\Qt\4.4.3\bin\qmake.exe -tp vc gandalf.pro "CONFIG += staticlib" "DEFINES += GANDALF_STATIC"
+
+5. Run VCBUILD to build the project itself:
+
+   vcbuild gandalf.vcproj [Debug | Release]
+
+NOTES
+
+* You must have libtiff, libpng and libjpeg available to build Gandalf. Modify
+  the .pro file if necessary to point to the include and library directories
+  containing these libraries.
+
+* If the library still attempts to build as a DLL, make sure that there is no
+  "CONFIG += dll" or equivalent line in the .pro file.
+
