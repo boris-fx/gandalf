@@ -220,7 +220,7 @@ Gan_Bool
 }
 
 /**
- * \brief Decrements a pseudo-inverse equation solver.
+ * \brief Increments a pseudo-inverse equation solver.
  * \param pis A pointer to a structure
  * \param scale A scaling for the equations
  * \param ... A variable argument list of vector components
@@ -241,7 +241,7 @@ Gan_Bool
  * where \f$ s \f$ is the \a scale value, and \f$ A^{\top} B \f$ is
  * incremented by \f$ s\:a\:b^{\top} \f$.
  *
- * \sa gan_pseudoinv_alloc().
+ * \sa gan_pseudoinv_increment_arr(), gan_pseudoinv_alloc().
  */
 Gan_Bool
  gan_pseudoinv_increment ( Gan_PseudoInverseStruct *pis, double scale, ... )
@@ -293,7 +293,7 @@ Gan_Bool
  * decremented by \f$ s\:a\:b^{\top} \f$. This function is used to remove data
  * added using gan_pseudoinv_increment().
  *
- * \sa gan_pseudoinv_alloc().
+ * \sa gan_pseudoinv_decrement_arr(), gan_pseudoinv_alloc().
  */
 Gan_Bool
  gan_pseudoinv_decrement ( Gan_PseudoInverseStruct *pis, double scale, ... )
@@ -316,6 +316,95 @@ Gan_Bool
         gan_blas_ger ( &pis->SabT, &pis->a, &pis->b, -scale ) == NULL )
    {
       gan_err_register ( "gan_pseudoinv_decrement", GAN_ERROR_FAILURE, "" );
+      return GAN_FALSE;
+   }
+
+   return GAN_TRUE;
+}
+
+/**
+ * \brief Decrements a pseudo-inverse equation solver.
+ * \param pis A pointer to a structure
+ * \param scale A scaling for the equations
+ * \param a Array of values of row of matrix A
+ * \param b Array of values of row of matrix B
+ * \return #GAN_TRUE on success, #GAN_FALSE on failure.
+ *
+ * Increments a system of linear equations
+ * \f[
+ *     A X = B
+ * \f]
+ * to be solved by pseudo-inverse:
+ * \f[
+ *    X = (A^{\top} A)^{-1} A^{\top} B
+ * \f]
+ * This function takes the arrays representing vectors
+ * \a a and \a b, of sizes equal to the \a asize and \a bsize arguments to
+ * the most recent call to gan_pseudoinv_reset() on the \a pis structure.
+ * The matrix \f$ A^{\top} A \f$ is incremented by \f$ s\:a\:a^{\top} \f$,
+ * where \f$ s \f$ is the \a scale value, and \f$ A^{\top} B \f$ is
+ * incremented by \f$ s\:a\:b^{\top} \f$.
+ *
+ * \sa gan_pseudoinv_increment(), gan_pseudoinv_alloc().
+ */
+Gan_Bool
+ gan_pseudoinv_increment_arr ( Gan_PseudoInverseStruct *pis, double scale, double* a, double* b )
+{
+   /* build vectors from arrays */
+   Gan_Vector av, bv;
+   gan_vec_form_data(&av, pis->a.rows, a, pis->a.rows);
+   gan_vec_form_data(&bv, pis->b.rows, b, pis->b.rows);
+
+   /* accumulate pseudo-inverse matrices (A * A^T) and (A * B^T) */
+   if ( gan_blas_spr ( &pis->SaaT, &av, scale ) == NULL ||
+        gan_blas_ger ( &pis->SabT, &av, &bv, scale ) == NULL )
+   {
+      gan_err_register ( "gan_pseudoinv_increment", GAN_ERROR_FAILURE, "" );
+      return GAN_FALSE;
+   }
+
+   return GAN_TRUE;
+}
+
+/**
+ * \brief Decrements a pseudo-inverse equation solver.
+ * \param pis A pointer to a structure
+ * \param scale A scaling for the equations
+ * \param a Array of values of row of matrix A
+ * \param b Array of values of row of matrix B
+ * \return #GAN_TRUE on success, #GAN_FALSE on failure.
+ *
+ * Decrements a system of linear equations
+ * \f[
+ *    A\:X = B
+ * \f]
+ * to be solved by pseudo-inverse:
+ * \f[
+ *     X = (A^{\top} A)^{-1} A^{\top} B
+ * \f]
+ * This function takes the arrays representing vectors \a a and \a b,
+ * of sizes equal to the \a asize and \a bsize arguments to the most
+ * recent call to gan_pseudoinv_reset() on the \a pis structure.
+ * The matrix \f$ (A^{\top} A) \f$ is decremented by \f$ s\:a\:a^{\top} \f$,
+ * where \f$ s \f$ is the value \a scale, and \f$ (A^{\top} B) \f$ is
+ * decremented by \f$ s\:a\:b^{\top} \f$. This function is used to remove data
+ * added using gan_pseudoinv_increment_arr().
+ *
+ * \sa gan_pseudoinv_alloc().
+ */
+Gan_Bool
+ gan_pseudoinv_decrement_arr ( Gan_PseudoInverseStruct *pis, double scale, double* a, double* b )
+{
+   /* build vectors from arrays */
+   Gan_Vector av, bv;
+   gan_vec_form_data(&av, pis->a.rows, a, pis->a.rows);
+   gan_vec_form_data(&bv, pis->b.rows, b, pis->b.rows);
+
+   /* accumulate pseudo-inverse matrices (A * A^T) and (A * B^T) */
+   if ( gan_blas_spr ( &pis->SaaT, &av, -scale ) == NULL ||
+        gan_blas_ger ( &pis->SabT, &av, &bv, -scale ) == NULL )
+   {
+      gan_err_register ( "gan_pseudoinv_decrement_arr", GAN_ERROR_FAILURE, "" );
       return GAN_FALSE;
    }
 

@@ -103,7 +103,7 @@ Gan_Bool
          int di,dj;
 
          total = 0.;
-         for ( i = 0; i< (mask->rows)/2+1; i++, source+=width*sstride ) 
+         for ( i = 0; i < (int)(mask->rows)/2+1; i++, source+=width*sstride ) 
          {
             for ( j = 0; j<(mask->cols)/2+1; j++) 
             {
@@ -1107,7 +1107,7 @@ static Gan_Image *
    }
 
    /* check if we aborted the loop early because of an error */ 
-   if ( i < dest->height-1 )
+   if ( i < (int)dest->height-1 )
    {
       gan_err_register ( "image_convolve2D_v3D_gl", GAN_ERROR_FAILURE, "" );
       return NULL;
@@ -1577,7 +1577,7 @@ static Gan_Image *
    }
 
    /* check if we aborted the loop early because of an error */ 
-   if ( i < dest->height-1 )
+   if ( i < (int)dest->height-1 )
    {
       gan_err_register ( "image_convolve2D_rgb_gl", GAN_ERROR_FAILURE, "" );
       return NULL;
@@ -2048,7 +2048,7 @@ static Gan_Image *
    }
 
    /* check if we aborted the loop early because of an error */ 
-   if ( i < dest->height-1 )
+   if ( i < (int)dest->height-1 )
    {
       gan_err_register ( "image_convolve2D_rgba_gl", GAN_ERROR_FAILURE, "" );
       return NULL;
@@ -2518,7 +2518,7 @@ static Gan_Image *
    }
 
    /* check if we aborted the loop early because of an error */ 
-   if ( i < dest->height-1 )
+   if ( i < (int)dest->height-1 )
    {
       gan_err_register ( "image_convolve2D_bgr_gl", GAN_ERROR_FAILURE, "" );
       return NULL;
@@ -2989,7 +2989,7 @@ static Gan_Image *
    }
 
    /* check if we aborted the loop early because of an error */ 
-   if ( i < dest->height-1 )
+   if ( i < (int)dest->height-1 )
    {
       gan_err_register ( "image_convolve2D_bgra_gl", GAN_ERROR_FAILURE, "" );
       return NULL;
@@ -3338,7 +3338,7 @@ static Gan_Image *
    }
 
    /* check if we aborted the loop early because of an error */ 
-   if ( i < dest->height-1 )
+   if ( i < (int)dest->height-1 )
    {
       gan_err_register ( "image_convolve2D_v3D_v3D", GAN_ERROR_FAILURE, "" );
       return NULL;
@@ -3590,7 +3590,7 @@ static Gan_Image *
    }
 
    /* check if we aborted the loop early because of an error */ 
-   if ( i < dest->height-1 )
+   if ( i < (int)dest->height-1 )
    {
       gan_err_register ( "image_convolve2D_rgb_rgb", GAN_ERROR_FAILURE, "" );
       return NULL;
@@ -3843,7 +3843,7 @@ static Gan_Image *
    }
 
    /* check if we aborted the loop early because of an error */ 
-   if ( i < dest->height-1 )
+   if ( i < (int)dest->height-1 )
    {
       gan_err_register ( "image_convolve2D_rgba_rgba", GAN_ERROR_FAILURE, "" );
       return NULL;
@@ -4095,7 +4095,7 @@ static Gan_Image *
    }
 
    /* check if we aborted the loop early because of an error */ 
-   if ( i < dest->height-1 )
+   if ( i < (int)dest->height-1 )
    {
       gan_err_register ( "image_convolve2D_bgr_bgr", GAN_ERROR_FAILURE, "" );
       return NULL;
@@ -4348,7 +4348,7 @@ static Gan_Image *
    }
 
    /* check if we aborted the loop early because of an error */ 
-   if ( i < dest->height-1 )
+   if ( i < (int)dest->height-1 )
    {
       gan_err_register ( "image_convolve2D_bgra_bgra", GAN_ERROR_FAILURE, "" );
       return NULL;

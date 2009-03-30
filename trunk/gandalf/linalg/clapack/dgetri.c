@@ -44,7 +44,13 @@ Gan_Bool
       *info = -3;
       return GAN_FALSE;
    }
-   
+
+   if ( lwork == -1)
+   {
+      work[0] = (double)gan_max2_l(1,n);
+      return GAN_TRUE;
+   }
+
    if ( lwork < gan_max2_l(1,n) )
    {
       *info = -6;

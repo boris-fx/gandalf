@@ -177,7 +177,7 @@ static Gan_SquMatrix_f *
 
    /* copy matrix */
 #ifdef HAVE_LAPACK
-   scopy_ ( (long *)&A->size, A->data, &onei, B->data, &onei );
+   BLAS_SCOPY ( (long *)&A->size, A->data, &onei, B->data, &onei );
 #else /* !HAVE_LAPACK */
    gan_scopy ( A->size, A->data, 1, B->data, 1 );
 #endif /* #ifdef HAVE_LAPACK */
@@ -204,8 +204,8 @@ static Gan_SquMatrix_f *
 
 #ifdef HAVE_LAPACK
    /* copy and scale matrix */
-   if(A!=B) scopy_ ( (long *)&A->size, A->data, &onei, B->data, &onei );
-   sscal_ ( (long *)&A->size, &a, B->data, &onei );
+   if(A!=B) BLAS_SCOPY ( (long *)&A->size, A->data, &onei, B->data, &onei );
+   BLAS_SSCAL ( (long *)&A->size, &a, B->data, &onei );
 #else /* !HAVE_LAPACK */
    /* copy and scale matrix */
    if(A!=B) gan_scopy ( A->size, A->data, 1, B->data, 1 );
@@ -247,15 +247,15 @@ static Gan_SquMatrix_f *
    /* add matrix data */
    if ( C == A )
       /* in-place operation A += B */
-      saxpy_ ( (long *)&A->size, &onef, B->data, &onei, A->data, &onei );
+      BLAS_SAXPY ( (long *)&A->size, &onef, B->data, &onei, A->data, &onei );
    else if ( C == B )
       /* in-place operation B += A */
-      saxpy_ ( (long *)&A->size, &onef, A->data, &onei, B->data, &onei );
+      BLAS_SAXPY ( (long *)&A->size, &onef, A->data, &onei, B->data, &onei );
    else
    {
       /* C = A + B */
-      scopy_ ( (long *)&A->size, A->data, &onei, C->data, &onei );
-      saxpy_ ( (long *)&A->size, &onef, B->data, &onei, C->data, &onei );
+      BLAS_SCOPY ( (long *)&A->size, A->data, &onei, C->data, &onei );
+      BLAS_SAXPY ( (long *)&A->size, &onef, B->data, &onei, C->data, &onei );
    }
 #else /* !HAVE_LAPACK */
    /* add matrix data */
@@ -312,22 +312,21 @@ static Gan_SquMatrix_f *
       /* subtract matrix data */
       if ( C == A )
          /* in-place operation A -= B */
-         saxpy_ ( (long *)&A->size, &minus_onef, B->data, &onei,
+         BLAS_SAXPY ( (long *)&A->size, &minus_onef, B->data, &onei,
                   A->data, &onei );
       else if ( C == B )
       {
          /* in-place operation B = A - B */
          float onef = 1.0;
 
-         sscal_ ( (long *)&A->size, &minus_onef, B->data, &onei );
-         saxpy_ ( (long *)&A->size, &onef, A->data, &onei, B->data, &onei );
+         BLAS_SSCAL ( (long *)&A->size, &minus_onef, B->data, &onei );
+         BLAS_SAXPY ( (long *)&A->size, &onef, A->data, &onei, B->data, &onei );
       }
       else
       {
          /* C = A - B */
-         scopy_ ( (long *)&A->size, A->data, &onei, C->data, &onei );
-         saxpy_ ( (long *)&A->size, &minus_onef, B->data, &onei,
-                  C->data, &onei );
+         BLAS_SCOPY ( (long *)&A->size, A->data, &onei, C->data, &onei );
+         BLAS_SAXPY ( (long *)&A->size, &minus_onef, B->data, &onei, C->data, &onei );
       }
 #else /* !HAVE_LAPACK */
       /* subtract matrix data */

@@ -45,47 +45,47 @@ extern "C" {
  * \{
  */
 
-Gan_Bool gan_convolve2D_f ( float *source, 
-                            int sstride,
-                            float *dest,   
-                            int dstride,
-                            Gan_Mask2D *mask, 
-                            unsigned long width );
-Gan_Bool gan_convolve2D_d ( double *source, 
-                            int sstride,
-                            double *dest,
-                            int dstride,  
-                            Gan_Mask2D *mask, 
-                            unsigned long width);
-Gan_Bool gan_convolve2D_i ( int *source, 
-                            int sstride,
-                            int *dest,  
-                            int dstride,
-                            Gan_Mask2D *mask, 
-                            unsigned long width);
-Gan_Bool  gan_convolve2D_uc ( unsigned char *source, 
-                              int sstride,
-                              unsigned char *dest, 
-                              int dstride,
-                              Gan_Mask2D *mask,
-                              unsigned long width );
-Gan_Bool gan_convolve2D_us ( unsigned short *source, 
-                             int sstride,
-                             unsigned short *dest,   
-                             int dstride,
-                             Gan_Mask2D *mask, 
-                             unsigned long width);
-Gan_Bool  gan_convolve2D_ui ( unsigned int *source,
-                              int sstride,
-                              unsigned int *dest,  
-                              int dstride,
-                              Gan_Mask2D *mask,
-                              unsigned long width );
+GANDALF_API Gan_Bool gan_convolve2D_f ( float *source, 
+                                        int sstride,
+                                        float *dest,   
+                                        int dstride,
+                                        Gan_Mask2D *mask, 
+                                        unsigned long width );
+GANDALF_API Gan_Bool gan_convolve2D_d ( double *source, 
+                                        int sstride,
+                                        double *dest,
+                                        int dstride,  
+                                        Gan_Mask2D *mask, 
+                                        unsigned long width);
+GANDALF_API Gan_Bool gan_convolve2D_i ( int *source, 
+                                        int sstride,
+                                        int *dest,  
+                                        int dstride,
+                                        Gan_Mask2D *mask, 
+                                        unsigned long width);
+GANDALF_API Gan_Bool  gan_convolve2D_uc ( unsigned char *source, 
+                                          int sstride,
+                                          unsigned char *dest, 
+                                          int dstride,
+                                          Gan_Mask2D *mask,
+                                          unsigned long width );
+GANDALF_API Gan_Bool gan_convolve2D_us ( unsigned short *source, 
+                                         int sstride,
+                                         unsigned short *dest,   
+                                         int dstride,
+                                         Gan_Mask2D *mask, 
+                                         unsigned long width);
+GANDALF_API Gan_Bool  gan_convolve2D_ui ( unsigned int *source,
+                                          int sstride,
+                                          unsigned int *dest,  
+                                          int dstride,
+                                          Gan_Mask2D *mask,
+                                          unsigned long width );
 
 
-Gan_Image *gan_image_convolve2D_q ( Gan_Image *image,
-                                    Gan_ImageChannelType channel,
-                                    Gan_Mask2D *mask, Gan_Image *dest );
+GANDALF_API Gan_Image *gan_image_convolve2D_q ( Gan_Image *image,
+                                                Gan_ImageChannelType channel,
+                                                Gan_Mask2D *mask, Gan_Image *dest );
 
 /**
  * \brief Macro: Convolves an image in both directions.

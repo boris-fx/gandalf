@@ -60,9 +60,66 @@
  * \{
  */
 
+static Gan_Bool convertCMYKtoRGB ( void* pixptr, const void *buf, Gan_Type type, unsigned int imageWidth, unsigned int scanlinesize )
+{
+   int col;
+
+   switch(type)
+   {
+      case GAN_UINT8:
+      {
+         Gan_RGBPixel_ui8* rgbPix = (Gan_RGBPixel_ui8*)pixptr;
+         const Gan_RGBAPixel_ui8* bufPix = (const Gan_RGBAPixel_ui8*)buf;
+         for(col = (int)imageWidth-1; col>=0; col--, rgbPix++, bufPix++)
+         {
+            unsigned int K = (unsigned int)(0xff-bufPix->A);
+            rgbPix->R = (uint8)((unsigned int)(0xff-bufPix->R)*K/0xff);
+            rgbPix->G = (uint8)((unsigned int)(0xff-bufPix->G)*K/0xff);
+            rgbPix->B = (uint8)((unsigned int)(0xff-bufPix->B)*K/0xff);
+         }
+      }
+      break;
+
+      case GAN_UINT16:
+      {
+         Gan_RGBPixel_ui16* rgbPix = (Gan_RGBPixel_ui16*)pixptr;
+         const Gan_RGBAPixel_ui16* bufPix = (const Gan_RGBAPixel_ui16*)buf;
+         for(col = (int)imageWidth-1; col>=0; col--, rgbPix++, bufPix++)
+         {
+            unsigned int K = (unsigned int)(0xffff-bufPix->A);
+            rgbPix->R = (uint16)((unsigned int)(0xffff-bufPix->R)*K/0xffff);
+            rgbPix->G = (uint16)((unsigned int)(0xffff-bufPix->G)*K/0xffff);
+            rgbPix->B = (uint16)((unsigned int)(0xffff-bufPix->B)*K/0xffff);
+         }
+      }
+      break;
+
+      case GAN_FLOAT32:
+      {
+         Gan_RGBPixel_f32* rgbPix = (Gan_RGBPixel_f32*)pixptr;
+         const Gan_RGBAPixel_f32* bufPix = (const Gan_RGBAPixel_f32*)buf;
+         for(col = (int)imageWidth-1; col>=0; col--, rgbPix++, bufPix++)
+         {
+            float K = 1.0F-bufPix->A;
+            rgbPix->R = (1.0F-bufPix->R)*K;
+            rgbPix->G = (1.0F-bufPix->G)*K;
+            rgbPix->B = (1.0F-bufPix->B)*K;
+         }
+      }
+      break;
+
+      default:
+        gan_err_flush_trace();
+        gan_err_register ( "convertCMYKtoRGB", GAN_ERROR_ILLEGAL_TYPE, "" );
+        return GAN_FALSE;
+   }
+
+   return GAN_FALSE;
+}
+
 /* fill given sample in each pixel on row */
 static Gan_Bool
- fill_row_samples ( Gan_Image *pImage, unsigned uiRow, uint16 s, tdata_t buf )
+ fill_row_samples ( Gan_Image *pImage, unsigned uiRow, uint16 s, tdata_t buf, Gan_Bool cmyk )
 {
    int iCol;
 
@@ -97,7 +154,27 @@ static Gan_Bool
                       pixptr->B = *bufptr++;
 
                    break;
-                   
+
+                 case 3:
+                   if(cmyk)
+                   {
+                      for ( iCol = (int)pImage->width-1; iCol >= 0; iCol--, pixptr++ )
+                      {
+                         unsigned int K = (unsigned int)(0xff - *bufptr++);
+                         pixptr->R = (uint8)((unsigned int)(0xff-pixptr->R)*K/0xff);
+                         pixptr->G = (uint8)((unsigned int)(0xff-pixptr->G)*K/0xff);
+                         pixptr->B = (uint8)((unsigned int)(0xff-pixptr->B)*K/0xff);
+                      }
+                   }
+                   else
+                   {
+                      gan_err_flush_trace();
+                      gan_err_register ( "fill_row_samples", GAN_ERROR_ILLEGAL_TYPE, "" );
+                      return GAN_FALSE;
+                   }
+
+                   break;
+
                  default:
                    gan_err_flush_trace();
                    gan_err_register ( "fill_row_samples", GAN_ERROR_ILLEGAL_TYPE, "" );
@@ -131,6 +208,26 @@ static Gan_Bool
 
                    break;
                    
+                 case 3:
+                   if(cmyk)
+                   {
+                      for ( iCol = (int)pImage->width-1; iCol >= 0; iCol--, pixptr++ )
+                      {
+                         unsigned int K = (unsigned int)(0xffff - *bufptr++);
+                         pixptr->R = (uint16)((unsigned int)(0xffff-pixptr->R)*K/0xffff);
+                         pixptr->G = (uint16)((unsigned int)(0xffff-pixptr->G)*K/0xffff);
+                         pixptr->B = (uint16)((unsigned int)(0xffff-pixptr->B)*K/0xffff);
+                      }
+                   }
+                   else
+                   {
+                      gan_err_flush_trace();
+                      gan_err_register ( "fill_row_samples", GAN_ERROR_ILLEGAL_TYPE, "" );
+                      return GAN_FALSE;
+                   }
+
+                   break;
+
                  default:
                    gan_err_flush_trace();
                    gan_err_register ( "fill_row_samples", GAN_ERROR_ILLEGAL_TYPE, "" );
@@ -164,6 +261,26 @@ static Gan_Bool
 
                    break;
                    
+                 case 3:
+                   if(cmyk)
+                   {
+                      for ( iCol = (int)pImage->width-1; iCol >= 0; iCol--, pixptr++ )
+                      {
+                         float K = 1.0F - *bufptr++;
+                         pixptr->R = (1.0F-pixptr->R)*K;
+                         pixptr->G = (1.0F-pixptr->G)*K;
+                         pixptr->B = (1.0F-pixptr->B)*K;
+                      }
+                   }
+                   else
+                   {
+                      gan_err_flush_trace();
+                      gan_err_register ( "fill_row_samples", GAN_ERROR_ILLEGAL_TYPE, "" );
+                      return GAN_FALSE;
+                   }
+
+                   break;
+
                  default:
                    gan_err_flush_trace();
                    gan_err_register ( "fill_row_samples", GAN_ERROR_ILLEGAL_TYPE, "" );
@@ -340,6 +457,8 @@ Gan_Bool gan_image_is_tiff(const unsigned char *magic_string, size_t length)
  * \param image The image structure to read the image data into or NULL
  * \param ictrlstr Pointer to structure controlling TIFF input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on ailure.
  *
  * Reads the TIFF image stored in the file \a filename into an \a image.
@@ -349,19 +468,24 @@ Gan_Bool gan_image_is_tiff(const unsigned char *magic_string, size_t length)
  * \sa gan_write_tiff_image().
  */
 Gan_Image *
- gan_read_tiff_image ( const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_tiff_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                     Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    TIFF *tif;
-	uint32 ui32Width, ui32Height, ui32SampleFormat;
+	uint32 ui32Width, ui32Height;
    unsigned int uiInternalHeight;
    unsigned uiRow;
    tsize_t scanlinesize;
-   uint16 bitspersample, config;
+   uint16 bitspersample, config, photometric;
+#if 0
+   uint16 sampleFormat;
+#endif
    tsample_t nsamples;
 	tdata_t buf;
    Gan_ImageFormat format;
    Gan_Type type;
    Gan_Bool flip=GAN_FALSE, single_field=GAN_FALSE, upper=GAN_FALSE, whole_image=GAN_FALSE;
+   int st;
 
    /* attempt to open file */
    tif = TIFFOpen(filename, "r");
@@ -373,12 +497,21 @@ Gan_Image *
    }
 
    /* read image details */
-	TIFFGetField ( tif, TIFFTAG_IMAGEWIDTH,      &ui32Width );
-	TIFFGetField ( tif, TIFFTAG_IMAGELENGTH,     &ui32Height );
-	TIFFGetField ( tif, TIFFTAG_BITSPERSAMPLE,   &bitspersample );
-	TIFFGetField ( tif, TIFFTAG_SAMPLESPERPIXEL, &nsamples );
-   TIFFGetField ( tif, TIFFTAG_PLANARCONFIG,    &config );
-   TIFFGetField ( tif, TIFFTAG_SAMPLEFORMAT,    &ui32SampleFormat );
+	if((st = TIFFGetField ( tif, TIFFTAG_IMAGEWIDTH,      &ui32Width )) != 1
+      || (st = TIFFGetField ( tif, TIFFTAG_IMAGELENGTH,     &ui32Height )) != 1
+      || (st = TIFFGetField ( tif, TIFFTAG_BITSPERSAMPLE,   &bitspersample )) != 1
+      || (st = TIFFGetField ( tif, TIFFTAG_SAMPLESPERPIXEL, &nsamples )) != 1
+      || (st = TIFFGetField ( tif, TIFFTAG_PLANARCONFIG,    &config )) != 1
+#if 0
+      || (st = TIFFGetField ( tif, TIFFTAG_SAMPLEFORMAT,    &sampleFormat )) != 1
+#endif
+      || (st = TIFFGetField ( tif, TIFFTAG_PHOTOMETRIC,     &photometric )) != 1)
+   {
+      TIFFClose(tif);
+      gan_err_flush_trace();
+      gan_err_register_with_number ( "gan_read_tiff_image_stream", GAN_ERROR_EXTERNAL_LIBRARY_CALL, "", st );
+      return NULL;
+   }
 
    /* make sure that we will have origin at top-left */
    TIFFSetField ( tif, TIFFTAG_ORIENTATION, ORIENTATION_BOTLEFT );
@@ -401,7 +534,13 @@ Gan_Image *
       case 1: format = GAN_GREY_LEVEL_IMAGE;       break;
       case 2: format = GAN_GREY_LEVEL_ALPHA_IMAGE; break;
       case 3: format = GAN_RGB_COLOUR_IMAGE;       break;
-      case 4: format = GAN_RGB_COLOUR_ALPHA_IMAGE; break;
+      case 4:
+        if(photometric == PHOTOMETRIC_SEPARATED)
+           format = GAN_RGB_COLOUR_IMAGE;
+        else
+           format = GAN_RGB_COLOUR_ALPHA_IMAGE;
+
+        break;
 
       default:
         _TIFFfree ( buf );
@@ -413,9 +552,47 @@ Gan_Image *
 
    switch ( bitspersample )
    {
-      case  8: type = GAN_UINT8;   break;
-      case 16: type = GAN_UINT16;  break;
-      case 32: type = GAN_FLOAT32; break;
+      case  8:
+#if 0
+        if(sampleFormat != SAMPLEFORMAT_UINT)
+        {
+           _TIFFfree ( buf );
+           TIFFClose(tif);
+           gan_err_flush_trace();
+           gan_err_register ( "gan_read_tiff_image", GAN_ERROR_ILLEGAL_TYPE, "" );
+           return NULL;
+        }
+#endif
+        type = GAN_UINT8;
+        break;
+
+      case 16:
+#if 0
+        if(sampleFormat != SAMPLEFORMAT_UINT)
+        {
+           _TIFFfree ( buf );
+           TIFFClose(tif);
+           gan_err_flush_trace();
+           gan_err_register ( "gan_read_tiff_image", GAN_ERROR_ILLEGAL_TYPE, "" );
+           return NULL;
+        }
+#endif
+        type = GAN_UINT16;
+        break;
+
+      case 32:
+#if 0
+        if(sampleFormat != SAMPLEFORMAT_IEEEFP)
+        {
+           _TIFFfree ( buf );
+           TIFFClose(tif);
+           gan_err_flush_trace();
+           gan_err_register ( "gan_read_tiff_image", GAN_ERROR_ILLEGAL_TYPE, "" );
+           return NULL;
+        }
+#endif
+        type = GAN_FLOAT32;
+        break;
 
       default:
         _TIFFfree ( buf );
@@ -496,7 +673,16 @@ Gan_Image *
 
               /* only transfer even rows for upper field, or odd rows for upper field */
               if((upper && (uiRow % 2) == 0) || (!upper && (uiRow % 2) == 1))
-                 memcpy ( gan_image_get_pixptr(image, whole_image ? (flip ? (image->height-uiRow-1) : uiRow) : (flip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), 0), (const void *)buf, scanlinesize );
+              {
+                 if(photometric == PHOTOMETRIC_SEPARATED)
+                    convertCMYKtoRGB ( gan_image_get_pixptr(image, whole_image ? (flip ? (image->height-uiRow-1) : uiRow) : (flip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), 0), (const void *)buf, image->type, image->width, scanlinesize );
+                 else
+                    memcpy ( gan_image_get_pixptr(image, whole_image ? (flip ? (image->height-uiRow-1) : uiRow) : (flip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), 0), (const void *)buf, scanlinesize );
+              }
+
+              /* check for abort every 10 rows */
+              if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                 break;
            }
         }
         else
@@ -505,7 +691,15 @@ Gan_Image *
            {
               /* read a line of data and copy in into the image */
               TIFFReadScanline ( tif, buf, uiRow, 0 );
-              memcpy ( gan_image_get_pixptr(image, flip ? (image->height-uiRow-1) : uiRow, 0), (const void *)buf, scanlinesize );
+              if(photometric == PHOTOMETRIC_SEPARATED)
+                 convertCMYKtoRGB ( gan_image_get_pixptr(image, flip ? (image->height-uiRow-1) : uiRow, 0), (const void *)buf, image->type,
+                                    image->width, scanlinesize );
+              else
+                 memcpy ( gan_image_get_pixptr(image, flip ? (image->height-uiRow-1) : uiRow, 0), (const void *)buf, scanlinesize );
+
+              /* check for abort every 10 rows */
+              if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                 break;
            }
         }
 
@@ -525,7 +719,12 @@ Gan_Image *
                   /* only transfer even rows for upper field, or odd rows for upper field */
                   if((upper && (uiRow % 2) == 0) || (!upper && (uiRow % 2) == 1))
                      /* fill given sample in each pixel on row */
-                     fill_row_samples ( image, whole_image ? (flip ? (image->height-uiRow-1) : uiRow) : (flip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), s, buf );
+                     fill_row_samples ( image, whole_image ? (flip ? (image->height-uiRow-1) : uiRow) : (flip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), s, buf,
+                                        (photometric == PHOTOMETRIC_SEPARATED) ? GAN_TRUE : GAN_FALSE );
+
+                  /* check for abort every 10 rows */
+                  if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                     break;
                }
          }
          else
@@ -536,7 +735,12 @@ Gan_Image *
                   TIFFReadScanline ( tif, buf, uiRow, s );
 
                   /* fill given sample in each pixel on row */
-                  fill_row_samples ( image, flip ? (image->height-uiRow-1) : uiRow, s, buf );
+                  fill_row_samples ( image, flip ? (image->height-uiRow-1) : uiRow, s, buf,
+                                     (photometric == PHOTOMETRIC_SEPARATED) ? GAN_TRUE : GAN_FALSE );
+
+                  /* check for abort every 10 rows */
+                  if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                     break;
                }
          }
       }
@@ -631,7 +835,7 @@ Gan_Bool
       pfFile = fopen(filename, "r");
       if(pfFile != NULL)
       {
-         Gan_Image* pimage = gan_read_tiff_image ( filename, NULL, NULL, &header );
+         Gan_Image* pimage = gan_read_tiff_image(filename, NULL, NULL, &header, NULL, NULL); /* abortRequested, abortObj */
          fclose(pfFile);
          if(pimage != NULL)
          {

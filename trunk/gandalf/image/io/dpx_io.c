@@ -232,7 +232,8 @@ Gan_Image *
                          gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                          Gan_ImageFormat eFormat, Gan_Type eType,
                          gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                         Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage)
+                         Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                         Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    Gan_Bool bAllocatedImage=GAN_FALSE;
    unsigned int uiRow;
@@ -355,6 +356,10 @@ Gan_Image *
               gan_err_register ( "pgiRead1BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -389,7 +394,8 @@ Gan_Image *
                          gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                          Gan_ImageFormat eFormat, Gan_Type eType,
                          gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                         Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage)
+                         Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                         Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    Gan_Bool bAllocatedImage=GAN_FALSE;
    unsigned int uiRow;
@@ -529,6 +535,10 @@ Gan_Image *
               gan_err_register ( "pgiRead8BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -593,6 +603,10 @@ Gan_Image *
               gan_err_register ( "pgiRead8BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -653,6 +667,10 @@ Gan_Image *
               gan_err_register ( "pgiRead8BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -713,6 +731,10 @@ Gan_Image *
               gan_err_register ( "pgiRead8BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -746,7 +768,8 @@ Gan_Image *
                           gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                           Gan_ImageFormat eFormat, Gan_Type eType,
                           gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                          Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage)
+                          Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                          Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    Gan_Bool bAllocatedImage=GAN_FALSE;
    unsigned int uiRow;
@@ -761,7 +784,7 @@ Gan_Image *
       return NULL;
    }
 
-   if(eType != GAN_UINT16)
+   if(eType != GAN_UINT10 && eType != GAN_UINT16)
    {
       gan_err_flush_trace();
       gan_err_register ( "pgiRead10BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "only 10 --> 16 bit conversion supported" );
@@ -857,9 +880,6 @@ Gan_Image *
       case GAN_RGB_COLOUR_IMAGE:
         for(uiRow = 0; uiRow<ui32LinesPerImageEle; uiRow++)
         {
-           Gan_RGBPixel_ui16* pui16rgbPix;
-           gan_uint32* pui32Pix;
-
            if(bSingleField)
            {
               /* only transfer even rows for upper field, or odd rows for upper field */
@@ -873,16 +893,34 @@ Gan_Image *
                     return NULL;
                  }
 
-                 for(iCol=(int)ui32PixelsPerLine-1,
-                     pui16rgbPix = gan_image_get_pixptr_rgb_ui16(pgiImage, bWholeImage ? (bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow) : (bFlip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), iCol),
-                     pui32Pix = ((gan_uint32*)acAlignedBuffer) + iCol; iCol >= 0; iCol--, pui16rgbPix--, pui32Pix--)
+                 if(eType == GAN_UINT10)
                  {
-                    if(bReversedEndianness)
-                       vReverseEndianness32(pui32Pix);
+#if 0
+                    for(iCol=(int)ui32PixelsPerLine-1,
+                        pui16rgbPix = gan_image_get_pixptr_rgb_ui16(pgiImage, bWholeImage ? (bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow) : (bFlip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), iCol),
+                        pui32Pix = ((gan_uint32*)acAlignedBuffer) + iCol; iCol >= 0; iCol--, pui16rgbPix--, pui32Pix--)
+                    {
+                       if(bReversedEndianness)
+                          vReverseEndianness32(pui32Pix);
+                    }
+#endif
+                 }
+                 else /* eType == GAN_UINT16 */
+                 {
+                    Gan_RGBPixel_ui16* pui16rgbPix;
+                    gan_uint32* pui32Pix;
 
-                    pui16rgbPix->R = (gan_uint16)(((*pui32Pix) & 0xffc00000) >> 16);
-                    pui16rgbPix->G = (gan_uint16)(((*pui32Pix) &   0x3ff000) >>  6);
-                    pui16rgbPix->B = (gan_uint16)(((*pui32Pix) &      0xffc) <<  4);
+                    for(iCol=(int)ui32PixelsPerLine-1,
+                        pui16rgbPix = gan_image_get_pixptr_rgb_ui16(pgiImage, bWholeImage ? (bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow) : (bFlip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), iCol),
+                        pui32Pix = ((gan_uint32*)acAlignedBuffer) + iCol; iCol >= 0; iCol--, pui16rgbPix--, pui32Pix--)
+                    {
+                       if(bReversedEndianness)
+                          vReverseEndianness32(pui32Pix);
+
+                       pui16rgbPix->R = (gan_uint16)(((*pui32Pix) & 0xffc00000) >> 16);
+                       pui16rgbPix->G = (gan_uint16)(((*pui32Pix) &   0x3ff000) >>  6);
+                       pui16rgbPix->B = (gan_uint16)(((*pui32Pix) &      0xffc) <<  4);
+                    }
                  }
               }
               /* otherwise ignore this scanline */
@@ -904,16 +942,25 @@ Gan_Image *
                  return NULL;
               }
 
-              for(iCol=(int)ui32PixelsPerLine-1,
-                  pui16rgbPix = gan_image_get_pixptr_rgb_ui16(pgiImage, bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow, iCol),
-                  pui32Pix = ((gan_uint32*)acAlignedBuffer) + iCol; iCol >= 0; iCol--, pui16rgbPix--, pui32Pix--)
+              if(eType == GAN_UINT10)
               {
-                 if(bReversedEndianness)
-                    vReverseEndianness32(pui32Pix);
+              }
+              else /* eType == GAN_UINT16 */
+              {
+                 Gan_RGBPixel_ui16* pui16rgbPix;
+                 gan_uint32* pui32Pix;
 
-                 pui16rgbPix->R = (gan_uint16)(((*pui32Pix) & 0xffc00000) >> 16);
-                 pui16rgbPix->G = (gan_uint16)(((*pui32Pix) &   0x3ff000) >>  6);
-                 pui16rgbPix->B = (gan_uint16)(((*pui32Pix) &      0xffc) <<  4);
+                 for(iCol=(int)ui32PixelsPerLine-1,
+                     pui16rgbPix = gan_image_get_pixptr_rgb_ui16(pgiImage, bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow, iCol),
+                     pui32Pix = ((gan_uint32*)acAlignedBuffer) + iCol; iCol >= 0; iCol--, pui16rgbPix--, pui32Pix--)
+                 {
+                    if(bReversedEndianness)
+                       vReverseEndianness32(pui32Pix);
+
+                    pui16rgbPix->R = (gan_uint16)(((*pui32Pix) & 0xffc00000) >> 16);
+                    pui16rgbPix->G = (gan_uint16)(((*pui32Pix) &   0x3ff000) >>  6);
+                    pui16rgbPix->B = (gan_uint16)(((*pui32Pix) &      0xffc) <<  4);
+                 }
               }
            }
 
@@ -925,6 +972,10 @@ Gan_Image *
               gan_err_register ( "pgiRead10BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -1065,6 +1116,10 @@ Gan_Image *
               gan_err_register ( "pgiRead10BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -1177,6 +1232,10 @@ Gan_Image *
               gan_err_register ( "pgiRead10BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -1210,7 +1269,8 @@ Gan_Image *
                           gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                           Gan_ImageFormat eFormat, Gan_Type eType,
                           gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                          Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage)
+                          Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                          Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    Gan_Bool bAllocatedImage=GAN_FALSE;
    unsigned int uiRow;
@@ -1395,6 +1455,10 @@ Gan_Image *
               gan_err_register ( "pgiRead12BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -1428,7 +1492,8 @@ Gan_Image *
                           gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                           Gan_ImageFormat eFormat, Gan_Type eType,
                           gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                          Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage)
+                          Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                          Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    Gan_Bool bAllocatedImage=GAN_FALSE;
    unsigned int uiRow;
@@ -1591,6 +1656,10 @@ Gan_Image *
               gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -1678,6 +1747,10 @@ Gan_Image *
               gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -1766,6 +1839,10 @@ Gan_Image *
               gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -1851,6 +1928,10 @@ Gan_Image *
               gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -1884,7 +1965,8 @@ Gan_Image *
                                gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                                Gan_ImageFormat eFormat, Gan_Type eType,
                                gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                               Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage)
+                               Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                               Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    Gan_Bool bAllocatedImage=GAN_FALSE;
    unsigned int uiRow;
@@ -2132,6 +2214,10 @@ Gan_Image *
               gan_err_register ( "pgiRead32BitFloatDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -2224,6 +2310,10 @@ Gan_Image *
               gan_err_register ( "pgiRead32BitFloatDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
               return NULL;
            }
+
+           /* check for abort every 10 rows */
+           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+              break;
         }
 
         break;
@@ -2324,7 +2414,8 @@ static Gan_Bool gan_read_dpx_generic_header ( char *acAlignedHeader, FILE *infil
    return GAN_TRUE;
 }
 
-static Gan_Bool gan_read_dpx_image_information_header ( char *acAlignedHeader, FILE *infile, Gan_Bool bReversedEndianness,
+static Gan_Bool gan_read_dpx_image_information_header ( Gan_Bool native_type,
+                                                        char *acAlignedHeader, FILE *infile, Gan_Bool bReversedEndianness,
                                                         gan_uint32 ui32ImageOffset,
                                                         gan_uint16 *pui16Orientation, /* image orientation */
                                                         gan_uint32 *pui32PixelsPerLine,
@@ -2466,10 +2557,22 @@ static Gan_Bool gan_read_dpx_image_information_header ( char *acAlignedHeader, F
         break;
 
       case 10:
+        if(native_type)
+           *peType = GAN_UINT10;
+        else
+           *peType = GAN_UINT16;
+
+        break;
+
       case 12:
+        if(native_type)
+           *peType = GAN_UINT10;
+        else
+           *peType = GAN_UINT16;
+
+        break;
+
       case 16:
-        *peType = GAN_UINT16;
-        *peType = GAN_UINT16;
         *peType = GAN_UINT16;
         break;
 
@@ -2719,6 +2822,8 @@ static Gan_Bool gan_read_dpx_tv_information_header ( char *acAlignedHeader, FILE
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the DPX image from the given file stream \a infile into the given
@@ -2728,7 +2833,8 @@ static Gan_Bool gan_read_dpx_tv_information_header ( char *acAlignedHeader, FILE
  * \sa gan_write_dpx_image_stream().
  */
 Gan_Image *
- gan_read_dpx_image_stream ( FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_dpx_image_stream(FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                           Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    char acHeader[BIG_BUFFER_SIZE], *acAlignedHeader;
    Gan_ImageFormat eFormat;
@@ -2757,7 +2863,7 @@ Gan_Image *
    }
 
    /* read the image information header */
-   if(!gan_read_dpx_image_information_header(acAlignedHeader, infile, bReversedEndianness, ui32ImageOffset,
+   if(!gan_read_dpx_image_information_header((ictrlstr == NULL) ? GAN_TRUE : ictrlstr->native_type, acAlignedHeader, infile, bReversedEndianness, ui32ImageOffset,
                                              &ui16Orientation, &ui32PixelsPerLine, &ui32LinesPerImageEle,
                                              &eFormat, &eType, &ui8BitSize, &bPacked, &ui32eolPadding, &ui32eoImagePadding,
                                              header))
@@ -2828,32 +2934,38 @@ Gan_Image *
    {
       case 1:
         image = pgiRead1BitDPXImageData(infile, ui32eolPadding, ui32eoImagePadding,
-                                        eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage);
+                                        eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage,
+                                        abortRequested, abortObj);
         break;
 
       case 8:
         image = pgiRead8BitDPXImageData(infile, ui32eolPadding, ui32eoImagePadding,
-                                        eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage);
+                                        eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage,
+                                        abortRequested, abortObj);
         break;
 
       case 10:
         image = pgiRead10BitDPXImageData(infile, bReversedEndianness, bPacked, ui32eolPadding, ui32eoImagePadding,
-                                         eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage);
+                                         eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage,
+                                         abortRequested, abortObj);
         break;
 
       case 12:
         image = pgiRead12BitDPXImageData(infile, bReversedEndianness, bPacked, ui32eolPadding, ui32eoImagePadding,
-                                         eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage);
+                                         eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage,
+                                         abortRequested, abortObj);
         break;
 
       case 16:
         image = pgiRead16BitDPXImageData(infile, bReversedEndianness, ui32eolPadding, ui32eoImagePadding,
-                                         eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage);
+                                         eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage,
+                                         abortRequested, abortObj);
         break;
 
       case 32:
         image = pgiRead32BitFloatDPXImageData(infile, bReversedEndianness, ui32eolPadding, ui32eoImagePadding,
-                                              eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage);
+                                              eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage,
+                                              abortRequested, abortObj);
         break;
 
       default:
@@ -2878,6 +2990,8 @@ Gan_Image *
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the DPX image with the in the file \a filename into the given
@@ -2887,7 +3001,8 @@ Gan_Image *
  * \sa gan_write_dpx_image().
  */
 Gan_Image *
- gan_read_dpx_image ( const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_dpx_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                    Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
    Gan_Image *result;
@@ -2901,7 +3016,7 @@ Gan_Image *
       return NULL;
    }
 
-   result = gan_read_dpx_image_stream ( infile, image, ictrlstr, header );
+   result = gan_read_dpx_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
    fclose(infile);
    return result;
 }
@@ -2915,7 +3030,7 @@ Gan_Image *
  */
 void gan_initialise_dpx_header_struct(Gan_DPXHeaderStruct *octrlstr, Gan_ImageFormat image_format, Gan_Type type)
 {
-   memset(octrlstr, 0, sizeof(Gan_DPXHeaderStruct));
+   memset(octrlstr, 0xff, sizeof(Gan_DPXHeaderStruct));
    octrlstr->generic.encryption_key = 0xffffffff;
    switch(type)
    {

@@ -388,7 +388,7 @@ Gan_Image *
       else
       {
          /* pixel data for this image is provided */
-         gan_err_test_ptr ( pix_data_size >= height*sizeof(GAN_PIXEL), "gan_image_form_gen_?", GAN_ERROR_INCOMPATIBLE, "data array not large enough" );
+         gan_err_test_ptr ( pix_data_size >= height*stride, "gan_image_form_gen_?", GAN_ERROR_INCOMPATIBLE, "data array not large enough" );
 
          /* set pixel data pointer in image */
          img->pix_data_ptr = (unsigned char *) pix_data;

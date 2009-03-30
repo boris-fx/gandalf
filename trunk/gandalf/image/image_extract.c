@@ -1561,12 +1561,24 @@ static Gan_Image *
         {
            Gan_RGBPixel_ui8 rgbPix;
 
+           case GAN_BOOL:
+             for ( r=0; r < height; r++ )
+                for ( c=0; c < width; c++ )
+                {
+                   if(gan_image_get_pix_b(grey, r0s+r, c0s+c))
+                      rgbPix.R = rgbPix.G = rgbPix.B = 0xff;
+                   else
+                      rgbPix.R = rgbPix.G = rgbPix.B = 0;
+                      
+                   gan_image_set_pix_rgb_ui8 ( rgb, r0d+r, c0d+c, &rgbPix );
+                }
+             break;
+
            case GAN_UINT8:
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                       gan_image_get_pix_gl_ui8 ( grey, r0s+r, c0s+c );
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_image_get_pix_gl_ui8 ( grey, r0s+r, c0s+c );
                    gan_image_set_pix_rgb_ui8 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1575,9 +1587,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_ui16_to_ui8(gan_image_get_pix_gl_ui16 (grey,
-                                                               r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_ui16_to_ui8(gan_image_get_pix_gl_ui16 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui8 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1586,9 +1596,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_ui32_to_ui8(gan_image_get_pix_gl_ui32 (grey,
-                                                               r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_ui32_to_ui8(gan_image_get_pix_gl_ui32 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui8 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1597,9 +1605,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_f32_to_ui8(gan_image_get_pix_gl_f32 (grey,
-                                                             r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_f32_to_ui8(gan_image_get_pix_gl_f32 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui8 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1608,9 +1614,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_f64_to_ui8(gan_image_get_pix_gl_f64 (grey,
-                                                             r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_f64_to_ui8(gan_image_get_pix_gl_f64 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui8 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1628,13 +1632,24 @@ static Gan_Image *
         {
            Gan_RGBPixel_ui16 rgbPix;
 
+           case GAN_BOOL:
+             for ( r=0; r < height; r++ )
+                for ( c=0; c < width; c++ )
+                {
+                   if(gan_image_get_pix_b(grey, r0s+r, c0s+c))
+                      rgbPix.R = rgbPix.G = rgbPix.B = 0xffff;
+                   else
+                      rgbPix.R = rgbPix.G = rgbPix.B = 0;
+                      
+                   gan_image_set_pix_rgb_ui16 ( rgb, r0d+r, c0d+c, &rgbPix );
+                }
+             break;
+
            case GAN_UINT8:
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_ui8_to_ui16(gan_image_get_pix_gl_ui8 (grey,
-                                                               r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_ui8_to_ui16(gan_image_get_pix_gl_ui8 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui16 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1643,8 +1658,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_image_get_pix_gl_ui16 ( grey, r0s+r, c0s+c);
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_image_get_pix_gl_ui16 ( grey, r0s+r, c0s+c);
                    gan_image_set_pix_rgb_ui16 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1653,9 +1667,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_ui32_to_ui16(gan_image_get_pix_gl_ui32 (grey,
-                                                               r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_ui32_to_ui16(gan_image_get_pix_gl_ui32 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui16 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1664,9 +1676,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_f32_to_ui16(gan_image_get_pix_gl_f32 (grey,
-                                                             r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_f32_to_ui16(gan_image_get_pix_gl_f32 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui16 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1675,17 +1685,14 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_f64_to_ui16(gan_image_get_pix_gl_f64 (grey,
-                                                             r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_f64_to_ui16(gan_image_get_pix_gl_f64 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui16 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
              
            default:
              gan_err_flush_trace();
-             gan_err_register ( "extract_grey_to_rgb",
-                                GAN_ERROR_NOT_IMPLEMENTED, "" );
+             gan_err_register ( "extract_grey_to_rgb", GAN_ERROR_NOT_IMPLEMENTED, "" );
              return NULL;
         }
         break;
@@ -1699,8 +1706,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_image_get_pix_gl_i32 ( grey, r0s+r, c0s+c );
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_image_get_pix_gl_i32 ( grey, r0s+r, c0s+c );
                    gan_image_set_pix_rgb_i32 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1709,8 +1715,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_f32_to_i32(gan_image_get_pix_gl_f32 (grey, r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_f32_to_i32(gan_image_get_pix_gl_f32 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_i32 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1719,8 +1724,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_f64_to_i32(gan_image_get_pix_gl_f64 (grey, r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_f64_to_i32(gan_image_get_pix_gl_f64 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_i32 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1741,8 +1745,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_ui8_to_ui32(gan_image_get_pix_gl_ui8 (grey, r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_ui8_to_ui32(gan_image_get_pix_gl_ui8 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui32 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1751,8 +1754,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_ui16_to_ui32(gan_image_get_pix_gl_ui16 (grey, r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_ui16_to_ui32(gan_image_get_pix_gl_ui16 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui32 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1761,8 +1763,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_image_get_pix_gl_ui32 ( grey, r0s+r, c0s+c );
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_image_get_pix_gl_ui32 ( grey, r0s+r, c0s+c );
                    gan_image_set_pix_rgb_ui32 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
@@ -1781,16 +1782,14 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_f64_to_ui32(gan_image_get_pix_gl_f64 (grey, r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_f64_to_ui32(gan_image_get_pix_gl_f64 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_ui32 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;
              
            default:
              gan_err_flush_trace();
-             gan_err_register ( "extract_grey_to_rgb",
-                                GAN_ERROR_NOT_IMPLEMENTED, "" );
+             gan_err_register ( "extract_grey_to_rgb", GAN_ERROR_NOT_IMPLEMENTED, "" );
              return NULL;
         }
         break;
@@ -1804,8 +1803,7 @@ static Gan_Image *
              for ( r=0; r < height; r++ )
                 for ( c=0; c < width; c++ )
                 {
-                   rgbPix.R = rgbPix.G = rgbPix.B =
-                   gan_pixel_ui8_to_f32(gan_image_get_pix_gl_ui8 (grey, r0s+r, c0s+c));
+                   rgbPix.R = rgbPix.G = rgbPix.B = gan_pixel_ui8_to_f32(gan_image_get_pix_gl_ui8 (grey, r0s+r, c0s+c));
                    gan_image_set_pix_rgb_f32 ( rgb, r0d+r, c0d+c, &rgbPix );
                 }
              break;

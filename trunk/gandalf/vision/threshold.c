@@ -28,7 +28,6 @@
 
 #include "threshold.h"
 #include <gandalf/image/image_defs.h>
-#include <gandalf/image/image_gl_uchar.h>
 #include <math.h>
 #include <float.h>
 #include "bright_feature.h"

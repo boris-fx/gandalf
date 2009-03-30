@@ -33,6 +33,7 @@
 #include <gandalf/image/image_bit.h>
 #include <gandalf/image/image_gl_uint8.h>
 #include <gandalf/image/image_rgb_uint8.h>
+#include <gandalf/image/image_rgba_uint8.h>
 #include <gandalf/image/image_extract.h>
 #include <gandalf/common/misc_error.h>
 
@@ -100,6 +101,8 @@ Gan_Bool gan_image_is_jpeg(const unsigned char *magic_string, size_t length)
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the JPEG image from the file stream \a infile into the given \a image.
@@ -110,7 +113,8 @@ Gan_Bool gan_image_is_jpeg(const unsigned char *magic_string, size_t length)
  */
 Gan_Image *
  gan_read_jpeg_image_stream(FILE *infile, Gan_Image *image,
-                            const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+                            const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                            Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    struct jpeg_decompress_struct cinfo;
    struct my_error_mgr jerr;
@@ -143,6 +147,11 @@ Gan_Image *
       format = GAN_GREY_LEVEL_IMAGE;
       cinfo.out_color_space = JCS_GRAYSCALE;
    }
+   else if ( cinfo.jpeg_color_space == JCS_YCCK)
+   {
+	   format = GAN_RGB_COLOUR_ALPHA_IMAGE;
+	   cinfo.out_color_space = JCS_CMYK;
+   }
    else
    {
       format = GAN_RGB_COLOUR_IMAGE;
@@ -151,7 +160,7 @@ Gan_Image *
 
    jpeg_calc_output_dimensions(&cinfo);
 
-   if ( cinfo.output_components != 1 && cinfo.output_components != 3 )
+   if ( cinfo.output_components != 1 && cinfo.output_components != 3 && cinfo.output_components != 4 )
    {
       gan_err_flush_trace();
       gan_err_register ( "gan_read_jpeg_image_stream", GAN_ERROR_INCOMPATIBLE, "" );
@@ -251,6 +260,10 @@ Gan_Image *
                  rowptr[0] = (JSAMPROW)aui8Buf;
 
               (void) jpeg_read_scanlines ( &cinfo, rowptr, (JDIMENSION)1);
+
+              /* check for abort every 10 rows */
+              if(abortRequested != NULL && (cinfo.output_scanline % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                 break;
            }
 
            free(aui8Buf);
@@ -261,6 +274,10 @@ Gan_Image *
            {
               rowptr[0] = (JSAMPROW)gan_image_get_pixptr_gl_ui8(image, flip ? (cinfo.output_height-cinfo.output_scanline-1) : cinfo.output_scanline, 0);
               (void) jpeg_read_scanlines ( &cinfo, rowptr, (JDIMENSION)1);
+
+              /* check for abort every 10 rows */
+              if(abortRequested != NULL && (cinfo.output_scanline % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                 break;
            }
         }
 
@@ -289,6 +306,10 @@ Gan_Image *
                  rowptr[0] = (JSAMPROW)argbui8Buf;
 
               (void) jpeg_read_scanlines ( &cinfo, rowptr, (JDIMENSION)1);
+
+              /* check for abort every 10 rows */
+              if(abortRequested != NULL && (cinfo.output_scanline % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                 break;
            }
 
            free(argbui8Buf);
@@ -299,6 +320,56 @@ Gan_Image *
            {
               rowptr[0] = (JSAMPROW)gan_image_get_pixptr_rgb_ui8(image, flip ? (cinfo.output_height-cinfo.output_scanline-1) : cinfo.output_scanline, 0);
               (void) jpeg_read_scanlines ( &cinfo, rowptr, (JDIMENSION)1 );
+
+              /* check for abort every 10 rows */
+              if(abortRequested != NULL && (cinfo.output_scanline % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                 break;
+           }
+        }
+
+        break;
+
+      case GAN_RGB_COLOUR_ALPHA_IMAGE:
+        if(single_field)
+        {
+           Gan_RGBAPixel_ui8 *argbaui8Buf = gan_malloc_array(Gan_RGBAPixel_ui8, (size_t)cinfo.output_width);
+
+           if(argbaui8Buf == NULL)
+           {
+              gan_err_flush_trace();
+              gan_err_register_with_number ( "gan_read_jpeg_image_stream", GAN_ERROR_MALLOC_FAILED, "", (size_t)cinfo.output_width*sizeof(Gan_RGBAPixel_ui8) );
+              jpeg_finish_decompress(&cinfo);
+              jpeg_destroy_decompress(&cinfo);
+              return NULL;
+           }
+
+           while ( cinfo.output_scanline < cinfo.output_height )
+           {
+              /* only transfer even rows for upper field, or odd rows for upper field */
+              if((upper && ((unsigned int)cinfo.output_scanline % 2) == 0) || (!upper && ((unsigned int)cinfo.output_scanline % 2) == 1))
+                 rowptr[0] = (JSAMPROW)gan_image_get_pixptr_rgba_ui8(image, whole_image ? (flip ? (cinfo.output_height-cinfo.output_scanline-1) : cinfo.output_scanline) : (flip ? (uiInternalHeight-(unsigned int)cinfo.output_scanline/2-1) : (unsigned int)cinfo.output_scanline/2), 0);
+              else
+                 rowptr[0] = (JSAMPROW)argbaui8Buf;
+
+              (void) jpeg_read_scanlines ( &cinfo, rowptr, (JDIMENSION)1);
+
+              /* check for abort every 10 rows */
+              if(abortRequested != NULL && (cinfo.output_scanline % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                 break;
+           }
+
+           free(argbaui8Buf);
+        }
+        else
+        {
+           while ( cinfo.output_scanline < cinfo.output_height )
+           {
+              rowptr[0] = (JSAMPROW)gan_image_get_pixptr_rgba_ui8(image, flip ? (cinfo.output_height-cinfo.output_scanline-1) : cinfo.output_scanline, 0);
+              (void) jpeg_read_scanlines ( &cinfo, rowptr, (JDIMENSION)1 );
+
+              /* check for abort every 10 rows */
+              if(abortRequested != NULL && (cinfo.output_scanline % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                 break;
            }
         }
 
@@ -312,6 +383,36 @@ Gan_Image *
         return NULL;
    }
 
+   // apply CMYK --> RGB conversion
+   if(cinfo.jpeg_color_space == JCS_YCCK)
+   {
+      int r, c;
+      Gan_RGBAPixel_ui8 *pix;
+
+      for(r=(int)image->height-1; r>=0; r--)
+         for(c=(int)image->width-1, pix = gan_image_get_pixptr_rgba_ui8(image, r, 0); c>=0; c--, pix++)
+         {
+#if 0
+            // first un-invert the values
+            pix->R = 0xff-pix->R;
+            pix->G = 0xff-pix->G;
+            pix->B = 0xff-pix->B;
+            pix->A = 0xff-pix->A;
+
+            // now convert
+            pix->R = 0xff - (gan_uint8)((unsigned int)pix->R + (unsigned int)pix->A - ((unsigned int)pix->R*pix->A)/0xff);
+            pix->G = 0xff - (gan_uint8)((unsigned int)pix->G + (unsigned int)pix->A - ((unsigned int)pix->G*pix->A)/0xff);
+            pix->B = 0xff - (gan_uint8)((unsigned int)pix->B + (unsigned int)pix->A - ((unsigned int)pix->B*pix->A)/0xff);
+#else
+            // convert
+            pix->R = ((unsigned int)pix->R*pix->A)/0xff;
+            pix->G = ((unsigned int)pix->G*pix->A)/0xff;
+            pix->B = ((unsigned int)pix->B*pix->A)/0xff;
+#endif
+            pix->A = 0xff;
+         }
+   }
+   
    jpeg_finish_decompress(&cinfo);
    jpeg_destroy_decompress(&cinfo);
    return image;
@@ -323,6 +424,8 @@ Gan_Image *
  * \param image The image structure to read the image data into or NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the JPEG image stored in the file \a filename into the given \a image.
@@ -332,8 +435,9 @@ Gan_Image *
  * \sa gan_write_jpeg_image().
  */
 Gan_Image *
- gan_read_jpeg_image ( const char *filename, Gan_Image *image,
-                       const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_jpeg_image(const char *filename, Gan_Image *image,
+                     const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                     Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
    Gan_Image *result;
@@ -347,7 +451,7 @@ Gan_Image *
       return NULL;
    }
 
-   result = gan_read_jpeg_image_stream ( infile, image, ictrlstr, header );
+   result = gan_read_jpeg_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
    fclose(infile);
    return result;
 }
@@ -579,7 +683,7 @@ Gan_Bool
             /* read temporary image */
             Gan_ImageHeaderStruct header;
 
-            Gan_Image* pimage = gan_read_jpeg_image_stream ( outfile, NULL, NULL, &header );
+            Gan_Image* pimage = gan_read_jpeg_image_stream(outfile, NULL, NULL, &header, NULL, NULL); /* abortRequested, abortObj */
             fclose(outfile);
 
             if(pimage != NULL)

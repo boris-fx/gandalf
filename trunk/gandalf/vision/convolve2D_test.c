@@ -69,6 +69,25 @@ static Gan_Bool run_test(void)
 {  
    // Generation of a 3x3 convolution mask.
    Gan_Matrix *mat = gan_mat_alloc(3,3);
+   Gan_Mask2D *mask;
+   Gan_Image* img_gl_uc;
+   Gan_Image* img_gl_i;
+   Gan_Pixel Pixel;
+   int i,j;
+   int v = 0;
+   Gan_Image *conv_gl_uc = NULL;
+   Gan_Image *conv_gl_i = NULL;
+   Gan_Image* img_gl_d = NULL;
+   Gan_Image* img_gl_f = NULL;
+   Gan_Image *conv_gl_d = NULL;
+   Gan_Image *conv_gl_f = NULL;
+   Gan_Image* img_gl_ui = NULL;
+   Gan_Image *conv_gl_ui = NULL;
+   Gan_Image* img_rgb_uc = NULL;
+   Gan_Image *conv_rgb_uc = NULL;
+   Gan_Image* img_rgb_d = NULL;
+   Gan_Image *conv_rgb_d = NULL;
+
    mat = gan_mat_fill_zero_q(mat,3,3);
    gan_mat_set_el(mat,0,0,1./9.);
    gan_mat_set_el(mat,1,0,1./9.);
@@ -80,7 +99,6 @@ static Gan_Bool run_test(void)
    gan_mat_set_el(mat,1,2,1./9.);
    gan_mat_set_el(mat,2,2,1./9.);
 
-   Gan_Mask2D *mask;
    mask = gan_mask2D_alloc_data (GAN_MASK2D_GENERIC,mat,3,3);
 
    /////////////////////////////////////
@@ -89,15 +107,12 @@ static Gan_Bool run_test(void)
    printf("==============================================================\n");
    printf("Testing 2D convolution with an unsigned char grey level image.\n");
    printf("==============================================================\n");
-   Gan_Image* img_gl_uc = gan_image_alloc_gl_uc(4,4);
-   Gan_Pixel Pixel;
 
    Pixel.format = GAN_GREY_LEVEL_IMAGE;
    Pixel.type = GAN_UCHAR;
 
    // Value insertion
-   int i,j;
-   int v = 0;
+   img_gl_uc = gan_image_alloc_gl_uc(4,4);
    printf("\nImage to convolve:\n");
    for (i=0; i<img_gl_uc->height; i++) 
    {
@@ -106,7 +121,7 @@ static Gan_Bool run_test(void)
       {
          Pixel.data.gl.uc = v*10;
          gan_image_set_pix (img_gl_uc,i,j,&Pixel);
-	 printf("%d \t",Pixel.data.gl.uc);
+         printf("%d \t",Pixel.data.gl.uc);
          v++;
       }
       printf(" ]\n");
@@ -116,7 +131,6 @@ static Gan_Bool run_test(void)
    printMask (mask);
 
    // Convolution
-   Gan_Image *conv_gl_uc = NULL;
    conv_gl_uc = gan_image_convolve2D_s (img_gl_uc,GAN_ALL_CHANNELS,mask);
  
    // Result is output to screen
@@ -138,8 +152,8 @@ static Gan_Bool run_test(void)
    printf("\n\n==============================================================\n");
    printf("Testing 2D convolution with an int grey level image.\n");
    printf("==============================================================\n");
- 
-   Gan_Image* img_gl_i = gan_image_alloc_gl_i(4,4);
+
+   img_gl_i = gan_image_alloc_gl_i(4,4);
    Pixel.type = GAN_INT;
 
    // Value insertion
@@ -152,7 +166,7 @@ static Gan_Bool run_test(void)
       {
          Pixel.data.gl.i = v*10;
          gan_image_set_pix (img_gl_i,i,j,&Pixel);
-	 printf("%d \t",Pixel.data.gl.i);
+         printf("%d \t",Pixel.data.gl.i);
          v++;
       }
       printf(" ]\n");
@@ -162,7 +176,6 @@ static Gan_Bool run_test(void)
    printMask(mask);
 
    // Convolution
-   Gan_Image *conv_gl_i = NULL;
    conv_gl_i = gan_image_convolve2D_s (img_gl_i,GAN_ALL_CHANNELS,mask);
  
    // Result is output to screen
@@ -184,7 +197,7 @@ static Gan_Bool run_test(void)
    printf("Testing 2D convolution with a double grey level image.\n");
    printf("==============================================================\n");
  
-   Gan_Image* img_gl_d = gan_image_alloc_gl_d(4,4);
+   img_gl_d = gan_image_alloc_gl_d(4,4);
    Pixel.type = GAN_DOUBLE;
 
    // Value insertion
@@ -207,7 +220,6 @@ static Gan_Bool run_test(void)
    printMask(mask);
 
    // Convolution
-   Gan_Image *conv_gl_d = NULL;
    conv_gl_d = gan_image_convolve2D_s (img_gl_d,GAN_ALL_CHANNELS,mask);
  
    // Result is output to screen
@@ -229,7 +241,7 @@ static Gan_Bool run_test(void)
    printf("Testing 2D convolution with a float grey level image.\n");
    printf("==============================================================\n");
  
-   Gan_Image* img_gl_f = gan_image_alloc_gl_f(4,4);
+   img_gl_f = gan_image_alloc_gl_f(4,4);
    Pixel.type = GAN_FLOAT;
 
    // Value insertion
@@ -252,7 +264,6 @@ static Gan_Bool run_test(void)
    printMask(mask);
 
    // Convolution
-   Gan_Image *conv_gl_f = NULL;
    conv_gl_f = gan_image_convolve2D_s (img_gl_f,GAN_ALL_CHANNELS,mask);
  
    // Result is output to screen
@@ -274,7 +285,7 @@ static Gan_Bool run_test(void)
    printf("Testing 2D convolution with an unsigned int grey level image.\n");
    printf("==============================================================\n");
  
-   Gan_Image* img_gl_ui = gan_image_alloc_gl_ui(4,4);
+   img_gl_ui = gan_image_alloc_gl_ui(4,4);
    Pixel.type = GAN_UINT;
 
    // Value insertion
@@ -297,7 +308,6 @@ static Gan_Bool run_test(void)
    printMask(mask);
 
    // Convolution
-   Gan_Image *conv_gl_ui = NULL;
    conv_gl_ui = gan_image_convolve2D_s (img_gl_ui,GAN_ALL_CHANNELS,mask);
  
    // Result is output to screen
@@ -318,7 +328,7 @@ static Gan_Bool run_test(void)
    printf("\n\n==============================================================\n");
    printf("Testing 2D convolution with an unsigned char RGB level image.\n");
    printf("==============================================================\n");
-   Gan_Image* img_rgb_uc = gan_image_alloc_rgb_uc(4,4);
+   img_rgb_uc = gan_image_alloc_rgb_uc(4,4);
 
    Pixel.format = GAN_RGB_COLOUR_IMAGE;
    Pixel.type = GAN_UCHAR;
@@ -346,7 +356,6 @@ static Gan_Bool run_test(void)
    printMask(mask);
 
    // RGB Convolution
-   Gan_Image *conv_rgb_uc = NULL;
    conv_rgb_uc = gan_image_convolve2D_s (img_rgb_uc,GAN_ALL_CHANNELS,mask);
  
    // Result is output to screen
@@ -416,7 +425,7 @@ static Gan_Bool run_test(void)
    printf("\n\n==============================================================\n");
    printf("Testing 2D convolution with a double RGB level image.\n");
    printf("==============================================================\n");
-   Gan_Image* img_rgb_d = gan_image_alloc_rgb_d(4,4);
+   img_rgb_d = gan_image_alloc_rgb_d(4,4);
 
    Pixel.format = GAN_RGB_COLOUR_IMAGE;
    Pixel.type = GAN_DOUBLE;
@@ -444,7 +453,6 @@ static Gan_Bool run_test(void)
    printMask(mask);
 
    // RGB Convolution
-   Gan_Image *conv_rgb_d = NULL;
    conv_rgb_d = gan_image_convolve2D_s (img_rgb_d,GAN_ALL_CHANNELS,mask);
  
    // Result is output to screen

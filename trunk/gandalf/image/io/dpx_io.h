@@ -289,32 +289,38 @@ GANDALF_API Gan_Image *pgiRead1BitDPXImageData(FILE* pfInFile,
                                                gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                                                Gan_ImageFormat eFormat, Gan_Type eType,
                                                gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                                               Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage);
+                                               Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                                               Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API Gan_Image *pgiRead8BitDPXImageData(FILE* pfInFile,
                                                gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                                                Gan_ImageFormat eFormat, Gan_Type eType,
                                                gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                                               Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage);
+                                               Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                                               Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API Gan_Image *pgiRead10BitDPXImageData(FILE* pfInFile, Gan_Bool bReversedEndianness, Gan_Bool bPacked,
                                                 gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                                                 Gan_ImageFormat eFormat, Gan_Type eType,
                                                 gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                                                Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage);
+                                                Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                                                Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API Gan_Image *pgiRead12BitDPXImageData(FILE* pfInFile, Gan_Bool bReversedEndianness, Gan_Bool bPacked,
                                                 gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                                                 Gan_ImageFormat eFormat, Gan_Type eType,
                                                 gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                                                Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage);
+                                                Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                                                Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API Gan_Image *pgiRead16BitDPXImageData(FILE* pfInFile, Gan_Bool bReversedEndianness,
                                                 gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                                                 Gan_ImageFormat eFormat, Gan_Type eType,
                                                 gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                                                Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage);
+                                                Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                                                Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API Gan_Image *pgiRead32BitFloatDPXImageData(FILE* pfInFile, Gan_Bool bReversedEndianness,
                                                      gan_uint32 ui32eolPadding, gan_uint32 ui32eoImagePadding,
                                                      Gan_ImageFormat eFormat, Gan_Type eType,
                                                      gan_uint32 ui32PixelsPerLine, gan_uint32 ui32LinesPerImageEle,
-                                                     Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage);
+                                                     Gan_Image* pgiImage, Gan_Bool bFlip, Gan_Bool bSingleField, Gan_Bool bUpper, Gan_Bool bWholeImage,
+                                                     Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API gan_uint32 ui32DPXFileSize(unsigned int uiImageDataOffset,
                            Gan_ImageFormat eFormat, gan_uint8 ui8BitSize, Gan_Bool bPacked, unsigned int uiHeight, unsigned int uiWidth,
                            gan_uint32* pui32eolPadding);
@@ -338,10 +344,12 @@ struct Gan_ImageWriteControlStruct;
 
 /* Prototypes for public functions in dpx_io.c */
 GANDALF_API Gan_Bool gan_image_is_dpx(const unsigned char *magic_string, size_t length);
-GANDALF_API Gan_Image *gan_read_dpx_image_stream ( FILE *infile, Gan_Image *image,
-                                                   const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header );
-GANDALF_API Gan_Image *gan_read_dpx_image ( const char *filename, Gan_Image *image,
-                                            const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header );
+GANDALF_API Gan_Image *gan_read_dpx_image_stream (FILE *infile, Gan_Image *image,
+                                                  const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                                                  Gan_Bool (*abortRequested)(void*), void* abortObj);
+GANDALF_API Gan_Image *gan_read_dpx_image(const char *filename, Gan_Image *image,
+                                          const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                                          Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API void       gan_initialise_dpx_header_struct(Gan_DPXHeaderStruct *octrlstr, Gan_ImageFormat image_format, Gan_Type type);
 GANDALF_API Gan_Bool   gan_write_dpx_image_stream ( FILE *outfile, const Gan_Image *image, Gan_Bool new_file, const struct Gan_ImageWriteControlStruct *octrlstr );
 GANDALF_API Gan_Bool   gan_write_dpx_image ( const char *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr );

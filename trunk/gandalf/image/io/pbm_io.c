@@ -86,6 +86,8 @@ Gan_Bool gan_image_is_pbm(const unsigned char *magic_string, size_t length)
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the PBM image from the given file stream \a infile into the given
@@ -95,7 +97,8 @@ Gan_Bool gan_image_is_pbm(const unsigned char *magic_string, size_t length)
  * \sa gan_write_pbm_image_stream().
  */
 Gan_Image *
- gan_read_pbm_image_stream ( FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_pbm_image_stream(FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                           Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    char s[80]="";
    char *signature = "P4\n";
@@ -218,6 +221,10 @@ Gan_Image *
             if ( ucarr[iCol/8] & (0x80 >> (iCol % 8)) )
                gan_image_set_pix_b ( image, flip ? (iHeight-iRow-1) : iRow, iCol, GAN_TRUE );
       }
+
+      /* check for abort every 10 rows */
+      if(abortRequested != NULL && (iRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+         break;
    }
 
    /* success */
@@ -231,6 +238,8 @@ Gan_Image *
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the PBM image with the in the file \a filename into the given
@@ -240,7 +249,8 @@ Gan_Image *
  * \sa gan_write_pbm_image().
  */
 Gan_Image *
- gan_read_pbm_image ( const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_pbm_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                    Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
    Gan_Image *result;
@@ -255,7 +265,7 @@ Gan_Image *
       return NULL;
    }
 
-   result = gan_read_pbm_image_stream ( infile, image, ictrlstr, header );
+   result = gan_read_pbm_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
    fclose(infile);
    return result;
 }

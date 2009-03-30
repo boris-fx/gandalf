@@ -482,7 +482,7 @@ Gan_Matrix *
    {
       long nel = A->rows*A->cols, onei = 1;
 
-      dcopy_ ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_DCOPY ( &nel, A->data, &onei, B->data, &onei );
    }
 #else   
    if ( !gan_dcopy ( A->rows*A->cols, A->data, 1, B->data, 1 ) )
@@ -532,8 +532,8 @@ Gan_Matrix *
    {
       long onei = 1;
       
-      dcopy_ ( &nel, A->data, &onei, B->data, &onei );
-      dscal_ ( &nel, &a, B->data, &onei );
+      BLAS_DCOPY ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_DSCAL ( &nel, &a, B->data, &onei );
    }
 #else   
    if ( !gan_dcopy ( nel, A->data, 1, B->data, 1 ) ||
@@ -653,11 +653,11 @@ Gan_Matrix *
 
       if ( A->cols <= A->rows )
          for ( i = (long)B->cols-1; i >= 0; i-- )
-            dcopy_ ( (long *)&B->rows, &A->data[i], (long *)&A->rows,
+            BLAS_DCOPY ( (long *)&B->rows, &A->data[i], (long *)&A->rows,
                      &B->data[i*B->rows], &onei );
       else
          for ( i = (long)B->rows-1; i >= 0; i-- )
-            dcopy_ ( (long *)&B->cols, &A->data[i*A->rows], &onei,
+            BLAS_DCOPY ( (long *)&B->cols, &A->data[i*A->rows], &onei,
                      &B->data[i], (long *)&B->rows);
       
    }
@@ -738,15 +738,15 @@ Gan_Matrix *
       /* add matrix data C = A + B */
       if ( C == A )
          /* in-place operation A += B */
-         daxpy_ ( &nel, &onef, B->data, &onei, A->data, &onei );
+         BLAS_DAXPY ( &nel, &onef, B->data, &onei, A->data, &onei );
       else if ( C == B )
          /* in-place operation B += A */
-         daxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+         BLAS_DAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
       else
       {
          /* C = A + B */
-         dcopy_ ( &nel, A->data, &onei, C->data, &onei );
-         daxpy_ ( &nel, &onef, B->data, &onei, C->data, &onei );
+         BLAS_DCOPY ( &nel, A->data, &onei, C->data, &onei );
+         BLAS_DAXPY ( &nel, &onef, B->data, &onei, C->data, &onei );
       }
    }
 #else
@@ -941,20 +941,20 @@ Gan_Matrix *
       /* subtract matrix data C = A - B */
       if ( C == A )
          /* in-place operation A -= B */
-         daxpy_ ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
+         BLAS_DAXPY ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
       else if ( C == B )
       {
          /* in-place operation B = A - B */
          double onef = 1.0;
 
-         dscal_ ( &nel, &minus_onef, B->data, &onei );
-         daxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+         BLAS_DSCAL ( &nel, &minus_onef, B->data, &onei );
+         BLAS_DAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
       }
       else
       {
          /* C = A - B */
-         dcopy_ ( &nel, A->data, &onei, C->data, &onei );
-         daxpy_ ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
+         BLAS_DCOPY ( &nel, A->data, &onei, C->data, &onei );
+         BLAS_DAXPY ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
       }
    }
 #else
@@ -1136,11 +1136,11 @@ Gan_Matrix *
       double dOne = 1.0, dZero = 0.0;
       long onei = 1;
 
-      dgemm_ ( A_tr ? "T" : "N", B_tr ? "T" : "N",
-               (long *)&Crows, (long *)&Ccols, (long *)&common, &dOne,
-               A->data, (A->rows == 0) ? &onei : (long *)&A->rows,
-               B->data, (B->rows == 0) ? &onei : (long *)&B->rows, &dZero,
-               C->data, (C->rows == 0) ? &onei : (long *)&C->rows );
+      BLAS_DGEMM ( A_tr ? "T" : "N", B_tr ? "T" : "N",
+                   (long *)&Crows, (long *)&Ccols, (long *)&common, &dOne,
+                   A->data, (A->rows == 0) ? &onei : (long *)&A->rows,
+                   B->data, (B->rows == 0) ? &onei : (long *)&B->rows, &dZero,
+                   C->data, (C->rows == 0) ? &onei : (long *)&C->rows );
    }
 #else   
    if ( !gan_dgemm ( A_tr, B_tr, Crows, Ccols, common, 1.0,

@@ -109,11 +109,11 @@ typedef struct
  * Don't call this function directly. Use the macro gan_mask1D_form_data()
  * instead.
  */
-Gan_Mask2D *gan_mask2D_form_gen ( Gan_Mask2D *mask,
-                                  Gan_Mask2DFormat format, 
-                                  Gan_Matrix *data, 
-                                  unsigned int rows,
-                                  unsigned int cols);
+GANDALF_API Gan_Mask2D *gan_mask2D_form_gen ( Gan_Mask2D *mask,
+                                              Gan_Mask2DFormat format, 
+                                              Gan_Matrix *data, 
+                                              unsigned int rows,
+                                              unsigned int cols);
 
 
 /**
@@ -124,7 +124,7 @@ Gan_Mask2D *gan_mask2D_form_gen ( Gan_Mask2D *mask,
  * Copy 2D convolution mask from source mask to dest mask
  * \return #GAN_TRUE on success, #GAN_FALSE on failure.
  */
-Gan_Bool    gan_mask2D_copy_q ( Gan_Mask2D *source, Gan_Mask2D *dest );
+GANDALF_API Gan_Bool gan_mask2D_copy_q ( Gan_Mask2D *source, Gan_Mask2D *dest );
 
 
 /**
@@ -134,7 +134,7 @@ Gan_Bool    gan_mask2D_copy_q ( Gan_Mask2D *source, Gan_Mask2D *dest );
  * Free memory associated with 2D convolution mask.
  * \return #GAN_TRUE on success, #GAN_FALSE on failure.
  */
-Gan_Bool    gan_mask2D_free ( Gan_Mask2D *mask );
+GANDALF_API Gan_Bool gan_mask2D_free ( Gan_Mask2D *mask );
 
 /**
  * \brief Generates a 2D convolution mask from a grey-level image.
@@ -143,7 +143,7 @@ Gan_Bool    gan_mask2D_free ( Gan_Mask2D *mask );
  * Generates a 2D convolution mask from a grey-level image.
  * \return A 2D convolution mask identical to the image.
  */
-Gan_Mask2D* gan_mask2D_gen_from_Gan_Image (Gan_Image *img);
+GANDALF_API Gan_Mask2D* gan_mask2D_gen_from_Gan_Image (Gan_Image *img);
 
 /**
  * \brief Macro: Allocate and return a new 2D convolution mask.
@@ -157,7 +157,7 @@ Gan_Mask2D* gan_mask2D_gen_from_Gan_Image (Gan_Image *img);
 #ifdef GAN_GENERATE_DOCUMENTATION
 Gan_Mask2D *gan_mask2D_alloc ( Gan_Mask2DFormat format, 
                                unsigned int rows,
-			       unsigned int cols);
+                               unsigned int cols);
 #else
 #define gan_mask2D_alloc(f,r,c) gan_mask2D_form_gen(NULL,f,NULL,r,c)
 #endif
@@ -174,7 +174,7 @@ Gan_Mask2D *gan_mask2D_alloc ( Gan_Mask2DFormat format,
 #ifdef GAN_GENERATE_DOCUMENTATION
 Gan_Mask2D *gan_mask2D_alloc_data ( Gan_Mask2DFormat format, 
                                     Gan_Matrix *data, unsigned int rows,
-				    unsigned int cols );
+                                    unsigned int cols );
 #else
 #define gan_mask2D_alloc_data(f,d,r,c) gan_mask2D_form_gen(NULL,f,d,r,c)
 #endif
@@ -192,7 +192,7 @@ Gan_Mask2D *gan_mask2D_alloc_data ( Gan_Mask2DFormat format,
 Gan_Mask2D *gan_mask2D_form ( Gan_Mask2D *mask,
                               Gan_Mask2DFormat format, 
                               unsigned int rows,
-			      unsigned int cols);
+                              unsigned int cols);
 #else
 #define gan_mask2D_form(m,f,r,c) gan_mask2D_form_gen(m,f,NULL,r,c)
 #endif
@@ -211,7 +211,7 @@ Gan_Mask2D *gan_mask2D_form ( Gan_Mask2D *mask,
 Gan_Mask2D *gan_mask2D_form_data ( Gan_Mask2D *mask,
                                    Gan_Mask2DFormat format, 
                                    Gan_Matrix *data, unsigned int rows,
-				   unsigned int cols);
+                                   unsigned int cols);
 #else
 #define gan_mask2D_form_data(mask,format,data,rows,cols)\
            gan_mask2D_form_gen(mask,format,data,rows,cols)

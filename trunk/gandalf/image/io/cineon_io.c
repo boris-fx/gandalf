@@ -111,6 +111,8 @@ Gan_Bool gan_image_is_cineon(const unsigned char *magic_string, size_t length)
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the Cineon image from the given file stream \a infile into the given
@@ -120,7 +122,8 @@ Gan_Bool gan_image_is_cineon(const unsigned char *magic_string, size_t length)
  * \sa gan_write_cineon_image_stream().
  */
 Gan_Image *
- gan_read_cineon_image_stream ( FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_cineon_image_stream(FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                              Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    char acHeader[BIG_BUFFER_SIZE], *acAlignedHeader;
    Gan_ImageFormat eFormat;
@@ -314,7 +317,8 @@ Gan_Image *
    {
       case 8:
         image = pgiRead8BitDPXImageData(infile, ui32eolPadding, ui32eoImagePadding,
-                                        eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage);
+                                        eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage,
+                                        abortRequested, abortObj);
         if(image == NULL)
         {
            gan_err_register ( "gan_read_cineon_image_stream", GAN_ERROR_FAILURE, "" );
@@ -325,7 +329,8 @@ Gan_Image *
 
       case 10:
         image = pgiRead10BitDPXImageData(infile, bReversedEndianness, bPacked, ui32eolPadding, ui32eoImagePadding,
-                                         eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage);
+                                         eFormat, eType, ui32PixelsPerLine, ui32LinesPerImageEle, image, bFlip, bSingleField, bUpper, bWholeImage,
+                                         abortRequested, abortObj);
         if(image == NULL)
         {
            gan_err_register ( "gan_read_cineon_image_stream", GAN_ERROR_FAILURE, "" );
@@ -350,6 +355,8 @@ Gan_Image *
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the Cineon image with the in the file \a filename into the given
@@ -359,7 +366,8 @@ Gan_Image *
  * \sa gan_write_cineon_image().
  */
 Gan_Image *
- gan_read_cineon_image ( const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_cineon_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                       Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
    Gan_Image *result;
@@ -373,7 +381,7 @@ Gan_Image *
       return NULL;
    }
 
-   result = gan_read_cineon_image_stream ( infile, image, ictrlstr, header );
+   result = gan_read_cineon_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
    fclose(infile);
    return result;
 }

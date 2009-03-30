@@ -203,7 +203,7 @@ static Gan_SquMatrix_f *
    {
       long nel = A->size*(A->size+1)/2, onei = 1;
 
-      scopy_ ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_SCOPY ( &nel, A->data, &onei, B->data, &onei );
    }
 #else
    if ( !gan_scopy ( A->size*(A->size+1)/2, A->data, 1, B->data, 1 ) )
@@ -242,8 +242,8 @@ static Gan_SquMatrix_f *
    {
       long nel = A->size*(A->size+1)/2, onei = 1;
 
-      if(A!=B) scopy_ ( &nel, A->data, &onei, B->data, &onei );
-      sscal_ ( &nel, &a, B->data, &onei );
+      if(A!=B) BLAS_SCOPY ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_SSCAL ( &nel, &a, B->data, &onei );
    }
 #else
    if ( (A!=B && !gan_scopy ( A->size*(A->size+1)/2, A->data, 1, B->data, 1 )) ||
@@ -299,15 +299,15 @@ static Gan_SquMatrix_f *
          float onef = 1.0F;
          if ( C == A )
             /* in-place operation A += B */
-            saxpy_ ( &nel, &onef, B->data, &onei, A->data, &onei );
+            BLAS_SAXPY ( &nel, &onef, B->data, &onei, A->data, &onei );
          else if ( C == B )
             /* in-place operation B += A */
-            saxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+            BLAS_SAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
          else
          {
             /* C = A + B */
-            scopy_ ( &nel, A->data, &onei, C->data, &onei );
-            saxpy_ ( &nel, &onef, B->data, &onei, C->data, &onei );
+            BLAS_SCOPY ( &nel, A->data, &onei, C->data, &onei );
+            BLAS_SAXPY ( &nel, &onef, B->data, &onei, C->data, &onei );
          }
       }
 #else
@@ -419,20 +419,20 @@ static Gan_SquMatrix_f *
       /* subtract matrix data */
       if ( C == A )
          /* in-place operation A -= B */
-         saxpy_ ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
+         BLAS_SAXPY ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
       else if ( C == B )
       {
          /* in-place operation B = A - B */
          float onef = 1.0F;
 
-         sscal_ ( &nel, &minus_onef, B->data, &onei );
-         saxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+         BLAS_SSCAL ( &nel, &minus_onef, B->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
       }
       else
       {
          /* C = A - B */
-         scopy_ ( &nel, A->data, &onei, C->data, &onei );
-         saxpy_ ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
+         BLAS_SCOPY ( &nel, A->data, &onei, C->data, &onei );
+         BLAS_SAXPY ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
       }
    }
 #else
@@ -515,7 +515,7 @@ static Gan_Vector_f *
       long onei = 1;
 
       /* compute matrix/vector product */
-      sspmv_ ( "U", (long *)&A->size, &onef, A->data, x->data, &onei, &zerof,
+      BLAS_SSPMV ( "U", (long *)&A->size, &onef, A->data, x->data, &onei, &zerof,
                y->data, &onei );
    }
 #else
@@ -583,13 +583,13 @@ static Gan_Matrix_f *
       if ( B_tr )
          /* multiply matrix data C = A*B^T */
          for ( j = 0; j < Ccols; j++ )
-            sspmv_ ( "U", (long *)&A->size, &onef, A->data,
+            BLAS_SSPMV ( "U", (long *)&A->size, &onef, A->data,
                      &B->data[j], (long *)&B->rows,
                      &zerof, &C->data[j*C->rows], &onei );
       else
          /* multiply matrix data C = A*B */
          for ( j = 0; j < Ccols; j++ )
-            sspmv_ ( "U", (long *)&A->size, &onef, A->data,
+            BLAS_SSPMV ( "U", (long *)&A->size, &onef, A->data,
                      &B->data[j*B->rows], &onei,
                      &zerof, &C->data[j*C->rows], &onei );
    }
@@ -677,15 +677,15 @@ static Gan_Matrix_f *
       if ( B_tr )
          /* multiply matrix data C = B^T*A */
          for ( i = 0; i < Crows; i++ )
-            sspmv_ ( "U", (long *)&A->size, &onef, A->data,
-                     &B->data[i*B->rows], &onei,
-                     &zerof, &C->data[i], (long *)&C->rows );
+            BLAS_SSPMV ( "U", (long *)&A->size, &onef, A->data,
+                         &B->data[i*B->rows], &onei,
+                         &zerof, &C->data[i], (long *)&C->rows );
       else
          /* multiply matrix data C = B*A */
          for ( i = 0; i < Crows; i++ )
-            sspmv_ ( "U", (long *)&A->size, &onef, A->data,
-                     &B->data[i], (long *)&B->rows,
-                     &zerof, &C->data[i], (long *)&C->rows );
+            BLAS_SSPMV ( "U", (long *)&A->size, &onef, A->data,
+                         &B->data[i], (long *)&B->rows,
+                         &zerof, &C->data[i], (long *)&C->rows );
    }
 #else
    if ( B_tr )
@@ -899,7 +899,7 @@ static Gan_SquMatrix_f *
       /* copy input matrix A into B */
       long nel = A->size*(A->size+1)/2, onei = 1;
 
-      scopy_ ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_SCOPY ( &nel, A->data, &onei, B->data, &onei );
    }
 
    /* compute Cholesky factorisation */
@@ -1014,7 +1014,7 @@ static Gan_SquMatrix_f *
       /* copy input matrix S into L */
       long nel = S->size*(S->size+1)/2, onei = 1;
 
-      scopy_ ( &nel, S->data, &onei, L->data, &onei );
+      BLAS_SCOPY ( &nel, S->data, &onei, L->data, &onei );
 #else
       if ( !gan_scopy ( S->size*(S->size+1)/2, S->data, 1, L->data, 1 ) )
       {
@@ -1681,23 +1681,19 @@ Gan_Bool
                           "workspace too small (at least 3*size of matrix)" );
 
       if ( Z == NULL )
-         sspev_ ( "N", "U", (long *)&A->size, A->data, W->data, NULL, &onei,
-                  work, &info );
+         sspev_ ( "N", "U", (long *)&A->size, A->data, W->data, NULL, &onei, work, &info );
       else
-         sspev_ ( "V", "U", (long *)&A->size, A->data, W->data,
-                  Z->data, (long *)&Z->rows, work, &info );
+         sspev_ ( "V", "U", (long *)&A->size, A->data, W->data, Z->data, (long *)&Z->rows, work, &info );
 
       if ( info != 0 )
       {
          gan_err_flush_trace();
          if ( info < 0 )
          {
-            gan_err_register ( "gan_symmatf_eigen",
-                               GAN_ERROR_CLAPACK_ILLEGAL_ARG, "" );
+            gan_err_register ( "gan_symmatf_eigen", GAN_ERROR_CLAPACK_ILLEGAL_ARG, "" );
          }
          else /* info > 0 */
-            gan_err_register ( "gan_symmatf_eigen",
-                               GAN_ERROR_NO_CONVERGENCE, "" );
+            gan_err_register ( "gan_symmatf_eigen", GAN_ERROR_NO_CONVERGENCE, "" );
 
          return GAN_FALSE;
       }

@@ -44,9 +44,9 @@ extern "C" {
  * \{
  */
 
-Gan_Bool gan_camera_build_equidistant ( Gan_Camera *camera,
-                                        double zh, double fx, double fy,
-                                        double x0, double y0 );
+GANDALF_API Gan_Bool gan_camera_build_equidistant ( Gan_Camera *camera,
+                                                    double zh, double fx, double fy,
+                                                    double x0, double y0 );
 
 /**
  * \}

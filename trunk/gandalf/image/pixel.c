@@ -7987,6 +7987,101 @@ Gan_Bool
 }
 
 /**
+ * \brief Extract alpha channel from pixel
+ * \return #GAN_TRUE on success, #GAN_FALSE on failure.
+ */
+Gan_Bool
+ gan_image_extract_pixel_alpha ( Gan_Pixel *inpix, Gan_Pixel *outpix, int *error_code )
+{
+   Gan_Pixel pixel;
+
+   /* if format & type are unchanged, return pixel unchanged */
+   if(inpix->format == GAN_GREY_LEVEL_IMAGE)
+   {
+      *outpix = *inpix;
+      return GAN_TRUE;
+   }
+
+   /* set format and type of output image */
+   pixel.format = GAN_GREY_LEVEL_IMAGE;
+   pixel.type   = inpix->type;
+
+   switch(inpix->format)
+   {
+      case GAN_GREY_LEVEL_ALPHA_IMAGE:
+        switch(inpix->type)
+        {
+           case GAN_UCHAR:
+             pixel.data.gl.uc = inpix->data.gla.uc.A;
+             break;
+
+           case GAN_USHORT:
+             pixel.data.gl.us = inpix->data.gla.us.A;
+             break;
+
+           case GAN_FLOAT:
+             pixel.data.gl.f = inpix->data.gla.f.A;
+             break;
+
+           default:
+             if(error_code == NULL)
+             {
+                gan_err_flush_trace();
+                gan_err_register ( "gan_image_extract_pixel_alpha", GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
+             }
+             else
+                *error_code = GAN_ERROR_ILLEGAL_IMAGE_TYPE;
+
+             return GAN_FALSE;
+        }
+        break;
+
+      case GAN_RGB_COLOUR_ALPHA_IMAGE:
+        switch(inpix->type)
+        {
+           case GAN_UCHAR:
+             pixel.data.gl.uc = inpix->data.rgba.uc.A;
+             break;
+
+           case GAN_USHORT:
+             pixel.data.gl.us = inpix->data.rgba.us.A;
+             break;
+
+           case GAN_FLOAT:
+             pixel.data.gl.f = inpix->data.rgba.f.A;
+             break;
+
+           default:
+             if ( error_code == NULL )
+             {
+                gan_err_flush_trace();
+                gan_err_register ( "gan_image_extract_pixel_alpha", GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
+             }
+             else
+                *error_code = GAN_ERROR_ILLEGAL_IMAGE_TYPE;
+
+             return GAN_FALSE;
+        }
+        break;
+
+      default:
+        if ( error_code == NULL )
+        {
+           gan_err_flush_trace();
+           gan_err_register ( "gan_image_extract_pixel_alpha", GAN_ERROR_ILLEGAL_IMAGE_FORMAT, "" );
+        }
+        else
+           *error_code = GAN_ERROR_ILLEGAL_IMAGE_FORMAT;
+
+        return GAN_FALSE;
+   }
+   
+   /* success */
+   *outpix = pixel;
+   return GAN_TRUE;
+}
+
+/**
  * \brief Return the scaling involved in converting a pixel from one type to another.
  */
 double
@@ -8006,8 +8101,7 @@ double
            case GAN_DOUBLE: return 1.0/GAN_UCHAR_MAXD;
            default:
              gan_err_flush_trace();
-             gan_err_register ( "gan_image_convert_scale",
-                                GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
+             gan_err_register ( "gan_image_convert_scale", GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
              return DBL_MAX;
         }
         break;
@@ -8021,8 +8115,7 @@ double
            case GAN_DOUBLE: return 1.0/GAN_USHRT_MAXD;
            default:
              gan_err_flush_trace();
-             gan_err_register ( "gan_image_convert_scale",
-                                GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
+             gan_err_register ( "gan_image_convert_scale", GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
              return DBL_MAX;
         }
         break;
@@ -8035,8 +8128,7 @@ double
            case GAN_USHORT: return GAN_USHRT_MAXD/GAN_UINT_MAXD;
            default:
              gan_err_flush_trace();
-             gan_err_register ( "gan_image_convert_scale",
-                                GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
+             gan_err_register ( "gan_image_convert_scale", GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
              return DBL_MAX;
         }
         break;
@@ -8049,8 +8141,7 @@ double
            case GAN_DOUBLE: return 1.0;
            default:
              gan_err_flush_trace();
-             gan_err_register ( "gan_image_convert_scale",
-                                GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
+             gan_err_register ( "gan_image_convert_scale", GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
              return DBL_MAX;
         }
         break;
@@ -8063,16 +8154,14 @@ double
            case GAN_FLOAT: return 1.0;
            default:
              gan_err_flush_trace();
-             gan_err_register ( "gan_image_convert_scale",
-                                GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
+             gan_err_register ( "gan_image_convert_scale", GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );
              return DBL_MAX;
         }
         break;
 
       default:
         gan_err_flush_trace();
-        gan_err_register ( "gan_image_convert_scale",
-                           GAN_ERROR_ILLEGAL_IMAGE_FORMAT, "" );
+        gan_err_register ( "gan_image_convert_scale", GAN_ERROR_ILLEGAL_IMAGE_FORMAT, "" );
         return DBL_MAX;
    }
 
@@ -8093,8 +8182,7 @@ Gan_Bool
 {
    Gan_Pixel new_pixel;
 
-   if ( !gan_image_convert_pixel_q ( pixel, pixel->format, GAN_DOUBLE,
-                                     &new_pixel ) )
+   if ( !gan_image_convert_pixel_q ( pixel, pixel->format, GAN_DOUBLE, &new_pixel ) )
    {
       gan_err_register ( "gan_image_offset_pixel_q", GAN_ERROR_FAILURE, "" );
       return GAN_FALSE;
@@ -8147,13 +8235,11 @@ Gan_Bool
 
       default:
         gan_err_flush_trace();
-        gan_err_register ( "gan_image_offset_pixel_q", GAN_ERROR_ILLEGAL_IMAGE_FORMAT,
-                           "image format" );
+        gan_err_register ( "gan_image_offset_pixel_q", GAN_ERROR_ILLEGAL_IMAGE_FORMAT, "image format" );
         return GAN_FALSE;
    }
 
-   if ( !gan_image_convert_pixel_q ( &new_pixel, pixel->format, pixel->type,
-                                     offset_pixel) )
+   if ( !gan_image_convert_pixel_q ( &new_pixel, pixel->format, pixel->type, offset_pixel) )
    {
       gan_err_register ( "gan_image_offset_pixel_q", GAN_ERROR_FAILURE, "" );
       return GAN_FALSE;
@@ -8176,8 +8262,7 @@ Gan_Bool
 {
    Gan_Pixel new_pixel;
 
-   if ( !gan_image_convert_pixel_q ( pixel, pixel->format, GAN_DOUBLE,
-                                     &new_pixel ) )
+   if ( !gan_image_convert_pixel_q ( pixel, pixel->format, GAN_DOUBLE, &new_pixel ) )
    {
       gan_err_register ( "gan_image_scale_pixel_q", GAN_ERROR_FAILURE, "" );
       return GAN_FALSE;
@@ -8227,13 +8312,11 @@ Gan_Bool
 
       default:
         gan_err_flush_trace();
-        gan_err_register ( "gan_image_scale_pixel_q", GAN_ERROR_ILLEGAL_IMAGE_FORMAT,
-                           "image format" );
+        gan_err_register ( "gan_image_scale_pixel_q", GAN_ERROR_ILLEGAL_IMAGE_FORMAT, "image format" );
         return GAN_FALSE;
    }
 
-   if ( !gan_image_convert_pixel_q ( &new_pixel, pixel->format, pixel->type,
-                                     scaled_pixel) )
+   if ( !gan_image_convert_pixel_q ( &new_pixel, pixel->format, pixel->type, scaled_pixel) )
    {
       gan_err_register ( "gan_image_scale_pixel_q", GAN_ERROR_FAILURE, "" );
       return GAN_FALSE;
@@ -8259,13 +8342,11 @@ Gan_Bool
    if ( scale == 0.0 )
    {
       gan_err_flush_trace();
-      gan_err_register ( "gan_image_pixel_divide_q",
-                         GAN_ERROR_DIVISION_BY_ZERO, "" );
+      gan_err_register ( "gan_image_divide_pixel_q", GAN_ERROR_DIVISION_BY_ZERO, "" );
       return GAN_FALSE;
    }
 
-   if ( !gan_image_convert_pixel_q ( pixel, pixel->format, GAN_DOUBLE,
-                                     &new_pixel ) )
+   if ( !gan_image_convert_pixel_q ( pixel, pixel->format, GAN_DOUBLE, &new_pixel ) )
    {
       gan_err_register ( "gan_image_divide_pixel_q", GAN_ERROR_FAILURE, "" );
       return GAN_FALSE;
@@ -8315,13 +8396,11 @@ Gan_Bool
 
       default:
         gan_err_flush_trace();
-        gan_err_register ( "gan_image_divide_pixel_q", GAN_ERROR_ILLEGAL_IMAGE_FORMAT,
-                           "image format" );
+        gan_err_register ( "gan_image_divide_pixel_q", GAN_ERROR_ILLEGAL_IMAGE_FORMAT, "image format" );
         return GAN_FALSE;
    }
 
-   if ( !gan_image_convert_pixel_q ( &new_pixel, pixel->format, pixel->type,
-                                     scaled_pixel) )
+   if ( !gan_image_convert_pixel_q ( &new_pixel, pixel->format, pixel->type, scaled_pixel) )
    {
       gan_err_register ( "gan_image_divide_pixel_q", GAN_ERROR_FAILURE, "" );
       return GAN_FALSE;

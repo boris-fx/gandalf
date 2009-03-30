@@ -177,7 +177,7 @@ static Gan_SquMatrix *
 
    /* copy matrix */
 #ifdef HAVE_LAPACK
-   dcopy_ ( (long *)&A->size, A->data, &onei, B->data, &onei );
+   BLAS_DCOPY ( (long *)&A->size, A->data, &onei, B->data, &onei );
 #else /* !HAVE_LAPACK */
    gan_dcopy ( A->size, A->data, 1, B->data, 1 );
 #endif /* #ifdef HAVE_LAPACK */
@@ -204,8 +204,8 @@ static Gan_SquMatrix *
 
 #ifdef HAVE_LAPACK
    /* copy and scale matrix */
-   if(A!=B) dcopy_ ( (long *)&A->size, A->data, &onei, B->data, &onei );
-   dscal_ ( (long *)&A->size, &a, B->data, &onei );
+   if(A!=B) BLAS_DCOPY ( (long *)&A->size, A->data, &onei, B->data, &onei );
+   BLAS_DSCAL ( (long *)&A->size, &a, B->data, &onei );
 #else /* !HAVE_LAPACK */
    /* copy and scale matrix */
    if(A!=B) gan_dcopy ( A->size, A->data, 1, B->data, 1 );
@@ -246,15 +246,15 @@ static Gan_SquMatrix *
    /* add matrix data */
    if ( C == A )
       /* in-place operation A += B */
-      daxpy_ ( (long *)&A->size, &onef, B->data, &onei, A->data, &onei );
+      BLAS_DAXPY ( (long *)&A->size, &onef, B->data, &onei, A->data, &onei );
    else if ( C == B )
       /* in-place operation B += A */
-      daxpy_ ( (long *)&A->size, &onef, A->data, &onei, B->data, &onei );
+      BLAS_DAXPY ( (long *)&A->size, &onef, A->data, &onei, B->data, &onei );
    else
    {
       /* C = A + B */
-      dcopy_ ( (long *)&A->size, A->data, &onei, C->data, &onei );
-      daxpy_ ( (long *)&A->size, &onef, B->data, &onei, C->data, &onei );
+      BLAS_DCOPY ( (long *)&A->size, A->data, &onei, C->data, &onei );
+      BLAS_DAXPY ( (long *)&A->size, &onef, B->data, &onei, C->data, &onei );
    }
 #else /* !HAVE_LAPACK */
    /* add matrix data */
@@ -310,22 +310,21 @@ static Gan_SquMatrix *
       /* subtract matrix data */
       if ( C == A )
          /* in-place operation A -= B */
-         daxpy_ ( (long *)&A->size, &minus_onef, B->data, &onei,
+         BLAS_DAXPY ( (long *)&A->size, &minus_onef, B->data, &onei,
                   A->data, &onei );
       else if ( C == B )
       {
          /* in-place operation B = A - B */
          double onef = 1.0;
 
-         dscal_ ( (long *)&A->size, &minus_onef, B->data, &onei );
-         daxpy_ ( (long *)&A->size, &onef, A->data, &onei, B->data, &onei );
+         BLAS_DSCAL ( (long *)&A->size, &minus_onef, B->data, &onei );
+         BLAS_DAXPY ( (long *)&A->size, &onef, A->data, &onei, B->data, &onei );
       }
       else
       {
          /* C = A - B */
-         dcopy_ ( (long *)&A->size, A->data, &onei, C->data, &onei );
-         daxpy_ ( (long *)&A->size, &minus_onef, B->data, &onei,
-                  C->data, &onei );
+         BLAS_DCOPY ( (long *)&A->size, A->data, &onei, C->data, &onei );
+         BLAS_DAXPY ( (long *)&A->size, &minus_onef, B->data, &onei, C->data, &onei );
       }
 #else /* !HAVE_LAPACK */
       /* subtract matrix data */

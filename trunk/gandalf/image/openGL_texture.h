@@ -81,9 +81,7 @@ typedef struct OpenGLTextureStruct
    Gan_Bool bEnableBlending;
 } Gan_OpenGLTextureStruct;
 
-
-#ifdef HAVE_OPENGL_EXT
-
+#if defined(HAVE_OPENGL_EXT) && defined(GL_ARB_shader_objects) && defined(GL_ARB_multitexture) && defined(GL_ARB_pixel_buffer_object)
 #ifdef __APPLE__
 typedef void (* PFNGLACTIVETEXTUREPROC) (GLenum);
 typedef GLhandleARB (* PFNGLCREATESHADEROBJECTARBPROC) (GLenum shaderType);
@@ -151,9 +149,7 @@ typedef struct _Gan_GLExt_Function_Pointers
    PFNGLDELETEBUFFERSARBPROC                            fDeleteBuffersARB;
    PFNGLMAPBUFFERARBPROC                                fMapBufferARB;
    PFNGLUNMAPBUFFERARBPROC                              fUnmapBufferARB;
-   
-#ifdef MOXXX_USE_ARB_FBO
-  //stct for FBO
+   //stct for FBO
    PFNGLGENFRAMEBUFFERSEXTPROC                          fGenFramebuffersEXT;
    PFNGLBINDFRAMEBUFFEREXTPROC                          fBindFramebufferEXT;
    PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC                   fCheckFramebufferStatusEXT;
@@ -164,15 +160,12 @@ typedef struct _Gan_GLExt_Function_Pointers
    PFNGLBINDRENDERBUFFEREXTPROC                         fBindRenderbufferEXT;
    PFNGLRENDERBUFFERSTORAGEEXTPROC                      fRenderbufferStorageEXT;
    PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC                  fFramebufferRenderbufferEXT;
-#endif /* MOXXX_USE_ARB_FBO */
+
 
    
 } Gan_GLExt_Function_Pointers;
 
 GANDALF_API void gan_initialise_glext_func_ptrs( Gan_GLExt_Function_Pointers* pExtFnPtrs);
-
-#endif /* HAVE_OPENGL_EXT */
-
 /* #if defined(GL_ARB_pixel_buffer_object) */
 
 /* GLsizeiptr OffsetLimitImage2D( __GLpixelStoreMode *pixelStoreMode, */
@@ -181,7 +174,7 @@ GANDALF_API void gan_initialise_glext_func_ptrs( Gan_GLExt_Function_Pointers* pE
 /*                                      const GLvoid* userdata); */
 /* #endif */
 
-
+#endif
 
 GANDALF_API Gan_Bool gan_build_openGL_textures_for_image ( Gan_Image *image, Gan_OpenGLTextureStruct *pOGLTexStruct );
 GANDALF_API void     gan_free_openGL_textures_for_image ( Gan_OpenGLTextureStruct *pOGLTexStruct );

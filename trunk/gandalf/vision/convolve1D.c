@@ -2094,8 +2094,7 @@ Gan_Bool
 
             default:
               gan_err_flush_trace();
-              gan_err_register ( "gan_convolve1D_us", GAN_ERROR_ILLEGAL_TYPE,
-                                 "" );
+              gan_err_register ( "gan_convolve1D_us", GAN_ERROR_ILLEGAL_TYPE, "" );
               break;
          }
       }

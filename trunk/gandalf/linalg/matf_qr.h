@@ -41,9 +41,9 @@ struct Gan_Matrix_f;
 struct Gan_SquMatrix_f;
 #endif
 
-Gan_Bool gan_matf_qr ( struct Gan_Matrix_f *A,
-                       struct Gan_Matrix_f *Q, struct Gan_SquMatrix_f *R,
-                       float *work, unsigned long work_size );
+GANDALF_API Gan_Bool gan_matf_qr ( struct Gan_Matrix_f *A,
+                                   struct Gan_Matrix_f *Q, struct Gan_SquMatrix_f *R,
+                                   float *work, unsigned long work_size );
 
 #ifdef __cplusplus
 }

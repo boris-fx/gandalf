@@ -71,7 +71,7 @@ Gan_Bool gan_image_is_targa(const unsigned char *magic_string, size_t length)
    if ((magic_string[TARGA_COLOURMAP_TYPE_OFFSET] == 0 || magic_string[TARGA_COLOURMAP_TYPE_OFFSET] == 1)
        && (magic_string[TARGA_DATA_TYPE_OFFSET] == TARGA_DATA_TYPE_MAPPED     || magic_string[TARGA_DATA_TYPE_OFFSET] == TARGA_DATA_TYPE_RGB ||
            magic_string[TARGA_DATA_TYPE_OFFSET] == TARGA_DATA_TYPE_RLE_MAPPED || magic_string[TARGA_DATA_TYPE_OFFSET] == TARGA_DATA_TYPE_RLE_RGB)
-       && (magic_string[TARGA_PIXEL_SIZE_OFFSET] == 24 || magic_string[TARGA_PIXEL_SIZE_OFFSET] == 32))
+       && (magic_string[TARGA_PIXEL_SIZE_OFFSET] == 16 || magic_string[TARGA_PIXEL_SIZE_OFFSET] == 24 || magic_string[TARGA_PIXEL_SIZE_OFFSET] == 32))
       return(GAN_TRUE);
 
    return(GAN_FALSE);
@@ -106,12 +106,25 @@ static void
    }
 }
 
+static void
+ extract16BittoRGB(gan_uint16* pixRow, int width, Gan_RGBPixel_ui8* imRow)
+{
+   for(width--; width>=0; width--, pixRow++, imRow++)
+   {
+      imRow->R = (((*pixRow) >> 10) & 0x1f) << 3;
+      imRow->G = (((*pixRow) >> 5) & 0x1f) << 3;
+      imRow->B = ((*pixRow) & 0x1f) << 3;
+   }
+}
+
 /**
  * \brief Reads a RGB colour image file in TARGA format from a stream.
  * \param infile The file stream to be read
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the TARGA image from the given file stream \a infile into the given
@@ -121,7 +134,8 @@ static void
  * \sa gan_write_targa_image_stream().
  */
 Gan_Image *
- gan_read_targa_image_stream ( FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_targa_image_stream(FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                             Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    char acHeader[BIG_BUFFER_SIZE], *acAlignedHeader;
    int iWidth, iHeight, iInternalHeight;
@@ -129,6 +143,7 @@ Gan_Image *
    Gan_Bool flip=GAN_FALSE, single_field=GAN_FALSE, upper=GAN_FALSE, whole_image=GAN_FALSE;
    Gan_ImageFormat eFormat;
    Gan_Pixel* apxlColourmap=NULL;
+   gan_uint16 *pixRow = NULL;
 
    /* align the header array */
    acAlignedHeader = (char*)((unsigned long int)acHeader + 7 - (((unsigned long int)acHeader + 7) % 8));
@@ -174,6 +189,7 @@ Gan_Image *
       {
          gan_err_flush_trace();
          gan_err_register_with_number ( "gan_read_targa_image_stream", GAN_ERROR_MALLOC_FAILED, "", ui16ColourmapLength*sizeof(Gan_Pixel) );
+         if(apxlColourmap != NULL) free(apxlColourmap);
          return NULL;
       }
 
@@ -189,6 +205,7 @@ Gan_Image *
             {
                gan_err_flush_trace();
                gan_err_register_with_number ( "gan_read_targa_image_stream", GAN_ERROR_MALLOC_FAILED, "", ui16ColourmapLength*sizeof(gan_uint8) );
+               if(apxlColourmap != NULL) free(apxlColourmap);
                return NULL;
             }
             
@@ -197,6 +214,7 @@ Gan_Image *
             {
                gan_err_flush_trace();
                gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_CORRUPTED_FILE, "corrupted Targa file header (truncated file?)" );
+               if(apxlColourmap != NULL) free(apxlColourmap);
                return NULL;
             }
 
@@ -225,6 +243,7 @@ Gan_Image *
             {
                gan_err_flush_trace();
                gan_err_register_with_number ( "gan_read_targa_image_stream", GAN_ERROR_MALLOC_FAILED, "", ui16ColourmapLength*sizeof(gan_uint8) );
+               if(apxlColourmap != NULL) free(apxlColourmap);
                return NULL;
             }
             
@@ -233,6 +252,7 @@ Gan_Image *
             {
                gan_err_flush_trace();
                gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_CORRUPTED_FILE, "corrupted Targa file header (truncated file?)" );
+               if(apxlColourmap != NULL) free(apxlColourmap);
                return NULL;
             }
 
@@ -261,6 +281,7 @@ Gan_Image *
             {
                gan_err_flush_trace();
                gan_err_register_with_number ( "gan_read_targa_image_stream", GAN_ERROR_MALLOC_FAILED, "", ui16ColourmapLength*sizeof(gan_uint8) );
+               if(apxlColourmap != NULL) free(apxlColourmap);
                return NULL;
             }
             
@@ -269,6 +290,7 @@ Gan_Image *
             {
                gan_err_flush_trace();
                gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_CORRUPTED_FILE, "corrupted Targa file header (truncated file?)" );
+               if(apxlColourmap != NULL) free(apxlColourmap);
                return NULL;
             }
 
@@ -291,12 +313,13 @@ Gan_Image *
    
    if(ui8PixelSize == 32)
       eFormat = GAN_RGB_COLOUR_ALPHA_IMAGE;
-   else if(ui8PixelSize == 24)
+   else if(ui8PixelSize == 16 || ui8PixelSize == 24)
       eFormat = GAN_RGB_COLOUR_IMAGE;
    else
    {
       gan_err_flush_trace();
       gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_CORRUPTED_FILE, "corrupted Targa file header" );
+      if(apxlColourmap != NULL) free(apxlColourmap);
       return NULL;
    }
         
@@ -326,6 +349,7 @@ Gan_Image *
       {
          gan_err_flush_trace();
          gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_INCOMPATIBLE, "" );
+         if(apxlColourmap != NULL) free(apxlColourmap);
          return NULL;
       }
 
@@ -344,7 +368,10 @@ Gan_Image *
    }
 
    if(ictrlstr != NULL && ictrlstr->header_only)
+   {
+      if(apxlColourmap != NULL) free(apxlColourmap);
       return (Gan_Image*)-1; /* special value */
+   }
 
    if ( image == NULL )
       image = gan_image_alloc ( eFormat, GAN_UINT8, whole_image ? iHeight : iInternalHeight, iWidth );
@@ -354,11 +381,27 @@ Gan_Image *
    if ( image == NULL )
    {
       gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_FAILURE, "setting up image" );
+      if(apxlColourmap != NULL) free(apxlColourmap);
       return NULL;
    }
-   
+
    /* if the image has zero size then we have finished */
-   if ( iWidth == 0 || iHeight == 0 ) return image;
+   if ( iWidth == 0 || iHeight == 0 )
+   {
+      return image;
+   }
+
+   // allocate one row of image for 16 bit image
+   if(ui8PixelSize == 16)
+   {
+      pixRow = gan_malloc_array(gan_uint16, iWidth);
+      if(pixRow == NULL)
+      {
+         gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_FAILURE, "setting up image row" );
+         if(apxlColourmap != NULL) free(apxlColourmap);
+         return NULL;
+      }
+   }
 
    switch(ui8DataType)
    {
@@ -379,21 +422,38 @@ Gan_Image *
                      {
                         gan_err_flush_trace();
                         gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
                         return NULL;
                      }
 
                      swap_rgba_to_bgra(gan_image_get_pixptr_rgba_ui8(image, whole_image ? (flip?(iHeight-iRow-1):iRow) : (flip?(iInternalHeight-iRow/2-1):iRow/2), 0), iWidth);
                   }
-                  else /* ui8PixelSize == 24 */
+                  else if (ui8PixelSize == 24)
                   {
                      if ( fread ( gan_image_get_pixptr_rgb_ui8(image, whole_image ? (flip?(iHeight-iRow-1):iRow) : (flip?(iInternalHeight-iRow/2-1):iRow/2), 0), sizeof(Gan_RGBPixel_ui8), iWidth, infile ) != (size_t)iWidth )
                      {
                         gan_err_flush_trace();
                         gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
                         return NULL;
                      }
 
                      swap_rgb_to_bgr(gan_image_get_pixptr_rgb_ui8(image, whole_image ? (flip?(iHeight-iRow-1):iRow) : (flip?(iInternalHeight-iRow/2-1):iRow/2), 0), iWidth);
+                  }
+                  else /* ui8PixelSize == 16 */
+                  {
+                     if(fread(pixRow, sizeof(gan_uint16), iWidth, infile) != (size_t)iWidth)
+                     {
+                        gan_err_flush_trace();
+                        gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
+                        return NULL;
+                     }
+
+                     extract16BittoRGB(pixRow, iWidth, gan_image_get_pixptr_rgb_ui8(image, whole_image ? (flip?(iHeight-iRow-1):iRow) : (flip?(iInternalHeight-iRow/2-1):iRow/2), 0));
                   }
                }
                else
@@ -405,19 +465,38 @@ Gan_Image *
                      {
                         gan_err_flush_trace();
                         gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
                         return NULL;
                      }
                   }
-                  else /* ui8PixelSize == 24 */
+                  else if(ui8PixelSize == 24)
                   {
                      if(fseek(infile, iWidth*sizeof(Gan_RGBPixel_ui8), SEEK_CUR) != 0)
                      {
                         gan_err_flush_trace();
                         gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
+                        return NULL;
+                     }
+                  }
+                  else /* ui8PixelSize == 16 */
+                  {
+                     if(fseek(infile, iWidth*sizeof(gan_uint16), SEEK_CUR) != 0)
+                     {
+                        gan_err_flush_trace();
+                        gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
                         return NULL;
                      }
                   }
                }
+
+               /* check for abort every 10 rows */
+               if(abortRequested != NULL && (iRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                  break;
             }
          }
          else
@@ -430,13 +509,19 @@ Gan_Image *
                   {
                      gan_err_flush_trace();
                      gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                     if(pixRow) free(pixRow);
+                     if(apxlColourmap != NULL) free(apxlColourmap);
                      return NULL;
                   }
 
                   swap_rgba_to_bgra(gan_image_get_pixptr_rgba_ui8(image, flip ? (iHeight-iRow-1) : iRow, 0), iWidth);
+
+                  /* check for abort every 10 rows */
+                  if(abortRequested != NULL && (iRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                     break;
                }
             }
-            else /* ui8PixelSize == 24 */
+            else if(ui8PixelSize == 24)
             {
                for(iRow=0; iRow<iHeight; iRow++)
                {
@@ -444,10 +529,36 @@ Gan_Image *
                   {
                      gan_err_flush_trace();
                      gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                     if(pixRow) free(pixRow);
+                     if(apxlColourmap != NULL) free(apxlColourmap);
                      return NULL;
                   }
 
                   swap_rgb_to_bgr(gan_image_get_pixptr_rgb_ui8(image, flip ? (iHeight-iRow-1) : iRow, 0), iWidth);
+
+                  /* check for abort every 10 rows */
+                  if(abortRequested != NULL && (iRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                     break;
+               }
+            }
+            else /* ui8PixelSize == 16 */
+            {
+               for(iRow=0; iRow<iHeight; iRow++)
+               {
+                  if(fread(pixRow, sizeof(gan_uint16), iWidth, infile) != (size_t)iWidth)
+                  {
+                     gan_err_flush_trace();
+                     gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                     if(pixRow) free(pixRow);
+                     if(apxlColourmap != NULL) free(apxlColourmap);
+                     return NULL;
+                  }
+
+                  extract16BittoRGB(pixRow, iWidth, image->row_data.rgb.uc[flip ? (iHeight-iRow-1) : iRow]);
+                  
+                  /* check for abort every 10 rows */
+                  if(abortRequested != NULL && (iRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                     break;
                }
             }
          }
@@ -462,15 +573,18 @@ Gan_Image *
 
          switch(ui8PixelSize)
          {
-            case 24:
+            case 16:
             {
-               Gan_RGBPixel_ui8* argbPix, rgbPixTmp;
+               gan_uint16* aPix;
+               Gan_RGBPixel_ui8 pixTmp;
 
-               argbPix = gan_malloc_array(Gan_RGBPixel_ui8, 127);
-               if(argbPix == NULL)
+               aPix = gan_malloc_array(gan_uint16, 128);
+               if(aPix == NULL)
                {
                   gan_err_flush_trace();
-                  gan_err_register_with_number ( "gan_read_targa_image_stream", GAN_ERROR_MALLOC_FAILED, "", 127*sizeof(Gan_RGBPixel_ui8) );
+                  gan_err_register_with_number ( "gan_read_targa_image_stream", GAN_ERROR_MALLOC_FAILED, "", 128*sizeof(gan_uint16) );
+                  if(pixRow) free(pixRow);
+                  if(apxlColourmap != NULL) free(apxlColourmap);
                   return NULL;
                }
 
@@ -482,6 +596,107 @@ Gan_Image *
                   {
                      gan_err_flush_trace();
                      gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                     if(pixRow) free(pixRow);
+                     if(apxlColourmap != NULL) free(apxlColourmap);
+                     return NULL;
+                  }
+
+                  /* read next packet */
+                  iPacketSize = 1+(ui8PacketHeader & 0x7f);
+                  if(ui8PacketHeader & 0x80)
+                  {
+                     /* run-length encoded packet */
+                     if(fread(aPix, 2, 1, infile) != 1)
+                     {
+                        gan_err_flush_trace();
+                        gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
+                        return NULL;
+                     }
+
+                     // extract RGB
+                     extract16BittoRGB(&aPix[0], 1, &pixTmp);
+
+                     for(iPacketPos=0; iPacketPos<iPacketSize; iPacketPos++, iPixelPos++)
+                     {
+                        /* get current position in image */
+                        iRow = iPixelPos/iWidth;
+                        iCol = iPixelPos%iWidth;
+
+                        if(single_field)
+                        {
+                           if((upper && (iRow % 2) == 0) || (!upper && (iRow % 2) == 1))
+                              gan_image_set_pix_rgb_ui8(image, whole_image ? (flip?(iHeight-iRow-1):iRow) : (flip?(iInternalHeight-iRow/2-1):iRow/2), iCol, &pixTmp);
+                        }
+                        else
+                           gan_image_set_pix_rgb_ui8(image, flip ? (iHeight-iRow-1) : iRow, iCol, &pixTmp);
+                     }
+                  }
+                  else
+                  {
+                     /* raw packet */
+                     if(fread(aPix, 2, iPacketSize, infile) != iPacketSize)
+                     {
+                        gan_err_flush_trace();
+                        gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
+                        return NULL;
+                     }
+
+                     for(iPacketPos=0; iPacketPos<iPacketSize; iPacketPos++, iPixelPos++)
+                     {
+                        /* get current position in image */
+                        iRow = iPixelPos/iWidth;
+                        iCol = iPixelPos%iWidth;
+
+                        // extract RGB
+                        extract16BittoRGB(&aPix[iPacketPos], 1, &pixTmp);
+                        
+                        if(single_field)
+                        {
+                           if((upper && (iRow % 2) == 0) || (!upper && (iRow % 2) == 1))
+                              gan_image_set_pix_rgb_ui8(image, whole_image ? (flip?(iHeight-iRow-1):iRow) : (flip?(iInternalHeight-iRow/2-1):iRow/2), iCol, &pixTmp);
+                        }
+                        else
+                           gan_image_set_pix_rgb_ui8(image, flip ? (iHeight-iRow-1) : iRow, iCol, &pixTmp);
+                     }
+                  }
+
+                  /* check for abort */
+                  if(abortRequested != NULL && GAN_TRUE == abortRequested(abortObj))
+                     break;
+               }
+               
+               free(aPix);
+            }
+            break;
+
+            case 24:
+            {
+               Gan_RGBPixel_ui8* argbPix, rgbPixTmp;
+
+               argbPix = gan_malloc_array(Gan_RGBPixel_ui8, 128);
+               if(argbPix == NULL)
+               {
+                  gan_err_flush_trace();
+                  gan_err_register_with_number ( "gan_read_targa_image_stream", GAN_ERROR_MALLOC_FAILED, "", 128*sizeof(Gan_RGBPixel_ui8) );
+                  if(pixRow) free(pixRow);
+                  if(apxlColourmap != NULL) free(apxlColourmap);
+                  return NULL;
+               }
+
+               iPixelPos=0;
+               while(iPixelPos<iNumberOfPixels)
+               {
+                  /* read next packet header */
+                  if(fread(&ui8PacketHeader, 1, 1, infile) != 1)
+                  {
+                     gan_err_flush_trace();
+                     gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                     if(pixRow) free(pixRow);
+                     if(apxlColourmap != NULL) free(apxlColourmap);
                      return NULL;
                   }
 
@@ -494,6 +709,8 @@ Gan_Image *
                      {
                         gan_err_flush_trace();
                         gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
                         return NULL;
                      }
 
@@ -524,6 +741,8 @@ Gan_Image *
                      {
                         gan_err_flush_trace();
                         gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
                         return NULL;
                      }
 
@@ -547,6 +766,10 @@ Gan_Image *
                            gan_image_set_pix_rgb_ui8(image, flip ? (iHeight-iRow-1) : iRow, iCol, &rgbPixTmp);
                      }
                   }
+
+                  /* check for abort */
+                  if(abortRequested != NULL && GAN_TRUE == abortRequested(abortObj))
+                     break;
                }
                
                free(argbPix);
@@ -557,12 +780,13 @@ Gan_Image *
             {
                Gan_RGBAPixel_ui8* argbaPix, rgbaPixTmp;
 
-
                argbaPix = gan_malloc_array(Gan_RGBAPixel_ui8, 128);
                if(argbaPix == NULL)
                {
                   gan_err_flush_trace();
                   gan_err_register_with_number ( "gan_read_targa_image_stream", GAN_ERROR_MALLOC_FAILED, "", 128*sizeof(Gan_RGBAPixel_ui8) );
+                  if(pixRow) free(pixRow);
+                  if(apxlColourmap != NULL) free(apxlColourmap);
                   return NULL;
                }
 
@@ -574,6 +798,8 @@ Gan_Image *
                   {
                      gan_err_flush_trace();
                      gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                     if(pixRow) free(pixRow);
+                     if(apxlColourmap != NULL) free(apxlColourmap);
                      return NULL;
                   }
 
@@ -586,6 +812,8 @@ Gan_Image *
                      {
                         gan_err_flush_trace();
                         gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
                         return NULL;
                      }
 
@@ -617,6 +845,8 @@ Gan_Image *
                      {
                         gan_err_flush_trace();
                         gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated TARGA file" );
+                        if(pixRow) free(pixRow);
+                        if(apxlColourmap != NULL) free(apxlColourmap);
                         return NULL;
                      }
 
@@ -641,6 +871,10 @@ Gan_Image *
                            gan_image_set_pix_rgba_ui8(image, flip ? (iHeight-iRow-1) : iRow, iCol, &rgbaPixTmp);
                      }
                   }
+
+                  /* check for abort */
+                  if(abortRequested != NULL && GAN_TRUE == abortRequested(abortObj))
+                     break;
                }
                
                free(argbaPix);
@@ -650,6 +884,8 @@ Gan_Image *
             default:
               gan_err_flush_trace();
               gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_ILLEGAL_TYPE, "" );
+              if(pixRow) free(pixRow);
+              if(apxlColourmap != NULL) free(apxlColourmap);
               return NULL;
             }
          }
@@ -659,12 +895,16 @@ Gan_Image *
       default:
         gan_err_flush_trace();
         gan_err_register ( "gan_read_targa_image_stream", GAN_ERROR_ILLEGAL_TYPE, "" );
+        if(pixRow) free(pixRow);
+        if(apxlColourmap != NULL) free(apxlColourmap);
         return NULL;
    }
 
+   // free pixel row if necessary
+   if(pixRow) free(pixRow);
+
    /* free colourmap if necessary */
-   if(apxlColourmap != NULL)
-      free(apxlColourmap);
+   if(apxlColourmap != NULL) free(apxlColourmap);
 
    /* success */
    return image;
@@ -676,6 +916,8 @@ Gan_Image *
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the TARGA image with the in the file \a filename into the given
@@ -685,7 +927,8 @@ Gan_Image *
  * \sa gan_write_targa_image().
  */
 Gan_Image *
- gan_read_targa_image ( const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_targa_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                      Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
    Gan_Image *result;
@@ -699,7 +942,7 @@ Gan_Image *
       return NULL;
    }
 
-   result = gan_read_targa_image_stream ( infile, image, ictrlstr, header );
+   result = gan_read_targa_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
    fclose(infile);
    return result;
 }

@@ -102,8 +102,7 @@ Gan_SymMatEigenStruct *
    if ( work_data == NULL )
       result = gan_vec_form ( &sme->work, 3*max_size );
    else
-      result = gan_vec_form_data ( &sme->work, work_data_size,
-                                   work_data, work_data_size );
+      result = gan_vec_form_data ( &sme->work, work_data_size, work_data, work_data_size );
 
    if ( result == NULL )
    {
@@ -203,6 +202,39 @@ Gan_Bool
 }
 
 /**
+ * \brief Increments an accumulated outer product matrix.
+ * \param sme A pointer to a structure
+ * \param scale A scaling for the outer product
+ * \param arr Array of components of same size as matrix
+ * \return #GAN_TRUE on success, #GAN_FALSE on failure.
+ *
+ * Increments an accumulated outer product matrix stored inside the \a sme
+ * structure with the outer product of a vector \a arr passed into the
+ * function. The outer product is scaled by the given scaling
+ * factor \a scale before the matrix is incremented (equivalent to scaling
+ * the vector by the square-root of \a scale).
+ *
+ * \sa gan_symeigen_alloc().
+ */
+Gan_Bool
+ gan_symeigen_increment_arr ( Gan_SymMatEigenStruct *sme, double scale, double *arr )
+{
+   unsigned long i;
+
+   /* use workspace vector inside structure as temporary vector */
+   gan_vec_set_size ( &sme->work, sme->SxxT.size );
+
+   /* read variable argument list into temporary vector */
+   for ( i = 0; i < sme->SxxT.size; i++ )
+      gan_vec_set_el ( &sme->work, i, arr[i] );
+
+   /* accumulate outer product sum matrix */
+   gan_blas_spr ( &sme->SxxT, &sme->work, scale );
+
+   return GAN_TRUE;
+}
+
+/**
  * \brief Eigendecomposes a matrix accumulated by summing outer products.
  * \param sme A pointer to a structure
  * \return #GAN_TRUE on success, #GAN_FALSE on failure.
@@ -215,8 +247,7 @@ Gan_Bool
 Gan_Bool
  gan_symeigen_solve ( Gan_SymMatEigenStruct *sme )
 {
-   return gan_symmat_eigen ( &sme->SxxT, &sme->W, &sme->Z, GAN_TRUE,
-                             sme->work.data, sme->work.data_size );
+   return gan_symmat_eigen ( &sme->SxxT, &sme->W, &sme->Z, GAN_TRUE, sme->work.data, sme->work.data_size );
 }
 
 /**

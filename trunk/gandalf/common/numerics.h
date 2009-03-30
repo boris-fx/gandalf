@@ -109,9 +109,9 @@ GANDALF_API double gan_random_m11(void);
 #define gan_random_m11() (2.0*gan_random_01()-1.0)
 #endif /* #ifdef GAN_GENERATE_DOCUMENTATION */
 
-void *gan_kth_highest ( void *base, size_t nmemb, size_t size,
-                        unsigned int k,
-                        int (*compar)(const void *, const void *) );
+GANDALF_API void *gan_kth_highest ( void *base, size_t nmemb, size_t size,
+                                    unsigned int k,
+                                    int (*compar)(const void *, const void *) );
 
 /**
  * \}

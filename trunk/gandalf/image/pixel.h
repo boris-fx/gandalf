@@ -1170,8 +1170,9 @@ GANDALF_API float          gan_pixel_bgraf_to_yf   ( const Gan_BGRAPixel_f  *bgr
 GANDALF_API double         gan_pixel_bgrad_to_yd   ( const Gan_BGRAPixel_d  *bgra );
 
 GANDALF_API Gan_Bool gan_image_convert_pixel ( Gan_Pixel *inpix,
-                                   Gan_ImageFormat format, Gan_Type type,
-                                   Gan_Pixel *outpix, int *error_code );
+                                               Gan_ImageFormat format, Gan_Type type,
+                                               Gan_Pixel *outpix, int *error_code );
+GANDALF_API Gan_Bool gan_image_extract_pixel_alpha ( Gan_Pixel *inpix, Gan_Pixel *outpix, int *error_code );
 GANDALF_API double gan_image_convert_scale ( Gan_Type gtFromType, Gan_Type gtToType );
 GANDALF_API Gan_Bool gan_image_offset_pixel_q ( Gan_Pixel *pixel, double offset,
                                     Gan_Pixel *offset_pixel );
@@ -2055,8 +2056,8 @@ GANDALF_API double gan_pixel_ui32_to_d ( gan_uint32 x );
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
 GANDALF_API Gan_Bool gan_image_convert_pixel_q ( Gan_Pixel *inpix,
-                                     Gan_ImageFormat format, Gan_Type type,
-                                     Gan_Pixel *outpix );
+                                                 Gan_ImageFormat format, Gan_Type type,
+                                                 Gan_Pixel *outpix );
 #else
 #define gan_image_convert_pixel_q(inpix,format,type,outpix) \
            gan_image_convert_pixel(inpix,format,type,outpix,NULL)
@@ -2071,7 +2072,7 @@ GANDALF_API Gan_Bool gan_image_convert_pixel_q ( Gan_Pixel *inpix,
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
 GANDALF_API Gan_Bool gan_image_convert_pixel_i ( Gan_Pixel *pix,
-                                     Gan_ImageFormat format, Gan_Type type );
+                                                 Gan_ImageFormat format, Gan_Type type );
 #else
 #define gan_image_convert_pixel_i(pix,format,type) \
            gan_image_convert_pixel_q(pix,format,type,pix)

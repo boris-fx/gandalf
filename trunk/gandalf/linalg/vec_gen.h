@@ -81,44 +81,30 @@ typedef struct Gan_Vector
 #include <gandalf/linalg/mat_square.h>
 
 /* function declarations */
-GANDALF_API Gan_Vector *gan_vec_form_gen ( Gan_Vector *x, unsigned long rows,
-                               double *data, size_t data_size );
+GANDALF_API Gan_Vector *gan_vec_form_gen ( Gan_Vector *x, unsigned long rows, double *data, size_t data_size );
 GANDALF_API void gan_vec_free ( Gan_Vector *x );
 GANDALF_API Gan_Vector *gan_vec_set_size ( Gan_Vector *x, unsigned long rows );
 GANDALF_API Gan_Vector *gan_vec_fill_va ( Gan_Vector *x, unsigned long rows, ... );
-GANDALF_API Gan_Vector *gan_vec_fill_vap ( Gan_Vector *x, unsigned long rows,
-                               va_list *aptr );
-GANDALF_API Gan_Vector *gan_vec_fill_const_q ( Gan_Vector *x, unsigned long rows,
-                                   double value );
+GANDALF_API Gan_Vector *gan_vec_fill_vap ( Gan_Vector *x, unsigned long rows, va_list *aptr );
+GANDALF_API Gan_Vector *gan_vec_fill_const_q ( Gan_Vector *x, unsigned long rows, double value );
 GANDALF_API Gan_Bool gan_vec_read_va ( const Gan_Vector *x, unsigned long rows, ... );
 GANDALF_API Gan_Vector *gan_vec_copy_q ( const Gan_Vector *x, Gan_Vector *y );
 GANDALF_API Gan_Vector *gan_vec_scale_q ( Gan_Vector *x, double a, Gan_Vector *y );
 GANDALF_API Gan_Vector *gan_vec_add_q ( Gan_Vector *x, Gan_Vector *y, Gan_Vector *z );
 GANDALF_API Gan_Vector *gan_vec_sub_q ( Gan_Vector *x, Gan_Vector *y, Gan_Vector *z );
 GANDALF_API double gan_vec_dot ( const Gan_Vector *x, const Gan_Vector *y );
-GANDALF_API struct Gan_Matrix *gan_vec_outer_q ( const Gan_Vector *x, const Gan_Vector *y,
-                                     struct Gan_Matrix *A );
-GANDALF_API struct Gan_SquMatrix *gan_vec_outer_sym_q ( const Gan_Vector *x,
-                                            struct Gan_SquMatrix *A );
-GANDALF_API Gan_Vector *gan_vec_insert ( Gan_Vector *x, unsigned long rx,
-                             const Gan_Vector *y, unsigned long ry,
-                             unsigned long rows );
+GANDALF_API struct Gan_Matrix *gan_vec_outer_q ( const Gan_Vector *x, const Gan_Vector *y, struct Gan_Matrix *A );
+GANDALF_API struct Gan_SquMatrix *gan_vec_outer_sym_q ( const Gan_Vector *x, struct Gan_SquMatrix *A );
+GANDALF_API Gan_Vector *gan_vec_insert ( Gan_Vector *x, unsigned long rx, const Gan_Vector *y, unsigned long ry, unsigned long rows );
 GANDALF_API void gan_vec_free_va ( Gan_Vector *x, ... );
-GANDALF_API Gan_Vector *gan_vec_insert_mat ( Gan_Vector *x, unsigned long rx,
-                                 const struct Gan_Matrix *A, unsigned long ra,
-                                                             unsigned long ca,
-                                 unsigned long rows );
-GANDALF_API Gan_Vector *gan_vec_insert_matT ( Gan_Vector *x, unsigned long rx,
-                                  const struct Gan_Matrix *A, unsigned long ra,
-                                                              unsigned long ca,
-                                  unsigned long rows );
-GANDALF_API Gan_Bool gan_vec_fprint ( FILE *fp, const Gan_Vector *x, const char *prefix,
-                          int indent, const char *fmt );
-GANDALF_API Gan_Vector *gan_vec_fscanf_q ( FILE *fp, Gan_Vector *x,
-                               char *prefix, int prefix_len );
+GANDALF_API Gan_Vector *gan_vec_insert_mat ( Gan_Vector *x, unsigned long rx, const struct Gan_Matrix *A, unsigned long ra, unsigned long ca,
+                                             unsigned long rows );
+GANDALF_API Gan_Vector *gan_vec_insert_matT ( Gan_Vector *x, unsigned long rx, const struct Gan_Matrix *A, unsigned long ra, unsigned long ca,
+                                              unsigned long rows );
+GANDALF_API Gan_Bool gan_vec_fprint ( FILE *fp, const Gan_Vector *x, const char *prefix, int indent, const char *fmt );
+GANDALF_API Gan_Vector *gan_vec_fscanf_q ( FILE *fp, Gan_Vector *x, char *prefix, int prefix_len );
 GANDALF_API Gan_Bool gan_vec_fwrite ( FILE *fp, const Gan_Vector *x, gan_uint32 magic_number );
-GANDALF_API Gan_Vector *gan_vec_fread_q ( FILE *fp, Gan_Vector *x,
-                              gan_uint32 *magic_number );
+GANDALF_API Gan_Vector *gan_vec_fread_q ( FILE *fp, Gan_Vector *x, gan_uint32 *magic_number );
 
 #ifdef GAN_GENERATE_DOCUMENTATION
 #define Gan_Matrix    struct Gan_Matrix
@@ -176,11 +162,9 @@ GANDALF_API Gan_Vector *gan_vec_form ( Gan_Vector *x, unsigned long rows );
  * \sa gan_vec_alloc() and gan_vec_form().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_Vector *gan_vec_form_data ( Gan_Vector *x, unsigned long rows,
-                                void *data, size_t data_size );
+GANDALF_API Gan_Vector *gan_vec_form_data ( Gan_Vector *x, unsigned long rows, double *data, size_t data_size );
 #else
-#define gan_vec_form_data(x,rows,data,data_size)\
-           gan_vec_form_gen(x,rows,data,data_size)
+#define gan_vec_form_data(x,rows,data,data_size) gan_vec_form_gen(x,rows,data,data_size)
 #endif
 
 /**
@@ -205,10 +189,7 @@ GANDALF_API Gan_Bool gan_vec_set_el ( Gan_Vector *x, unsigned i, double value );
 #define gan_vec_set_el(x,i,v) ((x)->data[i] = (v),GAN_TRUE)
 #else
 #define gan_vec_set_el(x,i,v) ((unsigned)(i)>=(x)->rows \
-                               ? (gan_err_flush_trace(),\
-                                  gan_err_register("gan_vec_set_el",\
-                                                   GAN_ERROR_TOO_LARGE,""),\
-                                  GAN_FALSE)\
+                               ? (gan_err_flush_trace(), gan_err_register("gan_vec_set_el", GAN_ERROR_TOO_LARGE,""), GAN_FALSE)\
                                : ((x)->data[i] = (v),GAN_TRUE))
 #endif /* #ifdef NDEBUG */
 #endif /* #ifdef GAN_GENERATE_DOCUMENTATION */
@@ -225,10 +206,7 @@ GANDALF_API double gan_vec_get_el ( const Gan_Vector *x, unsigned i );
 #define gan_vec_get_el(x,i) (x)->data[i]
 #else
 #define gan_vec_get_el(x,i) ((unsigned)(i)>=(x)->rows \
-                             ? (gan_err_flush_trace(),\
-                                gan_err_register("gan_vec_get_el",\
-                                                 GAN_ERROR_TOO_LARGE,""),\
-                                DBL_MAX)\
+                             ? (gan_err_flush_trace(), gan_err_register("gan_vec_get_el", GAN_ERROR_TOO_LARGE,""), DBL_MAX)\
                              : (x)->data[i])
 #endif /* #ifdef NDEBUG */
 #endif /* #ifdef GAN_GENERATE_DOCUMENTATION */
@@ -246,10 +224,7 @@ GANDALF_API Gan_Bool gan_vec_inc_el ( Gan_Vector *x, unsigned i, double value );
 #define gan_vec_inc_el(x,i,v) ((x)->data[i] += (v),GAN_TRUE)
 #else
 #define gan_vec_inc_el(x,i,v) ((unsigned)(i)>=(x)->rows \
-                               ? (gan_err_flush_trace(),\
-                                  gan_err_register("gan_vec_inc_el",\
-                                                   GAN_ERROR_TOO_LARGE,""),\
-                                  GAN_FALSE)\
+                               ? (gan_err_flush_trace(), gan_err_register("gan_vec_inc_el", GAN_ERROR_TOO_LARGE,""), GAN_FALSE)\
                                : ((x)->data[i] += (v),GAN_TRUE))
 #endif /* #ifdef NDEBUG */
 #endif /* #ifdef GAN_GENERATE_DOCUMENTATION */
@@ -267,10 +242,7 @@ GANDALF_API Gan_Bool gan_vec_dec_el ( Gan_Vector *x, unsigned i, double value );
 #define gan_vec_dec_el(x,i,v) ((x)->data[i] -= (v),GAN_TRUE)
 #else
 #define gan_vec_dec_el(x,i,v) ((unsigned)(i)>=(x)->rows \
-                               ? (gan_err_flush_trace(),\
-                                  gan_err_register("gan_vec_dec_el",\
-                                                   GAN_ERROR_TOO_LARGE,""),\
-                                  GAN_FALSE)\
+                               ? (gan_err_flush_trace(), gan_err_register("gan_vec_dec_el", GAN_ERROR_TOO_LARGE,""), GAN_FALSE)\
                                : ((x)->data[i] -= (v),GAN_TRUE))
 #endif /* #ifdef NDEBUG */
 #endif /* #ifdef GAN_GENERATE_DOCUMENTATION */
@@ -292,8 +264,7 @@ GANDALF_API Gan_Bool gan_vec_dec_el ( Gan_Vector *x, unsigned i, double value );
  * indentation \a indent and floating-point format \a fmt.
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_Bool gan_vec_print ( const Gan_Vector *x,
-                         const char *prefix, int indent, const char *fmt );
+GANDALF_API Gan_Bool gan_vec_print ( const Gan_Vector *x, const char *prefix, int indent, const char *fmt );
 #else
 #define gan_vec_print(x,p,i,f) (gan_vec_fprint(stdout,x,p,i,f))
 #endif

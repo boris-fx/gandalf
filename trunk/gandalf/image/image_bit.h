@@ -45,7 +45,6 @@
 #define GAN_IMAGE_FILL_CONST gan_image_fill_const_b
 #define GAN_IMAGE_GET_ACTIVE_SUBWINDOW gan_image_get_active_subwindow_b
 #define GAN_IMAGE_MASK_WINDOW gan_image_mask_window_b
-#define GAN_IMAGE_MASK_WINDOW gan_image_mask_window_b
 #define GAN_IMAGE_CLEAR_WINDOW gan_image_clear_window_b
 
 /* to generate bitmap-specific code */

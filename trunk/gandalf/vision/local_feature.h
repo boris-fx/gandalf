@@ -84,26 +84,25 @@ typedef struct Gan_LocalFeatureMapParams
    unsigned bsize;
 } Gan_LocalFeatureMapParams;
 
-GANDALF_API Gan_LocalFeatureMap *
-      gan_local_feature_map_form ( Gan_LocalFeatureMap *pmap,
-                                   unsigned height, unsigned width,
-                                   Gan_LocalFeatureMapParams *pms );
+GANDALF_API Gan_LocalFeatureMap *gan_local_feature_map_form ( Gan_LocalFeatureMap *pmap,
+                                                              unsigned height, unsigned width,
+                                                              Gan_LocalFeatureMapParams *pms );
 GANDALF_API void gan_local_feature_map_free ( Gan_LocalFeatureMap *pmap );
 GANDALF_API Gan_Bool gan_local_feature_map_clear ( Gan_LocalFeatureMap *pmap,
-                                       unsigned height, unsigned width,
-                                       Gan_LocalFeatureMapParams *pms );
+                                                   unsigned height, unsigned width,
+                                                   Gan_LocalFeatureMapParams *pms );
 GANDALF_API Gan_Bool gan_local_feature_point_add ( Gan_LocalFeatureMap *pmap,
-                                       unsigned r, unsigned c,
-                                       unsigned index );
+                                                   unsigned r, unsigned c,
+                                                   unsigned index );
 GANDALF_API Gan_Bool gan_local_feature_line_add ( Gan_LocalFeatureMap *pmap,
-                                      unsigned r1, unsigned c1,
-                                      unsigned r2, unsigned c2,
-                                      unsigned index );
+                                                  unsigned r1, unsigned c1,
+                                                  unsigned r2, unsigned c2,
+                                                  unsigned index );
 GANDALF_API Gan_Bool gan_local_feature_map_set_indices ( Gan_LocalFeatureMap *pmap );
-GANDALF_API Gan_Bool gan_local_feature_map_find_block ( Gan_LocalFeatureMap *pmap,
-                                            double y, double x,
-                                            Gan_Matrix23 *Ai,
-                                            unsigned *cr, unsigned *cc );
+GANDALF_API Gan_Bool gan_local_feature_map_find_block ( const Gan_LocalFeatureMap *pmap,
+                                                        double y, double x,
+                                                        const Gan_Matrix23 *Ai,
+                                                        unsigned *cr, unsigned *cc );
 
 /**
  * \brief Macro: Allocates a local feature map structure.
@@ -124,11 +123,9 @@ GANDALF_API Gan_Bool gan_local_feature_map_find_block ( Gan_LocalFeatureMap *pma
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
 GANDALF_API Gan_LocalFeatureMap *
- gan_local_feature_map_alloc ( unsigned height, unsigned width,
-                               Gan_LocalFeatureMapParams *pms );
+ gan_local_feature_map_alloc ( unsigned height, unsigned width, Gan_LocalFeatureMapParams *pms );
 #else
-#define gan_local_feature_map_alloc(height,width,pms)\
-    gan_local_feature_map_form(NULL,height,width,pms)
+#define gan_local_feature_map_alloc(height,width,pms) gan_local_feature_map_form(NULL,height,width,pms)
 #endif
 
 /**

@@ -114,11 +114,11 @@ GANDALF_API Gan_SymMatEigenStruct *gan_symeigen_alloc ( long max_size );
 #define gan_symeigen_alloc(ms) gan_symeigen_form_data(NULL,ms,NULL,0)
 #endif
 
-GANDALF_API void     gan_symeigen_free      ( Gan_SymMatEigenStruct *sme );
-GANDALF_API Gan_Bool gan_symeigen_reset     ( Gan_SymMatEigenStruct *sme, long size );
-GANDALF_API Gan_Bool gan_symeigen_increment ( Gan_SymMatEigenStruct *sme,
-                                  double scale, ... );
-GANDALF_API Gan_Bool gan_symeigen_solve     ( Gan_SymMatEigenStruct *sme );
+GANDALF_API void     gan_symeigen_free          ( Gan_SymMatEigenStruct *sme );
+GANDALF_API Gan_Bool gan_symeigen_reset         ( Gan_SymMatEigenStruct *sme, long size );
+GANDALF_API Gan_Bool gan_symeigen_increment     ( Gan_SymMatEigenStruct *sme, double scale, ... );
+GANDALF_API Gan_Bool gan_symeigen_increment_arr ( Gan_SymMatEigenStruct *sme, double scale, double *arr );
+GANDALF_API Gan_Bool gan_symeigen_solve         ( Gan_SymMatEigenStruct *sme );
 
 /**
  * \}
