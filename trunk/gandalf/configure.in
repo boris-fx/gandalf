@@ -5,7 +5,7 @@ dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
-AC_PROG_LIBTOOL
+dnl AC_PROG_LIBTOOL
 
 dnl ------------------------------------------
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -21,7 +21,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h malloc.h unistd.h)
 
 if test "x$GCC" = xyes; then
-   CFLAGS="$CFLAGS -Wall $X_CFLAGS"
+   CFLAGS="$CFLAGS -Wall"
    LDFLAGS="$LDFLAGS -L/usr/local/lib $X_LIBS"
 fi
 
@@ -42,6 +42,12 @@ AC_ARG_WITH(jpeg,
 	      [  --without-jpeg          disable JPEG support],
 	      [with_jpeg=$withval],
 	      [with_jpeg='yes'])
+
+# Disable LAPACK.
+AC_ARG_WITH(lapack,
+	      [  --without-lapack        disable LAPACK support],
+	      [with_lapack=$withval],
+	      [with_lapack='yes'])
 
 # Disable OpenGL.
 AC_ARG_WITH(opengl,
@@ -93,14 +99,22 @@ then
 fi
 
 #
-# Check for BLAS and LAPACK
+# Check for LAPACK
 #
 have_lapack='no'
+LAPACK_LIBS=''
 if test "$with_lapack" != 'no'
 then
-    dnl These macros are defined in aclocal.m4
-    ACX_BLAS(AC_DEFINE(HAVE_BLAS))
-    ACX_LAPACK(AC_DEFINE(HAVE_LAPACK))
+    dnl Replace `main' with a function in -llapack:
+    AC_CHECK_LIB(lapack, main, AC_DEFINE(HAVE_LAPACK) LAPACK_LIBS="-llapack -lblas -lf2c"
+	   	 have_lapack=yes, have_lapack=no, -lblas -lf2c -lm)
+fi
+
+if test "$with_lapack" != 'no'
+then
+    dnl Replace `main' with a function in -lscs (for SGI):
+    AC_CHECK_LIB(scs, main, AC_DEFINE(HAVE_SCSL) LAPACK_LIBS="-lscs -lblas"
+	         have_scs=yes, have_scs=no, -lblas -lm)
 fi
 
 dnl Replace `main' with a function in -lX11:
@@ -143,6 +157,25 @@ then
     AC_CHECK_LIB(jpeg, main, AC_DEFINE(HAVE_JPEG) JPEG_LIB="-ljpeg" have_jpeg=yes, have_jpeg=no,)
 fi
 
+#
+# Check for LAPACK
+#
+have_lapack='no'
+LAPACK_LIBS=''
+if test "$with_lapack" != 'no'
+then
+    dnl Replace `main' with a function in -llapack:
+    AC_CHECK_LIB(lapack, main, AC_DEFINE(HAVE_LAPACK) LAPACK_LIBS="-llapack -lblas -lf2c"
+	   	 have_lapack=yes, have_lapack=no, -lblas -lf2c -lm)
+fi
+
+if test "$with_lapack" != 'no'
+then
+    dnl Replace `main' with a function in -lscs (for SGI):
+    AC_CHECK_LIB(scs, main, AC_DEFINE(HAVE_SCSL) LAPACK_LIBS="-lscs -lblas"
+	         have_scs=yes, have_scs=no, -lblas -lm)
+fi
+
 dnl Replace `main' with a function in -lX11:
 AC_CHECK_LIB(X11, main)
 
@@ -172,12 +205,9 @@ fi
 # Check for OpenGL extensions
 #
 have_glext='no'
-if test "$with_opengl" != 'no'
-then
-    AC_CHECK_LIB(GL, glXGetProcAddressARB, AC_DEFINE(HAVE_OPENGL_EXT)
-	         have_glext=yes, have_glext=no, -lXmu -lXi -lX11 -lpthread -lm)
-fi
-	     
+AC_CHECK_LIB(GL, glXGetProcAddressARB, AC_DEFINE(HAVE_OPENGL_EXT)
+	     have_glext=yes, have_glext=no, -lXmu -lXi -lX11 -lpthread -lm)
+
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
