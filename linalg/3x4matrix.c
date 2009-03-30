@@ -187,6 +187,32 @@ Gan_Matrix34
  */
 
 /**
+ * \addtogroup FixedSizeMatrixMatrixProduct
+ * \{
+ */
+
+/**
+ * \brief Multiply 3x4 matrix by the transpose of 3x4 matrix.
+ *
+ * Multiply 3x4 matrix \a A by the transpose of 3x4 matrix \a B, producing
+ * a 3x3 matrix as the result \f$ A B^{\top} \f$.
+ *
+ * \return The result \f$ A B^{\top} \f$ as a new matrix.
+ */
+Gan_Matrix33
+ gan_mat34_rmultm34T_s ( const Gan_Matrix34 *A, const Gan_Matrix34 *B )
+{
+   Gan_Matrix33 C;
+
+   (void)gan_mat34_rmultm34T_q ( A, B, &C );
+   return C;
+}
+
+/**
+ * \}
+ */
+
+/**
  * \addtogroup FixedSizeMatrixVectorProduct
  * \{
  */

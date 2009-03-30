@@ -815,6 +815,8 @@ static Gan_Bool
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the SGI image from the given file stream \a infile into the given
@@ -824,7 +826,8 @@ static Gan_Bool
  * \sa gan_write_sgi_image_stream().
  */
 Gan_Image *
- gan_read_sgi_image_stream ( FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_sgi_image_stream(FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                           Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    char acHeader[BIG_BUFFER_SIZE], *acAlignedHeader;
    int iWidth, iHeight, iInternalHeight;
@@ -1042,6 +1045,10 @@ Gan_Image *
                      return NULL;
                   }
                }
+
+               /* check for abort every 10 rows */
+               if(abortRequested != NULL && (iRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                  break;
             }
          }
 
@@ -1121,6 +1128,10 @@ Gan_Image *
                gan_free_va(acRLEBuffer, aui32LengthTab, aui32StartTab, NULL);
                return NULL;
             }
+
+            /* check for abort */
+            if(abortRequested != NULL && GAN_TRUE == abortRequested(abortObj))
+               break;
          }
 
          gan_free_va(acRLEBuffer, aui32LengthTab, aui32StartTab, NULL);
@@ -1143,6 +1154,8 @@ Gan_Image *
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the SGI image with the in the file \a filename into the given
@@ -1152,7 +1165,8 @@ Gan_Image *
  * \sa gan_write_sgi_image().
  */
 Gan_Image *
- gan_read_sgi_image ( const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_sgi_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                    Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
    Gan_Image *result;
@@ -1166,7 +1180,7 @@ Gan_Image *
       return NULL;
    }
 
-   result = gan_read_sgi_image_stream ( infile, image, ictrlstr, header );
+   result = gan_read_sgi_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
    fclose(infile);
    return result;
 }
@@ -1312,7 +1326,7 @@ Gan_Bool
       }
 
       for(iPlane=0; iPlane<(int)ui16ZSize; iPlane++)
-         for ( r=0; r < height; r++ )
+         for ( r=0; r < (int)height; r++ )
          {
             /* ignore row if it's in a field we're not writing */
             if(single_field && ((upper && ((r % 2) == 1)) || (!upper && ((r % 2) == 0))))

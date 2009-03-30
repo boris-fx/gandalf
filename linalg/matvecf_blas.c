@@ -70,7 +70,7 @@ Gan_Vector_f *
 
    /* compute y += a*x */
 #ifdef HAVE_LAPACK
-   saxpy_ ( (long *)&x->rows, &a, x->data, &onei, y->data, &onei );
+   BLAS_SAXPY ( (long *)&x->rows, &a, x->data, &onei, y->data, &onei );
 #else
    gan_saxpy ( x->rows, a, x->data, 1, y->data, 1 );
 #endif /* #ifdef HAVE_LAPACK */
@@ -110,9 +110,9 @@ Gan_Vector_f *
 
    /* compute y = alpha*A*x + beta*y or y = alpha*A^T*x + beta*y */
 #ifdef HAVE_LAPACK
-   sgemv_ ( A_tr ? "t" : "n", (long *)&A->rows, (long *)&A->cols, &alpha,
-            A->data, (A->rows == 0) ? &onei : (long *)&A->rows,
-            x->data, &onei, &beta, y->data, &onei );
+   BLAS_SGEMV ( A_tr ? "t" : "n", (long *)&A->rows, (long *)&A->cols, &alpha,
+                A->data, (A->rows == 0) ? &onei : (long *)&A->rows,
+                x->data, &onei, &beta, y->data, &onei );
 #else
    gan_sgemv ( A_tr, A->rows, A->cols, alpha, A->data,
                (A->rows == 0) ? 1 : A->rows, x->data, 1, beta, y->data, 1 );
@@ -145,11 +145,9 @@ Gan_Matrix_f *
 
    /* compute A += a*x*y^T */
 #ifdef HAVE_LAPACK
-   sger_ ( (long *)&A->rows, (long *)&A->cols, &a, x->data, &onei,
-           y->data, &onei, A->data, (long *)&A->rows );
+   BLAS_SGER ( (long *)&A->rows, (long *)&A->cols, &a, x->data, &onei, y->data, &onei, A->data, (long *)&A->rows );
 #else
-   gan_sger ( A->rows, A->cols, a, x->data, 1, y->data, 1,
-              A->data, A->rows );
+   gan_sger ( A->rows, A->cols, a, x->data, 1, y->data, 1, A->data, A->rows );
 #endif /* #ifdef HAVE_LAPACK */
 
    /* return result */
@@ -179,7 +177,7 @@ Gan_SquMatrix_f *
 
    /* compute A += a*x*x^T */
 #ifdef HAVE_LAPACK
-   sspr_ ( "U", (long *)&A->size, &a, x->data, &onei, A->data );
+   BLAS_SSPR ( "U", (long *)&A->size, &a, x->data, &onei, A->data );
 #else
    gan_sspr ( GAN_MATRIXPART_UPPER, A->size, a, x->data, 1, A->data );
 #endif /* #ifdef HAVE_LAPACK */
@@ -207,7 +205,7 @@ Gan_Vector_f *
 
    /* compute x *= a */
 #ifdef HAVE_LAPACK
-   sscal_ ( (long *)&x->rows, &a, x->data, &onei );
+   BLAS_SSCAL ( (long *)&x->rows, &a, x->data, &onei );
 #else
    gan_sscal ( x->rows, a, x->data, 1 );
 #endif /* #ifdef HAVE_LAPACK */
@@ -247,12 +245,12 @@ Gan_Matrix_f *
 
    /* compute C = alpha*A(^T)*B(^T) + beta*C */
 #ifdef HAVE_LAPACK
-   sgemm_ ( A_tr ? "t" : "n", B_tr ? "t" : "n",
-            (long *)&C->rows, (long *)&C->cols,
-            A_tr ? (long *)&A->rows : (long *)&A->cols, &alpha,
-            A->data, (A->rows == 0) ? &onei : (long *)&A->rows,
-            B->data, (B->rows == 0) ? &onei : (long *)&B->rows, &beta,
-            C->data, (C->rows == 0) ? &onei : (long *)&C->rows );
+   BLAS_SGEMM ( A_tr ? "t" : "n", B_tr ? "t" : "n",
+                (long *)&C->rows, (long *)&C->cols,
+                A_tr ? (long *)&A->rows : (long *)&A->cols, &alpha,
+                A->data, (A->rows == 0) ? &onei : (long *)&A->rows,
+                B->data, (B->rows == 0) ? &onei : (long *)&B->rows, &beta,
+                C->data, (C->rows == 0) ? &onei : (long *)&C->rows );
 #else
    gan_sgemm ( A_tr, B_tr, C->rows, C->cols,
                A_tr ? A->rows : A->cols, alpha,

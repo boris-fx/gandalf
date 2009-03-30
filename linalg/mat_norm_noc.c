@@ -66,7 +66,7 @@ Gan_Bool
             return GAN_FALSE;
          }
 
-         GAN_SYMMAT_DIVIDE_S ( &BTB, norm );
+         GAN_SYMMAT_DIVIDE_I ( &BTB, norm );
 
          /* increment sum by adjusting Sp */
          (void)GAN_SYMMAT_INCREMENT ( &Sp, &BTB );

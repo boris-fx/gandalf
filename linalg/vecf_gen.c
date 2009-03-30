@@ -281,7 +281,7 @@ Gan_Vector_f *
 
    /* copy vector */
 #ifdef HAVE_LAPACK
-   scopy_ ( (long *)&x->rows, x->data, &onei, y->data, &onei );
+   BLAS_SCOPY ( (long *)&x->rows, x->data, &onei, y->data, &onei );
 #else
    gan_scopy ( x->rows, x->data, 1, y->data, 1 );
 #endif /* #ifdef HAVE_LAPACK */
@@ -328,8 +328,8 @@ Gan_Vector_f *
 
 #ifdef HAVE_LAPACK
    /* copy and scale vector */
-   scopy_ ( (long *)&x->rows, x->data, &onei, y->data, &onei );
-   sscal_ ( (long *)&y->rows, &a, y->data, &onei );
+   BLAS_SCOPY ( (long *)&x->rows, x->data, &onei, y->data, &onei );
+   BLAS_SSCAL ( (long *)&y->rows, &a, y->data, &onei );
 #else
    /* copy and scale vector */
    gan_scopy ( x->rows, x->data, 1, y->data, 1 );
@@ -384,15 +384,15 @@ Gan_Vector_f *
    /* add vector data */
    if ( z == x )
       /* in-place operation x += y */
-      saxpy_ ( (long *)&x->rows, &onef, y->data, &onei, x->data, &onei );
+      BLAS_SAXPY ( (long *)&x->rows, &onef, y->data, &onei, x->data, &onei );
    else if ( z == y )
       /* in-place operation y += x */
-      saxpy_ ( (long *)&x->rows, &onef, x->data, &onei, y->data, &onei );
+      BLAS_SAXPY ( (long *)&x->rows, &onef, x->data, &onei, y->data, &onei );
    else
    {
       /* z = x + y */
-      scopy_ ( (long *)&x->rows, x->data, &onei, z->data, &onei );
-      saxpy_ ( (long *)&x->rows, &onef, y->data, &onei, z->data, &onei );
+      BLAS_SCOPY ( (long *)&x->rows, x->data, &onei, z->data, &onei );
+      BLAS_SAXPY ( (long *)&x->rows, &onef, y->data, &onei, z->data, &onei );
    }
 #else
    /* add vector data */
@@ -459,20 +459,20 @@ Gan_Vector_f *
    /* subtract vector data */
    if ( z == x )
       /* in-place operation x -= y */
-      saxpy_ ( (long *)&x->rows, &minus_onef, y->data, &onei, x->data, &onei );
+      BLAS_SAXPY ( (long *)&x->rows, &minus_onef, y->data, &onei, x->data, &onei );
    else if ( z == y )
    {
       /* in-place operation y = x - y */
       float onef = 1.0;
 
-      sscal_ ( (long *)&x->rows, &minus_onef, y->data, &onei );
-      saxpy_ ( (long *)&x->rows, &onef, x->data, &onei, y->data, &onei );
+      BLAS_SSCAL ( (long *)&x->rows, &minus_onef, y->data, &onei );
+      BLAS_SAXPY ( (long *)&x->rows, &onef, x->data, &onei, y->data, &onei );
    }
    else
    {
       /* z = x - y */
-      scopy_ ( (long *)&x->rows, x->data, &onei, z->data, &onei );
-      saxpy_ ( (long *)&x->rows, &minus_onef, y->data, &onei, z->data, &onei );
+      BLAS_SCOPY ( (long *)&x->rows, x->data, &onei, z->data, &onei );
+      BLAS_SAXPY ( (long *)&x->rows, &minus_onef, y->data, &onei, z->data, &onei );
    }
 #else
    /* subtract vector data */
@@ -524,7 +524,7 @@ float
 
    /* compute dot-product */
 #ifdef HAVE_LAPACK
-   return sdot_ ( (long *)&x->rows, x->data, &onei, y->data, &onei );
+   return (float)BLAS_SDOT ( (long *)&x->rows, x->data, &onei, y->data, &onei );
 #else
    return gan_sdot ( x->rows, x->data, 1, y->data, 1 );
 #endif /* #ifdef HAVE_LAPACK */

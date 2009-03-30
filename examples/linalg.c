@@ -16,14 +16,14 @@
 **************************************************************************/
 
 /* error handling */
-#include <common/misc_error.h>
+#include <gandalf/common/misc_error.h>
 
 /* general rectangular matrix functions */
-#include <linalg/mat_gen.h>
+#include <gandalf/linalg/mat_gen.h>
 
 /* symmetric matrix functions */
-#include <linalg/mat_symmetric.h>
-#include <linalg/mat_diagonal.h>
+#include <gandalf/linalg/mat_symmetric.h>
+#include <gandalf/linalg/mat_diagonal.h>
 
 /* example code for using the linear algebra package */
 

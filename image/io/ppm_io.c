@@ -84,6 +84,8 @@ Gan_Bool gan_image_is_ppm(const unsigned char *magic_string, size_t length)
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the PPM image from the given file stream \a infile into the given
@@ -93,7 +95,8 @@ Gan_Bool gan_image_is_ppm(const unsigned char *magic_string, size_t length)
  * \sa gan_write_ppm_image_stream().
  */
 Gan_Image *
- gan_read_ppm_image_stream ( FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_ppm_image_stream(FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                           Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    char s[80]="";
    int iWidth, iHeight, iInternalHeight, iRow;
@@ -193,17 +196,27 @@ Gan_Image *
                gan_err_register ( "gan_read_ppm_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated PPM file" );
                return NULL;
             }
+
+         /* check for abort every 10 rows */
+         if(abortRequested != NULL && (iRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+            break;
       }
    }
    else
    {
       for(iRow=0; iRow<iHeight; iRow++)
+      {
          if ( fread ( image->row_data.rgb.uc[flip ? (iHeight-iRow-1) : iRow], sizeof(Gan_RGBPixel_ui8), iWidth, infile ) != (size_t)iWidth )
          {
             gan_err_flush_trace();
             gan_err_register ( "gan_read_ppm_image_stream", GAN_ERROR_TRUNCATED_FILE, "truncated PPM file" );
             return NULL;
          }
+
+         /* check for abort every 10 rows */
+         if(abortRequested != NULL && (iRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+            break;
+      }
    }
 
    /* success */
@@ -216,6 +229,8 @@ Gan_Image *
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the PPM image with the in the file \a filename into the given
@@ -225,7 +240,8 @@ Gan_Image *
  * \sa gan_write_ppm_image().
  */
 Gan_Image *
- gan_read_ppm_image ( const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+ gan_read_ppm_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                    Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
    Gan_Image *result;
@@ -240,7 +256,7 @@ Gan_Image *
       return NULL;
    }
 
-   result = gan_read_ppm_image_stream ( infile, image, ictrlstr, header );
+   result = gan_read_ppm_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
    fclose(infile);
    return result;
 }

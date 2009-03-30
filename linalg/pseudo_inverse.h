@@ -95,8 +95,8 @@ typedef struct
 } Gan_PseudoInverseStruct;
 
 GANDALF_API Gan_PseudoInverseStruct *gan_pseudoinv_form ( Gan_PseudoInverseStruct *psi,
-                                              long max_asize,
-                                              long max_bsize );
+                                                          long max_asize,
+                                                          long max_bsize );
 
 /**
  * \brief Macro: Allocates a pseudo-inverse equation solving structure.
@@ -119,25 +119,18 @@ GANDALF_API Gan_PseudoInverseStruct *gan_pseudoinv_alloc ( long max_asize,
 #endif
 
 GANDALF_API void     gan_pseudoinv_free ( Gan_PseudoInverseStruct *pis );
-GANDALF_API Gan_Bool gan_pseudoinv_reset ( Gan_PseudoInverseStruct *pis,
-                               long asize, long bsize );
-GANDALF_API Gan_Bool gan_pseudoinv_increment ( Gan_PseudoInverseStruct *pis,
-                                   double scale, ... );
-GANDALF_API Gan_Bool gan_pseudoinv_decrement ( Gan_PseudoInverseStruct *pis,
-                                   double scale, ... );
-GANDALF_API Gan_Bool gan_pseudoinv_set_constraint ( Gan_PseudoInverseStruct *pis,
-                                        Gan_Matrix *C, Gan_Matrix *D );
-GANDALF_API Gan_Bool gan_pseudoinv_set_null_space ( Gan_PseudoInverseStruct *pis,
-                                        int null_space );
-GANDALF_API Gan_Bool gan_pseudoinv_set_ratio_thres ( Gan_PseudoInverseStruct *pis,
-                                         double ratio_thres );
-GANDALF_API Gan_Bool gan_pseudoinv_set_low_values_allowed ( Gan_PseudoInverseStruct *pis,
-                                                int low_values_allowed );
+GANDALF_API Gan_Bool gan_pseudoinv_reset ( Gan_PseudoInverseStruct *pis, long asize, long bsize );
+GANDALF_API Gan_Bool gan_pseudoinv_increment ( Gan_PseudoInverseStruct *pis, double scale, ... );
+GANDALF_API Gan_Bool gan_pseudoinv_decrement ( Gan_PseudoInverseStruct *pis, double scale, ... );
+GANDALF_API Gan_Bool gan_pseudoinv_increment_arr ( Gan_PseudoInverseStruct *pis, double scale, double* a, double* b );
+GANDALF_API Gan_Bool gan_pseudoinv_decrement_arr ( Gan_PseudoInverseStruct *pis, double scale, double* a, double* b );
+GANDALF_API Gan_Bool gan_pseudoinv_set_constraint ( Gan_PseudoInverseStruct *pis, Gan_Matrix *C, Gan_Matrix *D );
+GANDALF_API Gan_Bool gan_pseudoinv_set_null_space ( Gan_PseudoInverseStruct *pis, int null_space );
+GANDALF_API Gan_Bool gan_pseudoinv_set_ratio_thres ( Gan_PseudoInverseStruct *pis, double ratio_thres );
+GANDALF_API Gan_Bool gan_pseudoinv_set_low_values_allowed ( Gan_PseudoInverseStruct *pis, int low_values_allowed );
 GANDALF_API Gan_Bool gan_pseudoinv_solve ( Gan_PseudoInverseStruct *pis, int *error_code );
-GANDALF_API Gan_Matrix *
-         gan_pseudoinv_get_solution ( Gan_PseudoInverseStruct *pis );
-GANDALF_API Gan_Vector *
-         gan_pseudoinv_get_null_vector ( Gan_PseudoInverseStruct *pis );
+GANDALF_API Gan_Matrix *gan_pseudoinv_get_solution ( Gan_PseudoInverseStruct *pis );
+GANDALF_API Gan_Vector *gan_pseudoinv_get_null_vector ( Gan_PseudoInverseStruct *pis );
 
 /**
  * \}

@@ -57,9 +57,7 @@
  * \sa gan_local_feature_map_form(), gan_local_feature_map_free().
  */
 Gan_LocalFeatureMap *
- gan_local_feature_map_form ( Gan_LocalFeatureMap *pmap,
-                              unsigned height, unsigned width,
-                              Gan_LocalFeatureMapParams *pms )
+ gan_local_feature_map_form ( Gan_LocalFeatureMap *pmap, unsigned height, unsigned width, Gan_LocalFeatureMapParams *pms )
 {
    unsigned yblocks, xblocks;
 
@@ -83,18 +81,13 @@ Gan_LocalFeatureMap *
    if ( pms == NULL || pms->ystep == 0 )
    {
       /* special case: empty local feature map */
-      gan_err_test_ptr ( pms == NULL || pms->xstep == 0,
-                         "gan_local_feature_map_form",
-                         GAN_ERROR_INCOMPATIBLE, "step parameters" );
+      gan_err_test_ptr ( pms == NULL || pms->xstep == 0, "gan_local_feature_map_form", GAN_ERROR_INCOMPATIBLE, "step parameters" );
       xblocks = yblocks = 0;
    }
    else
    {
-      gan_err_test_ptr ( pms->xstep != 0, "gan_local_feature_map_form",
-                         GAN_ERROR_INCOMPATIBLE, "step parameters" );
-      gan_err_test_ptr ( pms->bsize % 2 == 1,
-                          "gan_local_feature_map_form",GAN_ERROR_INCOMPATIBLE,
-                          "local feature pmap catchment area should be odd");
+      gan_err_test_ptr ( pms->xstep != 0, "gan_local_feature_map_form", GAN_ERROR_INCOMPATIBLE, "step parameters" );
+      gan_err_test_ptr ( pms->bsize % 2 == 1, "gan_local_feature_map_form",GAN_ERROR_INCOMPATIBLE, "local feature pmap catchment area should be odd");
       xblocks = (width + pms->xstep - 1)/pms->xstep + pms->bsize - 1;
       yblocks = (width + pms->ystep - 1)/pms->ystep + pms->bsize - 1;
    }
@@ -114,6 +107,7 @@ Gan_LocalFeatureMap *
    }
 
    /* clear feature map */
+   gan_image_fill_const_p(&pmap->index, NULL);
    if ( !gan_local_feature_map_clear ( pmap, height, width, pms ) )
    {
       gan_err_register ( "gan_local_feature_map_form", GAN_ERROR_FAILURE, "" );
@@ -186,8 +180,7 @@ Gan_Bool
    }
 
    /* allocate image of feature totals */
-   if ( gan_image_set_gl_i ( &pmap->nfeatures,
-                             pmap->yblocks, pmap->xblocks ) == NULL )
+   if ( gan_image_set_gl_i ( &pmap->nfeatures, pmap->yblocks, pmap->xblocks ) == NULL )
    {
       gan_err_register ( "gan_local_feature_map_clear", GAN_ERROR_FAILURE, "");
       return GAN_FALSE;
@@ -199,8 +192,7 @@ Gan_Bool
          free ( gan_image_get_pix_p ( &pmap->index, 0, 0 ) );
 
    /* allocate image of feature indices */
-   if ( gan_image_set_p ( &pmap->index,
-                          pmap->yblocks, pmap->xblocks ) == NULL )
+   if ( gan_image_set_p ( &pmap->index, pmap->yblocks, pmap->xblocks ) == NULL )
    {
       gan_err_register ( "gan_local_feature_map_clear", GAN_ERROR_FAILURE, "");
       return GAN_FALSE;
@@ -217,8 +209,7 @@ Gan_Bool
       /* copy fields from parameter structure */
       pmap->xstep = pms->xstep;
       pmap->ystep = pms->ystep;
-      gan_err_test_bool ( pms->ystep == 0 || pms->bsize % 2 == 1,
-                          "gan_local_feature_map_clear",GAN_ERROR_INCOMPATIBLE,
+      gan_err_test_bool ( pms->ystep == 0 || pms->bsize % 2 == 1, "gan_local_feature_map_clear",GAN_ERROR_INCOMPATIBLE,
                           "local feature pmap catchment area should be odd");
       pmap->bsize2 = pms->bsize/2;
    }
@@ -249,9 +240,7 @@ Gan_Bool
    int **nfeatures = gan_image_get_pixarr_gl_i(&pmap->nfeatures);
 
    /* exit if local feature map has illegal step size between blocks */
-   gan_err_test_bool ( pmap->xstep != 0 && pmap->ystep != 0,
-                       "gan_local_feature_point_add", GAN_ERROR_INCOMPATIBLE,
-                       "" );
+   gan_err_test_bool ( pmap->xstep != 0 && pmap->ystep != 0, "gan_local_feature_point_add", GAN_ERROR_INCOMPATIBLE, "" );
 
    /* compute block position of feature */
    r = r/pmap->ystep + pmap->bsize2;
@@ -268,8 +257,7 @@ Gan_Bool
       for ( r = rs; r <= re; r++ )
          for ( c = cs; c <= ce; c++ )
          {
-            gan_err_test_bool ( r < pmap->nfeatures.height && c < pmap->nfeatures.width,
-                                "gan_local_feature_point_add", GAN_ERROR_INCOMPATIBLE, "" );
+            gan_err_test_bool ( r < pmap->nfeatures.height && c < pmap->nfeatures.width, "gan_local_feature_point_add", GAN_ERROR_INCOMPATIBLE, "" );
             nfeatures[r][c]++;
          }
    else
@@ -328,9 +316,7 @@ Gan_Bool
 
    /* if endpoint block coordinates are coincident, use point function */
    if ( c1 == c2 && r1 == r2 )
-      return gan_local_feature_point_add ( pmap, r1*pmap->ystep,
-                                                 c1*pmap->xstep,
-                                           index );
+      return gan_local_feature_point_add ( pmap, r1*pmap->ystep, c1*pmap->xstep, index );
 
    /* check whether extent of line is greater in the horizontal or vertical
       direction */
@@ -486,15 +472,14 @@ Gan_Bool
  * \return #GAN_TRUE on success, #GAN_FALSE on failure.
  */
 Gan_Bool
- gan_local_feature_map_find_block ( Gan_LocalFeatureMap *pmap,
-                                    double y, double x, Gan_Matrix23 *Ai,
+ gan_local_feature_map_find_block ( const Gan_LocalFeatureMap *pmap,
+                                    double y, double x, const Gan_Matrix23 *Ai,
                                     unsigned *cr, unsigned *cc )
 {
    if ( pmap->xstep == 0 || pmap->ystep == 0 )
    {
       gan_err_flush_trace();
-      gan_err_register ( "gan_local_feature_map_find_block",
-                         GAN_ERROR_INCOMPATIBLE, "local feature map" );
+      gan_err_register ( "gan_local_feature_map_find_block", GAN_ERROR_INCOMPATIBLE, "local feature map" );
       return GAN_FALSE;
    }
 

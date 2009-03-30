@@ -17,7 +17,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include <common/file_io.h>
+#include <gandalf/common/file_io.h>
 
 static void print_arguments(const char* progname)
 {

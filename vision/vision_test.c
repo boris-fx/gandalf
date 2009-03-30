@@ -365,7 +365,7 @@ static Gan_Bool lev_marq_test(void)
       if ( new_residual < residual )
       {
          /* iteration succeeded in reducing the residual */
-         lambda /= 10.0;
+         lambda *= 0.1;
          residual = new_residual;
       }
       else

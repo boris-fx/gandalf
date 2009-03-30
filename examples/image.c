@@ -17,12 +17,12 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include <image/image_defs.h>
-#include <image/image_gl_uchar.h>
-#include <image/image_gl_uint.h>
-#include <image/image_gl_int.h>
-#include <image/image_rgb_uchar.h>
-#include <common/misc_error.h>
+#include <gandalf/image/image_defs.h>
+#include <gandalf/image/image_gl_uchar.h>
+#include <gandalf/image/image_gl_uint.h>
+#include <gandalf/image/image_gl_int.h>
+#include <gandalf/image/image_rgb_uchar.h>
+#include <gandalf/common/misc_error.h>
 
 /* Prints the image */
 static Gan_Bool print_image ( Gan_Image *img )

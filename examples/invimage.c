@@ -16,9 +16,9 @@
 **************************************************************************/
 
 #include <stdio.h>
-#include <linalg/3x3matrix.h>
-#include <image/io/image_io.h>
-#include <image/image_invert.h>
+#include <gandalf/linalg/3x3matrix.h>
+#include <gandalf/image/io/image_io.h>
+#include <gandalf/image/image_invert.h>
 
 static void vPrintArguments ( char *acProgName )
 {

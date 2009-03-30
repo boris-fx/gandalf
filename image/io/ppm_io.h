@@ -52,8 +52,12 @@ struct Gan_ImageWriteControlStruct;
 
 /* Prototypes for public functions in ppm_io.c */
 GANDALF_API Gan_Bool gan_image_is_ppm(const unsigned char *magic_string, size_t length);
-GANDALF_API Gan_Image *gan_read_ppm_image_stream ( FILE *infile, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header );
-GANDALF_API Gan_Image *gan_read_ppm_image ( const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header );
+GANDALF_API Gan_Image *gan_read_ppm_image_stream(FILE *infile, Gan_Image *image,
+                                                 const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                                                 Gan_Bool (*abortRequested)(void*), void* abortObj);
+GANDALF_API Gan_Image *gan_read_ppm_image(const char *filename, Gan_Image *image,
+                                          const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                                          Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API Gan_Bool   gan_write_ppm_image_stream ( FILE *outfile, const Gan_Image *image, Gan_Bool new_file, const struct Gan_ImageWriteControlStruct *octrlstr );
 GANDALF_API Gan_Bool   gan_write_ppm_image ( const char *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr );
 

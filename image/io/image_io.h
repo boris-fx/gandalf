@@ -89,6 +89,10 @@ typedef struct Gan_ImageReadControlStruct
 
    /// if reading a single field, whether to insert it into a full size image (required for pulldown frames)
    Gan_Bool whole_image;
+
+   /// whether to use native packed pixel type
+   Gan_Bool native_type;
+   
 #if 0
    /// input type for colourspace conversion. #GAN_UNDEFINED_TYPE indicates no conversion. Should be checked against file type.
    Gan_Type itype;
@@ -184,10 +188,12 @@ GANDALF_API Gan_Bool gan_image_format_type_supported ( Gan_ImageFileFormat file_
                                                        const Gan_ImageHeaderInfo* info );
 GANDALF_API Gan_Bool gan_image_write_field_supported ( Gan_ImageFileFormat file_format );
 GANDALF_API void gan_initialise_image_read_control_struct(Gan_ImageReadControlStruct *ictrlstr);
-GANDALF_API Gan_Image *gan_image_read ( const char *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
-                                        const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header );
-GANDALF_API Gan_Image *gan_image_read_stream ( FILE *infile, Gan_ImageFileFormat file_format, Gan_Image *image,
-                                               const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header );
+GANDALF_API Gan_Image *gan_image_read_with_abort_test ( const char *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
+                                                        const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header,
+                                                        Gan_Bool (*abortRequested)(void*), void* abortObj);
+GANDALF_API Gan_Image *gan_image_read_stream_with_abort_test ( FILE *infile, Gan_ImageFileFormat file_format, Gan_Image *image,
+                                                               const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header,
+                                                               Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API Gan_Bool gan_initialise_image_header_info(Gan_ImageHeaderInfo *ohdrinfo, Gan_ImageFormat image_format, Gan_Type type);
 GANDALF_API Gan_Bool gan_initialise_image_write_control_struct(Gan_ImageWriteControlStruct *octrlstr,
                                                                Gan_ImageFileFormat file_format, Gan_ImageFormat image_format, Gan_Type type);
@@ -195,6 +201,60 @@ GANDALF_API Gan_Bool gan_image_write ( const char *filename, Gan_ImageFileFormat
                                        const Gan_ImageWriteControlStruct *octrlstr );
 GANDALF_API Gan_Bool gan_image_write_stream ( FILE *outfile, Gan_ImageFileFormat file_format, const Gan_Image *image,
                                               Gan_Bool new_file, const Gan_ImageWriteControlStruct *octrlstr );
+
+/**
+ * \brief Macro: Reads an image file.
+ * \param filename The name of the image file
+ * \param file_format The format of the file, e.g. GAN_PNG_FORMAT
+ * \param image The image structure to read the image data into or NULL
+ * \param ictrlstr Structure controlling read or \c NULL
+ * \param header Output information structure containing format-dependent header data, or \c NULL
+ * \return Pointer to \a image structure, or \c NULL on failure.
+ *
+ * Reads an image from the given file \a filename into the provided \a image
+ * structure. If \a image is \c NULL a new image is dynamically allocated;
+ * otherwise the already allocated \a image structure is reused.
+ *
+ * If the file format is known, it should be specified in \a file_format;
+ * otherwise pass \a file_format as #GAN_UNKNOWN_FORMAT and the function will
+ * try to determine the file format.
+ *
+ * \sa gan_write_image().
+ */
+#ifdef GAN_GENERATE_DOCUMENTATION
+GANDALF_API Gan_Image *gan_image_read ( const char *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
+                                        const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header );
+#else
+#define gan_image_read(name,format,image,ictrlstr,header) \
+    gan_image_read_with_abort_test(name,format,image,ictrlstr,header,NULL,NULL)
+#endif
+
+/**
+ * \brief Macro: Reads an image file from a file stream.
+ * \param infile Input file stream
+ * \param file_format Image file format, e.g. GAN_PNG_FORMAT, or #GAN_UNKNOWN_FORMAT
+ * \param image The image structure to read the image data into or \c NULL
+ * \param ictrlstr Structure controlling read or \c NULL
+ * \param header Output information structure containing format-dependent header data, or \c NULL
+ * \return Pointer to image structure, or \c NULL on failure.
+ *
+ * Reads an image from the given file stream \a infile into the provided
+ * \a image structure. If \a image is \c NULL a new image is dynamically
+ * allocated; otherwise the already allocated \a image structure is reused.
+ *
+ * If the file format is known, it should be specified by \a file_format;
+ * otherwise pass \a file_format as #GAN_UNKNOWN_FORMAT and the function will
+ * try to determine the file format.
+ *
+ * \sa gan_write_image_stream().
+ */
+#ifdef GAN_GENERATE_DOCUMENTATION
+GANDALF_API Gan_Image *gan_image_read_stream ( FILE *infile, Gan_ImageFileFormat file_format, Gan_Image *image,
+                                               const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header );
+#else
+#define gan_image_read_stream(infile,format,image,ictrlstr,header) \
+    gan_image_read_stream_with_abort_test(infile,format,image,ictrlstr,header,NULL,NULL)
+#endif
 
 /**
  * \}

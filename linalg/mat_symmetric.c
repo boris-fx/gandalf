@@ -204,7 +204,7 @@ static Gan_SquMatrix *
    {
       long nel = A->size*(A->size+1)/2, onei = 1;
 
-      dcopy_ ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_DCOPY ( &nel, A->data, &onei, B->data, &onei );
    }
 #else
    if ( !gan_dcopy ( A->size*(A->size+1)/2, A->data, 1, B->data, 1 ) )
@@ -243,8 +243,8 @@ static Gan_SquMatrix *
    {
       long nel = A->size*(A->size+1)/2, onei = 1;
 
-      if(A!=B) dcopy_ ( &nel, A->data, &onei, B->data, &onei );
-      dscal_ ( &nel, &a, B->data, &onei );
+      if(A!=B) BLAS_DCOPY ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_DSCAL ( &nel, &a, B->data, &onei );
    }
 #else
    if ( (A!=B && !gan_dcopy ( A->size*(A->size+1)/2, A->data, 1, B->data, 1 )) ||
@@ -300,15 +300,15 @@ static Gan_SquMatrix *
          double onef = 1.0;
          if ( C == A )
             /* in-place operation A += B */
-            daxpy_ ( &nel, &onef, B->data, &onei, A->data, &onei );
+            BLAS_DAXPY ( &nel, &onef, B->data, &onei, A->data, &onei );
          else if ( C == B )
             /* in-place operation B += A */
-            daxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+            BLAS_DAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
          else
          {
             /* C = A + B */
-            dcopy_ ( &nel, A->data, &onei, C->data, &onei );
-            daxpy_ ( &nel, &onef, B->data, &onei, C->data, &onei );
+            BLAS_DCOPY ( &nel, A->data, &onei, C->data, &onei );
+            BLAS_DAXPY ( &nel, &onef, B->data, &onei, C->data, &onei );
          }
       }
 #else
@@ -420,20 +420,20 @@ static Gan_SquMatrix *
       /* subtract matrix data */
       if ( C == A )
          /* in-place operation A -= B */
-         daxpy_ ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
+         BLAS_DAXPY ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
       else if ( C == B )
       {
          /* in-place operation B = A - B */
          double onef = 1.0;
 
-         dscal_ ( &nel, &minus_onef, B->data, &onei );
-         daxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+         BLAS_DSCAL ( &nel, &minus_onef, B->data, &onei );
+         BLAS_DAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
       }
       else
       {
          /* C = A - B */
-         dcopy_ ( &nel, A->data, &onei, C->data, &onei );
-         daxpy_ ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
+         BLAS_DCOPY ( &nel, A->data, &onei, C->data, &onei );
+         BLAS_DAXPY ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
       }
    }
 #else
@@ -516,8 +516,8 @@ static Gan_Vector *
       long onei = 1;
 
       /* compute matrix/vector product */
-      dspmv_ ( "U", (long *)&A->size, &onef, A->data, x->data, &onei, &zerof,
-               y->data, &onei );
+      BLAS_DSPMV ( "U", (long *)&A->size, &onef, A->data, x->data, &onei, &zerof,
+                   y->data, &onei );
    }
 #else
    /* compute matrix/vector product */
@@ -584,13 +584,13 @@ static Gan_Matrix *
       if ( B_tr )
          /* multiply matrix data C = A*B^T */
          for ( j = 0; j < Ccols; j++ )
-            dspmv_ ( "U", (long *)&A->size, &onef, A->data,
+            BLAS_DSPMV ( "U", (long *)&A->size, &onef, A->data,
                      &B->data[j], (long *)&B->rows,
                      &zerof, &C->data[j*C->rows], &onei );
       else
          /* multiply matrix data C = A*B */
          for ( j = 0; j < Ccols; j++ )
-            dspmv_ ( "U", (long *)&A->size, &onef, A->data,
+            BLAS_DSPMV ( "U", (long *)&A->size, &onef, A->data,
                      &B->data[j*B->rows], &onei,
                      &zerof, &C->data[j*C->rows], &onei );
    }
@@ -678,15 +678,15 @@ static Gan_Matrix *
       if ( B_tr )
          /* multiply matrix data C = B^T*A */
          for ( i = 0; i < Crows; i++ )
-            dspmv_ ( "U", (long *)&A->size, &onef, A->data,
-                     &B->data[i*B->rows], &onei,
-                     &zerof, &C->data[i], (long *)&C->rows );
+            BLAS_DSPMV ( "U", (long *)&A->size, &onef, A->data,
+                         &B->data[i*B->rows], &onei,
+                         &zerof, &C->data[i], (long *)&C->rows );
       else
          /* multiply matrix data C = B*A */
          for ( i = 0; i < Crows; i++ )
-            dspmv_ ( "U", (long *)&A->size, &onef, A->data,
-                     &B->data[i], (long *)&B->rows,
-                     &zerof, &C->data[i], (long *)&C->rows );
+            BLAS_DSPMV ( "U", (long *)&A->size, &onef, A->data,
+                         &B->data[i], (long *)&B->rows,
+                         &zerof, &C->data[i], (long *)&C->rows );
    }
 #else
    if ( B_tr )
@@ -898,7 +898,7 @@ static Gan_SquMatrix *
       /* copy input matrix A into B */
       long nel = A->size*(A->size+1)/2, onei = 1;
 
-      dcopy_ ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_DCOPY ( &nel, A->data, &onei, B->data, &onei );
    }
 
    /* compute Cholesky factorisation */
@@ -1013,7 +1013,7 @@ static Gan_SquMatrix *
       /* copy input matrix S into L */
       long nel = S->size*(S->size+1)/2, onei = 1;
 
-      dcopy_ ( &nel, S->data, &onei, L->data, &onei );
+      BLAS_DCOPY ( &nel, S->data, &onei, L->data, &onei );
 #else
       if ( !gan_dcopy ( S->size*(S->size+1)/2, S->data, 1, L->data, 1 ) )
       {
@@ -1677,8 +1677,7 @@ Gan_Bool
                           "workspace too small (at least 3*size of matrix)" );
 
       if ( Z == NULL )
-         dspev_ ( "N", "U", (long *)&A->size, A->data, W->data, NULL, &onei,
-                  work, &info );
+         dspev_ ( "N", "U", (long *)&A->size, A->data, W->data, NULL, &onei, work, &info );
       else
       {
 #if 0
@@ -1688,8 +1687,7 @@ Gan_Bool
          Gan_SquMatrix* Acopy = gan_squmat_copy_s(A);
          gan_fill_array_d(work, work_size, 1, 0.0);
 #endif
-         dspev_ ( "V", "U", (long *)&A->size, A->data, W->data,
-                  Z->data, (long *)&Z->rows, work, &info );
+         dspev_ ( "V", "U", (long *)&A->size, A->data, W->data, Z->data, (long *)&Z->rows, work, &info );
 #if 0
          gan_fill_array_d(work, work_size, 1, 0.0);
          gan_dspev ( GAN_EVECTYPE_EVECSORIGINAL, GAN_MATRIXPART_UPPER, A->size, Acopy->data, W->data,

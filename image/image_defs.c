@@ -3,8 +3,8 @@
  * Module:        Image definitions and general functions
  * Part of:       Gandalf Library
  *
- * Revision:      $Revision: 1.66 $
- * Last edited:   $Date: 2007/07/12 11:46:44 $
+ * Revision:      $Revision: 1.65 $
+ * Last edited:   $Date: 2007/04/12 09:16:06 $
  * Author:        $Author: pm $
  * Copyright:     (c) 2000 Imagineer Software Limited
  */
@@ -1061,13 +1061,14 @@ size_t
       case GAN_RGB_COLOUR_IMAGE:
         switch ( type )
         {
-           case GAN_UCHAR:  width *= sizeof(Gan_RGBPixel_uc); break;
-           case GAN_USHORT: width *= sizeof(Gan_RGBPixel_us); break;
-           case GAN_SHORT:  width *= sizeof(Gan_RGBPixel_s);  break;
-           case GAN_UINT:   width *= sizeof(Gan_RGBPixel_ui); break;
-           case GAN_INT:    width *= sizeof(Gan_RGBPixel_i);  break;
-           case GAN_FLOAT:  width *= sizeof(Gan_RGBPixel_f);  break;
-           case GAN_DOUBLE: width *= sizeof(Gan_RGBPixel_d);  break;
+           case GAN_UCHAR:  width *= sizeof(Gan_RGBPixel_uc);    break;
+           case GAN_USHORT: width *= sizeof(Gan_RGBPixel_us);    break;
+           case GAN_SHORT:  width *= sizeof(Gan_RGBPixel_s);     break;
+           case GAN_UINT:   width *= sizeof(Gan_RGBPixel_ui);    break;
+           case GAN_INT:    width *= sizeof(Gan_RGBPixel_i);     break;
+           case GAN_FLOAT:  width *= sizeof(Gan_RGBPixel_f);     break;
+           case GAN_DOUBLE: width *= sizeof(Gan_RGBPixel_d);     break;
+           case GAN_UINT10: width *= sizeof(Gan_RGBXPixel_ui10); break;
            default:
              gan_err_flush_trace();
              gan_err_register ( "gan_image_min_stride", GAN_ERROR_ILLEGAL_IMAGE_TYPE, "" );

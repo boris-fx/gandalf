@@ -334,7 +334,7 @@ Gan_Vector *
 
    /* copy vector */
 #ifdef HAVE_LAPACK
-   dcopy_ ( (long *)&x->rows, x->data, &onei, y->data, &onei );
+   BLAS_DCOPY ( (long *)&x->rows, x->data, &onei, y->data, &onei );
 #else
    gan_dcopy ( x->rows, x->data, 1, y->data, 1 );
 #endif /* #ifdef HAVE_LAPACK */
@@ -381,8 +381,8 @@ Gan_Vector *
 
 #ifdef HAVE_LAPACK
    /* copy and scale vector */
-   dcopy_ ( (long *)&x->rows, x->data, &onei, y->data, &onei );
-   dscal_ ( (long *)&y->rows, &a, y->data, &onei );
+   BLAS_DCOPY ( (long *)&x->rows, x->data, &onei, y->data, &onei );
+   BLAS_DSCAL ( (long *)&y->rows, &a, y->data, &onei );
 #else
    /* copy and scale vector */
    gan_dcopy ( x->rows, x->data, 1, y->data, 1 );
@@ -437,15 +437,15 @@ Gan_Vector *
    /* add vector data */
    if ( z == x )
       /* in-place operation x += y */
-      daxpy_ ( (long *)&x->rows, &onef, y->data, &onei, x->data, &onei );
+      BLAS_DAXPY ( (long *)&x->rows, &onef, y->data, &onei, x->data, &onei );
    else if ( z == y )
       /* in-place operation y += x */
-      daxpy_ ( (long *)&x->rows, &onef, x->data, &onei, y->data, &onei );
+      BLAS_DAXPY ( (long *)&x->rows, &onef, x->data, &onei, y->data, &onei );
    else
    {
       /* z = x + y */
-      dcopy_ ( (long *)&x->rows, x->data, &onei, z->data, &onei );
-      daxpy_ ( (long *)&x->rows, &onef, y->data, &onei, z->data, &onei );
+      BLAS_DCOPY ( (long *)&x->rows, x->data, &onei, z->data, &onei );
+      BLAS_DAXPY ( (long *)&x->rows, &onef, y->data, &onei, z->data, &onei );
    }
 #else
    /* add vector data */
@@ -512,20 +512,20 @@ Gan_Vector *
    /* subtract vector data */
    if ( z == x )
       /* in-place operation x -= y */
-      daxpy_ ( (long *)&x->rows, &minus_onef, y->data, &onei, x->data, &onei );
+      BLAS_DAXPY ( (long *)&x->rows, &minus_onef, y->data, &onei, x->data, &onei );
    else if ( z == y )
    {
       /* in-place operation y = x - y */
       double onef = 1.0;
 
-      dscal_ ( (long *)&x->rows, &minus_onef, y->data, &onei );
-      daxpy_ ( (long *)&x->rows, &onef, x->data, &onei, y->data, &onei );
+      BLAS_DSCAL ( (long *)&x->rows, &minus_onef, y->data, &onei );
+      BLAS_DAXPY ( (long *)&x->rows, &onef, x->data, &onei, y->data, &onei );
    }
    else
    {
       /* z = x - y */
-      dcopy_ ( (long *)&x->rows, x->data, &onei, z->data, &onei );
-      daxpy_ ( (long *)&x->rows, &minus_onef, y->data, &onei, z->data, &onei );
+      BLAS_DCOPY ( (long *)&x->rows, x->data, &onei, z->data, &onei );
+      BLAS_DAXPY ( (long *)&x->rows, &minus_onef, y->data, &onei, z->data, &onei );
    }
 #else
    /* subtract vector data */
@@ -577,7 +577,7 @@ double
 
    /* compute dot-product */
 #ifdef HAVE_LAPACK
-   return ddot_ ( (long *)&x->rows, x->data, &onei, y->data, &onei );
+   return BLAS_DDOT ( (long *)&x->rows, x->data, &onei, y->data, &onei );
 #else
    return gan_ddot ( x->rows, x->data, 1, y->data, 1 );
 #endif /* #ifdef HAVE_LAPACK */

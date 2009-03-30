@@ -59,6 +59,7 @@ void gan_initialise_image_read_control_struct(Gan_ImageReadControlStruct *ictrls
    ictrlstr->single_field = GAN_FALSE;
    ictrlstr->upper        = GAN_FALSE;
    ictrlstr->whole_image  = GAN_FALSE;
+   ictrlstr->native_type  = GAN_FALSE;
 #if 0
    ictrlstr->itype = GAN_UNDEFINED_TYPE;
    ictrlstr->otype = GAN_UNDEFINED_TYPE;
@@ -354,6 +355,8 @@ Gan_Bool gan_image_file_format_compressed ( Gan_ImageFileFormat format )
  * \param image The image structure to read the image data into or \c NULL
  * \param ictrlstr Structure controlling read or \c NULL
  * \param header Output information structure containing format-dependent header data, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads an image from the given file stream \a infile into the provided
@@ -364,11 +367,15 @@ Gan_Bool gan_image_file_format_compressed ( Gan_ImageFileFormat format )
  * otherwise pass \a file_format as #GAN_UNKNOWN_FORMAT and the function will
  * try to determine the file format.
  *
- * \sa gan_write_image_stream().
+ * If \c abortRequested is not \c NULL, its contents are periodically checked,
+ * and if the value is GAN_TRUE the file read is aborted.
+ *
+ * \sa gan_write_image_stream_with_abort_test().
  */
 Gan_Image *
- gan_image_read_stream ( FILE *infile, Gan_ImageFileFormat file_format, Gan_Image *image,
-                         const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header )
+ gan_image_read_stream_with_abort_test ( FILE *infile, Gan_ImageFileFormat file_format, Gan_Image *image,
+                                         const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header,
+                                         Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    /* determine actual file format if necessary */
    if(file_format == GAN_UNKNOWN_FORMAT)
@@ -395,42 +402,42 @@ Gan_Image *
    {
 #ifdef HAVE_PNG
       case GAN_PNG_FORMAT:
-        image = gan_read_png_image_stream ( infile, image, ictrlstr, header );
+        image = gan_read_png_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
         break;
 #endif
 
 #ifdef HAVE_JPEG
       case GAN_JPEG_FORMAT:
-        image = gan_read_jpeg_image_stream ( infile, image, ictrlstr, header );
+        image = gan_read_jpeg_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
         break;
 #endif
 
       case GAN_PBM_FORMAT:
-        image = gan_read_pbm_image_stream ( infile, image, ictrlstr, header );
+        image = gan_read_pbm_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_PGM_FORMAT:
-        image = gan_read_pgm_image_stream ( infile, image, ictrlstr, header );
+        image = gan_read_pgm_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_PPM_FORMAT:
-        image = gan_read_ppm_image_stream ( infile, image, ictrlstr, header );
+        image = gan_read_ppm_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_DPX_FORMAT:
-        image = gan_read_dpx_image_stream ( infile, image, ictrlstr, header );
+        image = gan_read_dpx_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_CINEON_FORMAT:
-        image = gan_read_cineon_image_stream ( infile, image, ictrlstr, header );
+        image = gan_read_cineon_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_SGI_FORMAT:
-        image = gan_read_sgi_image_stream ( infile, image, ictrlstr, header );
+        image = gan_read_sgi_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_TARGA_FORMAT:
-        image = gan_read_targa_image_stream ( infile, image, ictrlstr, header );
+        image = gan_read_targa_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       default:
@@ -457,6 +464,8 @@ Gan_Image *
  * \param image The image structure to read the image data into or NULL
  * \param ictrlstr Structure controlling read or \c NULL
  * \param header Output information structure containing format-dependent header data, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to \a image structure, or \c NULL on failure.
  *
  * Reads an image from the given file \a filename into the provided \a image
@@ -470,8 +479,9 @@ Gan_Image *
  * \sa gan_write_image().
  */
 Gan_Image *
- gan_image_read ( const char *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
-                  const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header )
+ gan_image_read_with_abort_test ( const char *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
+                                  const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header,
+                                  Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    /* determine actual file format if necessary */
    if(file_format == GAN_UNKNOWN_FORMAT)
@@ -498,48 +508,48 @@ Gan_Image *
    {
 #ifdef HAVE_PNG
       case GAN_PNG_FORMAT:
-        image = gan_read_png_image ( filename, image, ictrlstr, header );
+        image = gan_read_png_image ( filename, image, ictrlstr, header, abortRequested, abortObj);
         break;
 #endif
 
 #ifdef HAVE_JPEG
       case GAN_JPEG_FORMAT:
-        image = gan_read_jpeg_image ( filename, image, ictrlstr, header );
+        image = gan_read_jpeg_image(filename, image, ictrlstr, header, abortRequested, abortObj);
         break;
 #endif
 
 #ifdef HAVE_TIFF
       case GAN_TIFF_FORMAT:
-        image = gan_read_tiff_image ( filename, image, ictrlstr, header );
+        image = gan_read_tiff_image(filename, image, ictrlstr, header, abortRequested, abortObj);
         break;
 #endif
 
       case GAN_PBM_FORMAT:
-        image = gan_read_pbm_image ( filename, image, ictrlstr, header );
+        image = gan_read_pbm_image(filename, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_PGM_FORMAT:
-        image = gan_read_pgm_image ( filename, image, ictrlstr, header );
+        image = gan_read_pgm_image(filename, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_PPM_FORMAT:
-        image = gan_read_ppm_image ( filename, image, ictrlstr, header );
+        image = gan_read_ppm_image(filename, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_DPX_FORMAT:
-        image = gan_read_dpx_image ( filename, image, ictrlstr, header );
+        image = gan_read_dpx_image(filename, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_CINEON_FORMAT:
-        image = gan_read_cineon_image ( filename, image, ictrlstr, header );
+        image = gan_read_cineon_image(filename, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_SGI_FORMAT:
-        image = gan_read_sgi_image ( filename, image, ictrlstr, header );
+        image = gan_read_sgi_image(filename, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       case GAN_TARGA_FORMAT:
-        image = gan_read_targa_image ( filename, image, ictrlstr, header );
+        image = gan_read_targa_image(filename, image, ictrlstr, header, abortRequested, abortObj);
         break;
 
       default:
@@ -567,8 +577,8 @@ Gan_Image *
  */
 GANDALF_API Gan_Bool gan_initialise_image_header_info(Gan_ImageHeaderInfo *hdrinfo, Gan_ImageFormat image_format, Gan_Type type)
 {
-   hdrinfo->time_code = 0;
-   hdrinfo->user_bits = 0;
+   hdrinfo->time_code = GAN_UINT32_MAX;
+   hdrinfo->user_bits = GAN_UINT32_MAX;
    hdrinfo->interlaced = GAN_FALSE;
    hdrinfo->frame_rate = 0.0F;
 

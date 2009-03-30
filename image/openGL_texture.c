@@ -84,20 +84,16 @@ static void *NSGLGetProcAddress(const char *name)
 }
 #endif
 
-static struct _Gan_GLExt_Function_Pointers sGLExtFuncPtrs = {  0, 0,
+static struct _Gan_GLExt_Function_Pointers sGLExtFuncPtrs = {  0, 0, 0, 0, 0,
                                                                0, 0, 0, 0, 0,
                                                                0, 0, 0, 0, 0,
+                                                               0, 0, 0, 0, 0, 
                                                                0, 0, 0, 0, 0,
-                                                               0, 0,
+                                                               0, 0, 0, 0, 0,
 #ifdef PFNGLBUFFERSUBDATAARBPROC
                                                                0,
 #endif
-                                                               0, 0, 0
-#ifdef MOXXX_USE_ARB_FBO
-                                                               , 0, 0, 0, 0, 0,
-                                                               0, 0, 0, 0
-#endif
-};
+                                                               0};
 
 /**
  * \brief Initialise OpenGL extension function pointer structure
@@ -128,7 +124,6 @@ void gan_initialise_glext_func_ptrs(Gan_GLExt_Function_Pointers* pExtFnPtrs)
    pExtFnPtrs->fDeleteBuffersARB = (PFNGLDELETEBUFFERSARBPROC)gan_texGetProcAddress((const GLubyte*)"glDeleteBuffersARB");
    pExtFnPtrs->fMapBufferARB = (PFNGLMAPBUFFERARBPROC)gan_texGetProcAddress((const GLubyte*)"glMapBufferARB");
    pExtFnPtrs->fUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)gan_texGetProcAddress((const GLubyte*)"glUnmapBufferARB");
-#ifdef MOXXX_USE_ARB_FBO
    //stct for fbo
    pExtFnPtrs->fGenFramebuffersEXT = (PFNGLGENFRAMEBUFFERSEXTPROC)gan_texGetProcAddress((const GLubyte*)"glGenFramebuffersEXT");
    pExtFnPtrs->fBindFramebufferEXT = (PFNGLBINDFRAMEBUFFEREXTPROC)gan_texGetProcAddress((const GLubyte*)"glBindFramebufferEXT");
@@ -141,7 +136,7 @@ void gan_initialise_glext_func_ptrs(Gan_GLExt_Function_Pointers* pExtFnPtrs)
    pExtFnPtrs->fBindRenderbufferEXT =  (PFNGLBINDRENDERBUFFEREXTPROC)gan_texGetProcAddress((const GLubyte*)"glBindRenderbufferEXT");
    pExtFnPtrs->fRenderbufferStorageEXT =  (PFNGLRENDERBUFFERSTORAGEEXTPROC)gan_texGetProcAddress((const GLubyte*)"glRenderbufferStorageEXT");
    pExtFnPtrs->fFramebufferRenderbufferEXT =  (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC)gan_texGetProcAddress((const GLubyte*)"glFramebufferRenderbufferEXT");
-#endif
+
 
                                  
 
@@ -175,6 +170,9 @@ int gan_check_glext_func_ptrs()
    return sGLExtFuncPtrs.error;
 }
 
+#else
+void gan_initialise_glext_func_ptrs(Gan_GLExt_Function_Pointers* pExtFnPtrs)
+{}
 #endif
 
 

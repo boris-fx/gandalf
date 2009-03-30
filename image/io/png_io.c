@@ -268,6 +268,8 @@ Gan_Bool gan_image_is_png(const unsigned char *magic_string, size_t length)
  * \param image The image structure to read the image data into or NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the PNG image from the file stream \a infile into the given \a image.
@@ -280,7 +282,8 @@ Gan_Bool gan_image_is_png(const unsigned char *magic_string, size_t length)
  */
 Gan_Image *
  gan_read_png_image_stream(FILE *infile, Gan_Image *image,
-                           const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+                           const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                           Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    double file_gamma;
    Gan_ImageFormat format;
@@ -440,6 +443,10 @@ Gan_Image *
             png_read_row(png_ptr, ((png_bytepp)image->row_data_ptr)[whole_image ? (flip ? (uiHeight-uiRow-1) : uiRow) : (flip ? (uiInternalHeight-uiRow/2-1) : uiRow/2)], NULL);
          else
             png_read_row(png_ptr, ((png_bytepp)imbuf->row_data_ptr)[0], NULL);
+
+         /* check for abort every 10 rows */
+         if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+            break;
       }
 
       gan_image_free(imbuf);
@@ -452,10 +459,32 @@ Gan_Image *
          int row;
 
          for(row=(int)uiHeight-1; row>=0; row--)
+         {
             png_read_row(png_ptr, ((png_bytepp)image->row_data_ptr)[row], NULL);
+
+            /* check for abort every 10 rows */
+            if(abortRequested != NULL && (row % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+               break;
+         }
       }
       else
-         png_read_image(png_ptr, (png_bytepp)image->row_data_ptr);
+      {
+         if(abortRequested == NULL)
+            png_read_image(png_ptr, (png_bytepp)image->row_data_ptr);
+         else
+         {
+            unsigned int row;
+
+            for(row=0; row<uiHeight; row++)
+            {
+               png_read_row(png_ptr, ((png_bytepp)image->row_data_ptr)[row], NULL);
+
+               /* check for abort every 10 rows */
+               if((row % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+                  break;
+            }
+         }
+      }
    }
    
    png_read_end(png_ptr, NULL);
@@ -472,6 +501,8 @@ Gan_Image *
  * \param image The image structure to read the image data into or NULL
  * \param ictrlstr Pointer to structure controlling input or \c NULL
  * \param header Pointer to file header structure to be filled, or \c NULL
+ * \param abortRequested Pointer to callback function indicating abort, or \c NULL
+ * \param abortObj Pointer to object passed to \a abortRequested()
  * \return Pointer to image structure, or \c NULL on failure.
  *
  * Reads the PNG image stored in the file \a filename into the given \a image.
@@ -483,7 +514,8 @@ Gan_Image *
  * \sa gan_write_png_image().
  */
 Gan_Image *
- gan_read_png_image ( const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header )
+gan_read_png_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+                   Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
 
@@ -496,7 +528,7 @@ Gan_Image *
       return NULL;
    }
  
-   image = gan_read_png_image_stream ( infile, image, ictrlstr, header );
+   image = gan_read_png_image_stream(infile, image, ictrlstr, header, abortRequested, abortObj);
    fclose(infile);
    if ( image == NULL )
    {
@@ -743,7 +775,7 @@ Gan_Bool
             /* read temporary image */
             Gan_ImageHeaderStruct header;
 
-            Gan_Image* pimage = gan_read_png_image_stream ( outfile, NULL, NULL, &header );
+            Gan_Image* pimage = gan_read_png_image_stream(outfile, NULL, NULL, &header, NULL, NULL); /* abortRequested, abortObj */
             fclose(outfile);
 
             if(pimage != NULL)

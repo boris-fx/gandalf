@@ -610,7 +610,7 @@ static Gan_Bool
    CAM_FLOAT det;
    int it;
    int rbest, cbest, block_limit = 1 << GAN_CUBIC_BSPLINE_CAMERA_LEVEL;
-   CAM_FLOAT mindistance2=1.0e11, dist2, block_lim2 = (CAM_FLOAT)(block_limit-2);
+   CAM_FLOAT mindistance2=1.0e11F, dist2, block_lim2 = (CAM_FLOAT)(block_limit-2);
    Gan_Bool bFound = GAN_FALSE;
 #define LAST_DISTANCE_THRES 0.01F
    if(support->last_Xdu != NULL && support->last_Xdu[0].x < 1.0e8
@@ -693,8 +693,14 @@ static Gan_Bool
 
       if(mindistance2 > 1.0e10)
       {
-         gan_err_flush_trace();
-         gan_err_register ( "compute_unwarped_coordinates", GAN_ERROR_INCOMPATIBLE, "" );
+         if ( error_code == NULL )
+         {
+            gan_err_flush_trace();
+            gan_err_register ( "compute_unwarped_coordinates", GAN_ERROR_NO_CONVERGENCE, "" );
+         }
+         else
+            *error_code = GAN_ERROR_OUTSIDE_RANGE;
+
          return GAN_FALSE;
       }
 

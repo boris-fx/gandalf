@@ -486,7 +486,7 @@ Gan_Matrix_f *
    {
       long nel = A->rows*A->cols, onei = 1;
 
-      scopy_ ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_SCOPY ( &nel, A->data, &onei, B->data, &onei );
    }
 #else   
    if ( !gan_scopy ( A->rows*A->cols, A->data, 1, B->data, 1 ) )
@@ -536,8 +536,8 @@ Gan_Matrix_f *
    {
       long onei = 1;
       
-      scopy_ ( &nel, A->data, &onei, B->data, &onei );
-      sscal_ ( &nel, &a, B->data, &onei );
+      BLAS_SCOPY ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_SSCAL ( &nel, &a, B->data, &onei );
    }
 #else   
    if ( !gan_scopy ( nel, A->data, 1, B->data, 1 ) ||
@@ -657,11 +657,11 @@ Gan_Matrix_f *
 
       if ( A->cols <= A->rows )
          for ( i = (long)B->cols-1; i >= 0; i-- )
-            scopy_ ( (long *)&B->rows, &A->data[i], (long *)&A->rows,
+            BLAS_SCOPY ( (long *)&B->rows, &A->data[i], (long *)&A->rows,
                      &B->data[i*B->rows], &onei );
       else
          for ( i = (long)B->rows-1; i >= 0; i-- )
-            scopy_ ( (long *)&B->cols, &A->data[i*A->rows], &onei,
+            BLAS_SCOPY ( (long *)&B->cols, &A->data[i*A->rows], &onei,
                      &B->data[i], (long *)&B->rows);
       
    }
@@ -744,15 +744,15 @@ Gan_Matrix_f *
       /* add matrix data C = A + B */
       if ( C == A )
          /* in-place operation A += B */
-         saxpy_ ( &nel, &onef, B->data, &onei, A->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, B->data, &onei, A->data, &onei );
       else if ( C == B )
          /* in-place operation B += A */
-         saxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
       else
       {
          /* C = A + B */
-         scopy_ ( &nel, A->data, &onei, C->data, &onei );
-         saxpy_ ( &nel, &onef, B->data, &onei, C->data, &onei );
+         BLAS_SCOPY ( &nel, A->data, &onei, C->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, B->data, &onei, C->data, &onei );
       }
    }
 #else
@@ -950,20 +950,20 @@ Gan_Matrix_f *
       /* subtract matrix data C = A - B */
       if ( C == A )
          /* in-place operation A -= B */
-         saxpy_ ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
+         BLAS_SAXPY ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
       else if ( C == B )
       {
          /* in-place operation B = A - B */
          float onef = 1.0F;
 
-         sscal_ ( &nel, &minus_onef, B->data, &onei );
-         saxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+         BLAS_SSCAL ( &nel, &minus_onef, B->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
       }
       else
       {
          /* C = A - B */
-         scopy_ ( &nel, A->data, &onei, C->data, &onei );
-         saxpy_ ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
+         BLAS_SCOPY ( &nel, A->data, &onei, C->data, &onei );
+         BLAS_SAXPY ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
       }
    }
 #else
@@ -1148,11 +1148,11 @@ Gan_Matrix_f *
       float dOne = 1.0F, dZero = 0.0F;
       long lOne = 1;
 
-      sgemm_ ( A_tr ? "T" : "N", B_tr ? "T" : "N",
-               (long *)&Crows, (long *)&Ccols, (long *)&common, &dOne,
-               A->data, (A->rows == 0) ? &lOne : (long *)&A->rows,
-               B->data, (B->rows == 0) ? &lOne : (long *)&B->rows, &dZero,
-               C->data, (C->rows == 0) ? &lOne : (long *)&C->rows );
+      BLAS_SGEMM ( A_tr ? "T" : "N", B_tr ? "T" : "N",
+                   (long *)&Crows, (long *)&Ccols, (long *)&common, &dOne,
+                   A->data, (A->rows == 0) ? &lOne : (long *)&A->rows,
+                   B->data, (B->rows == 0) ? &lOne : (long *)&B->rows, &dZero,
+                   C->data, (C->rows == 0) ? &lOne : (long *)&C->rows );
    }
 #else   
    if ( !gan_sgemm ( A_tr, B_tr, Crows, Ccols, common, 1.0F,

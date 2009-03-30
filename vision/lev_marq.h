@@ -183,23 +183,23 @@ typedef Gan_Bool (*Gan_LevMarqInitFunc) ( Gan_Vector *x, Gan_List *obs_list,
 
 GANDALF_API Gan_LevMarqStruct *gan_lev_marq_form ( Gan_LevMarqStruct *lm );
 GANDALF_API Gan_LevMarqObs *gan_lev_marq_obs_h ( Gan_LevMarqStruct *lm,
-                                     Gan_Vector *z, void *zdata,
-                                     Gan_SquMatrix *Ni,
-                                     Gan_LevMarqObsFunc_h obs_func );
+                                                 Gan_Vector *z, void *zdata,
+                                                 Gan_SquMatrix *Ni,
+                                                 Gan_LevMarqObsFunc_h obs_func );
 GANDALF_API Gan_LevMarqObs *gan_lev_marq_obs_h_robust ( Gan_LevMarqStruct *lm,
-                                            Gan_Vector *z, void *zdata,
-                                            Gan_SquMatrix *Ni,
-                                            Gan_LevMarqObsFunc_h obs_func,
-                                            double var_scale, double chi2 );
+                                                        Gan_Vector *z, void *zdata,
+                                                        Gan_SquMatrix *Ni,
+                                                        Gan_LevMarqObsFunc_h obs_func,
+                                                        double var_scale, double chi2 );
 GANDALF_API Gan_LevMarqObs *gan_lev_marq_obs_F ( Gan_LevMarqStruct *lm,
-                                     Gan_Vector *z, void *zdata,
-                                     Gan_SquMatrix *Ni,
-                                     Gan_LevMarqObsFunc_F obs_func );
+                                                 Gan_Vector *z, void *zdata,
+                                                 Gan_SquMatrix *Ni,
+                                                 Gan_LevMarqObsFunc_F obs_func );
 GANDALF_API Gan_Bool gan_lev_marq_init ( Gan_LevMarqStruct *lm,
-                             Gan_LevMarqInitFunc init_func,
-                             void *data, double *residualp );
+                                         Gan_LevMarqInitFunc init_func,
+                                         void *data, double *residualp );
 GANDALF_API Gan_Bool gan_lev_marq_iteration ( Gan_LevMarqStruct *lm, double lambda,
-                                  double *residual );
+                                              double *residual );
 GANDALF_API Gan_Vector    *gan_lev_marq_get_x ( Gan_LevMarqStruct *lm );
 GANDALF_API Gan_SquMatrix *gan_lev_marq_get_P ( Gan_LevMarqStruct *lm );
 GANDALF_API void gan_lev_marq_free ( Gan_LevMarqStruct *lm );

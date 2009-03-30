@@ -288,7 +288,7 @@ static Gan_SquMatrix_f *
       long nel = A->size*(A->size+1)/2, onei = 1;
 
       /* copy matrix */
-      scopy_ ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_SCOPY ( &nel, A->data, &onei, B->data, &onei );
    }
 #else /* !HAVE_LAPACK */
    /* copy matrix */
@@ -328,7 +328,7 @@ static Gan_SquMatrix_f *
       long nel = A->size*(A->size+1)/2, onei = 1;
 
       /* copy matrix */
-      scopy_ ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_SCOPY ( &nel, A->data, &onei, B->data, &onei );
    }
 #else /* !HAVE_LAPACK */
    /* copy matrix */
@@ -369,8 +369,8 @@ static Gan_SquMatrix_f *
       long nel = A->size*(A->size+1)/2, onei = 1;
 
       /* copy and scale matrix */
-      if(A!=B) scopy_ ( &nel, A->data, &onei, B->data, &onei );
-      sscal_ ( &nel, &a, B->data, &onei );
+      if(A!=B) BLAS_SCOPY ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_SSCAL ( &nel, &a, B->data, &onei );
    }
 #else /* !HAVE_LAPACK */
    /* copy and scale matrix */
@@ -412,8 +412,8 @@ static Gan_SquMatrix_f *
       long nel = A->size*(A->size+1)/2, onei = 1;
 
       /* copy and scale matrix */
-      if(A!=B) scopy_ ( &nel, A->data, &onei, B->data, &onei );
-      sscal_ ( &nel, &a, B->data, &onei );
+      if(A!=B) BLAS_SCOPY ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_SSCAL ( &nel, &a, B->data, &onei );
    }
 #else /* !HAVE_LAPACK */
    /* copy and scale matrix */
@@ -466,15 +466,15 @@ static Gan_SquMatrix_f *
       /* add matrix data */
       if ( C == A )
          /* in-place operation A += B */
-         saxpy_ ( &nel, &onef, B->data, &onei, A->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, B->data, &onei, A->data, &onei );
       else if ( C == B )
          /* in-place operation B += A */
-         saxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
       else
       {
          /* C = A + B */
-         scopy_ ( &nel, A->data, &onei, C->data, &onei );
-         saxpy_ ( &nel, &onef, B->data, &onei, C->data, &onei );
+         BLAS_SCOPY ( &nel, A->data, &onei, C->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, B->data, &onei, C->data, &onei );
       }
    }
 #else /* !HAVE_LAPACK */
@@ -548,15 +548,15 @@ static Gan_SquMatrix_f *
       /* add matrix data */
       if ( C == A )
          /* in-place operation A += B */
-         saxpy_ ( &nel, &onef, B->data, &onei, A->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, B->data, &onei, A->data, &onei );
       else if ( C == B )
          /* in-place operation B += A */
-         saxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
       else
       {
          /* C = A + B */
-         scopy_ ( &nel, A->data, &onei, C->data, &onei );
-         saxpy_ ( &nel, &onef, B->data, &onei, C->data, &onei );
+         BLAS_SCOPY ( &nel, A->data, &onei, C->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, B->data, &onei, C->data, &onei );
       }
    }
 #else /* !HAVE_LAPACK */
@@ -632,20 +632,20 @@ static Gan_SquMatrix_f *
       /* subtract matrix data */
       if ( C == A )
          /* in-place operation A -= B */
-         saxpy_ ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
+         BLAS_SAXPY ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
       else if ( C == B )
       {
          /* in-place operation B = A - B */
          float onef = 1.0F;
 
-         sscal_ ( &nel, &minus_onef, B->data, &onei );
-         saxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+         BLAS_SSCAL ( &nel, &minus_onef, B->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
       }
       else
       {
          /* C = A - B */
-         scopy_ ( &nel, A->data, &onei, C->data, &onei );
-         saxpy_ ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
+         BLAS_SCOPY ( &nel, A->data, &onei, C->data, &onei );
+         BLAS_SAXPY ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
       }
    }
 #else /* !HAVE_LAPACK */
@@ -724,20 +724,20 @@ static Gan_SquMatrix_f *
       /* subtract matrix data */
       if ( C == A )
          /* in-place operation A -= B */
-         saxpy_ ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
+         BLAS_SAXPY ( &nel, &minus_onef, B->data, &onei, A->data, &onei );
       else if ( C == B )
       {
          /* in-place operation B = A - B */
          float onef = 1.0F;
 
-         sscal_ ( &nel, &minus_onef, B->data, &onei );
-         saxpy_ ( &nel, &onef, A->data, &onei, B->data, &onei );
+         BLAS_SSCAL ( &nel, &minus_onef, B->data, &onei );
+         BLAS_SAXPY ( &nel, &onef, A->data, &onei, B->data, &onei );
       }
       else
       {
          /* C = A - B */
-         scopy_ ( &nel, A->data, &onei, C->data, &onei );
-         saxpy_ ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
+         BLAS_SCOPY ( &nel, A->data, &onei, C->data, &onei );
+         BLAS_SAXPY ( &nel, &minus_onef, B->data, &onei, C->data, &onei );
       }
    }
 #else /* !HAVE_LAPACK */
@@ -824,8 +824,8 @@ static Gan_Vector_f *
 #ifdef HAVE_LAPACK
    {
       /* compute matrix/vector product y = L^-1*x */
-      if ( x != y ) scopy_ ( (long *)&x->rows, x->data, &onei, y->data, &onei);
-      stpsv_ ( "U", "T", "N", (long *)&y->rows, L->data, y->data, &onei );
+      if ( x != y ) BLAS_SCOPY ( (long *)&x->rows, x->data, &onei, y->data, &onei);
+      BLAS_STPSV ( "U", "T", "N", (long *)&y->rows, L->data, y->data, &onei );
    }
 #else /* !HAVE_LAPACK */
    {
@@ -849,8 +849,8 @@ static Gan_Vector_f *
    {
 #ifdef HAVE_LAPACK
       /* compute matrix/vector product y = L^-T*x */
-      if ( x != y ) scopy_ ( (long *)&x->rows, x->data, &onei, y->data, &onei);
-      stpsv_ ( "U", "N", "N", (long *)&y->rows, L->data, y->data, &onei );
+      if ( x != y ) BLAS_SCOPY ( (long *)&x->rows, x->data, &onei, y->data, &onei);
+      BLAS_STPSV ( "U", "N", "N", (long *)&y->rows, L->data, y->data, &onei );
 #else /* !HAVE_LAPACK */
       /* compute matrix/vector product y = L^-T*x */
       if ( x != y )
@@ -912,8 +912,8 @@ static Gan_Vector_f *
    {
 #ifdef HAVE_LAPACK
       /* compute matrix/vector product y = U^-1*x */
-      if ( x != y ) scopy_ ( (long *)&x->rows, x->data, &onei, y->data, &onei);
-      stpsv_ ( "U", "N", "N", (long *)&y->rows, U->data, y->data, &onei );
+      if ( x != y ) BLAS_SCOPY ( (long *)&x->rows, x->data, &onei, y->data, &onei);
+      BLAS_STPSV ( "U", "N", "N", (long *)&y->rows, U->data, y->data, &onei );
 #else /* !HAVE_LAPACK */
       /* compute matrix/vector product y = U^-1*x */
       if ( x != y ) gan_scopy ( x->rows, x->data, 1, y->data, 1 );
@@ -935,8 +935,8 @@ static Gan_Vector_f *
    {
 #ifdef HAVE_LAPACK
       /* compute matrix/vector product y = U^-T*x */
-      if ( x != y ) scopy_ ( (long *)&x->rows, x->data, &onei, y->data, &onei);
-      stpsv_ ( "U", "T", "N", (long *)&y->rows, U->data, y->data, &onei );
+      if ( x != y ) BLAS_SCOPY ( (long *)&x->rows, x->data, &onei, y->data, &onei);
+      BLAS_STPSV ( "U", "T", "N", (long *)&y->rows, U->data, y->data, &onei );
 #else /* !HAVE_LAPACK */
       /* compute matrix/vector product y = U^-T*x */
       if ( x != y ) gan_scopy ( x->rows, x->data, 1, y->data, 1 );
@@ -1008,7 +1008,7 @@ static Gan_Matrix_f *
 #ifdef HAVE_LAPACK
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
-            stpsv_ ( "U", "T", "N", (long *)&C->rows, L->data, Cptr, &onei );
+            BLAS_STPSV ( "U", "T", "N", (long *)&C->rows, L->data, Cptr, &onei );
 #else /* !HAVE_LAPACK */
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
@@ -1034,7 +1034,7 @@ static Gan_Matrix_f *
 #ifdef HAVE_LAPACK
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
-            stpsv_ ( "U", "N", "N", (long *)&C->rows, L->data, Cptr, &onei );
+            BLAS_STPSV ( "U", "N", "N", (long *)&C->rows, L->data, Cptr, &onei );
 #else /* !HAVE_LAPACK */
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
@@ -1059,10 +1059,10 @@ static Gan_Matrix_f *
       {
          /* compute matrix/vector product C = L^-1*B */
 #ifdef HAVE_LAPACK
-         if ( B != C ) scopy_ ( &nel, B->data, &onei, C->data, &onei );
+         if ( B != C ) BLAS_SCOPY ( &nel, B->data, &onei, C->data, &onei );
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
-            stpsv_ ( "U", "T", "N", (long *)&C->rows, L->data, Cptr, &onei );
+            BLAS_STPSV ( "U", "T", "N", (long *)&C->rows, L->data, Cptr, &onei );
 #else /* !HAVE_LAPACK */
          if ( B != C )
             gan_scopy ( L->size*Ccols, B->data, 1, C->data, 1 );
@@ -1088,10 +1088,10 @@ static Gan_Matrix_f *
       {
          /* compute matrix/vector product C = L^-T*B */
 #ifdef HAVE_LAPACK
-         if ( B != C ) scopy_ ( &nel, B->data, &onei, C->data, &onei );
+         if ( B != C ) BLAS_SCOPY ( &nel, B->data, &onei, C->data, &onei );
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
-            stpsv_ ( "U", "N", "N", (long *)&C->rows, L->data, Cptr, &onei );
+            BLAS_STPSV ( "U", "N", "N", (long *)&C->rows, L->data, Cptr, &onei );
 #else /* !HAVE_LAPACK */
          if ( B != C )
             gan_scopy ( L->size*Ccols, B->data, 1, C->data, 1 );
@@ -1165,7 +1165,7 @@ static Gan_Matrix_f *
 #ifdef HAVE_LAPACK
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
-            stpsv_ ( "U", "N", "N", (long *)&C->rows, U->data, Cptr, &onei );
+            BLAS_STPSV ( "U", "N", "N", (long *)&C->rows, U->data, Cptr, &onei );
 #else /* !HAVE_LAPACK */
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
@@ -1191,7 +1191,7 @@ static Gan_Matrix_f *
 #ifdef HAVE_LAPACK
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
-            stpsv_ ( "U", "T", "N", (long *)&C->rows, U->data, Cptr, &onei );
+            BLAS_STPSV ( "U", "T", "N", (long *)&C->rows, U->data, Cptr, &onei );
 #else /* !HAVE_LAPACK */
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
@@ -1216,10 +1216,10 @@ static Gan_Matrix_f *
       {
          /* compute matrix/vector product C = U^-1*B */
 #ifdef HAVE_LAPACK
-         if ( B != C ) scopy_ ( &nel, B->data, &onei, C->data, &onei );
+         if ( B != C ) BLAS_SCOPY ( &nel, B->data, &onei, C->data, &onei );
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
-            stpsv_ ( "U", "N", "N", (long *)&C->rows, U->data, Cptr, &onei );
+            BLAS_STPSV ( "U", "N", "N", (long *)&C->rows, U->data, Cptr, &onei );
 #else /* !HAVE_LAPACK */
          if ( B != C )
             gan_scopy ( U->size*Ccols, B->data, 1, C->data, 1 );
@@ -1245,10 +1245,10 @@ static Gan_Matrix_f *
       {
          /* compute matrix/vector product C = U^-T*B */
 #ifdef HAVE_LAPACK
-         if ( B != C ) scopy_ ( &nel, B->data, &onei, C->data, &onei );
+         if ( B != C ) BLAS_SCOPY ( &nel, B->data, &onei, C->data, &onei );
          for ( j = 0, Cptr = C->data; (unsigned long) j < C->cols;
                j++, Cptr += C->rows )
-            stpsv_ ( "U", "T", "N", (long *)&C->rows, U->data, Cptr, &onei );
+            BLAS_STPSV ( "U", "T", "N", (long *)&C->rows, U->data, Cptr, &onei );
 #else /* !HAVE_LAPACK */
          if ( B != C )
             gan_scopy ( U->size*Ccols, B->data, 1, C->data, 1 );
@@ -1322,7 +1322,7 @@ static Gan_Matrix_f *
 #ifdef HAVE_LAPACK
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
                i++, Cptr++ )
-            stpsv_ ( "U", "N", "N", (long *)&C->cols, L->data,
+            BLAS_STPSV ( "U", "N", "N", (long *)&C->cols, L->data,
                      Cptr, (long *)&C->rows );
 #else /* !HAVE_LAPACK */
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
@@ -1349,7 +1349,7 @@ static Gan_Matrix_f *
 #ifdef HAVE_LAPACK
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
                i++, Cptr++ )
-            stpsv_ ( "U", "T", "N", (long *)&C->cols, L->data,
+            BLAS_STPSV ( "U", "T", "N", (long *)&C->cols, L->data,
                      Cptr, (long *)&C->rows );
 #else /* !HAVE_LAPACK */
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
@@ -1375,10 +1375,10 @@ static Gan_Matrix_f *
       {
          /* compute matrix/vector product C = B*L^-1 */
 #ifdef HAVE_LAPACK
-         if ( B != C ) scopy_ ( &nel, B->data, &onei, C->data, &onei );
+         if ( B != C ) BLAS_SCOPY ( &nel, B->data, &onei, C->data, &onei );
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
                i++, Cptr++ )
-            stpsv_ ( "U", "N", "N", (long *)&C->cols, L->data,
+            BLAS_STPSV ( "U", "N", "N", (long *)&C->cols, L->data,
                      Cptr, (long *)&C->rows );
 #else /* !HAVE_LAPACK */
          if ( B != C ) gan_scopy ( Crows*L->size, B->data, 1, C->data, 1 );
@@ -1403,10 +1403,10 @@ static Gan_Matrix_f *
       {
          /* compute matrix/vector product C = B*L^-T */
 #ifdef HAVE_LAPACK
-         if ( B != C ) scopy_ ( &nel, B->data, &onei, C->data, &onei );
+         if ( B != C ) BLAS_SCOPY ( &nel, B->data, &onei, C->data, &onei );
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
                i++, Cptr++ )
-            stpsv_ ( "U", "T", "N", (long *)&C->cols, L->data,
+            BLAS_STPSV ( "U", "T", "N", (long *)&C->cols, L->data,
                      Cptr, (long *)&C->rows );
 #else /* !HAVE_LAPACK */
          if ( B != C ) gan_scopy ( Crows*L->size, B->data, 1, C->data, 1 );
@@ -1479,7 +1479,7 @@ static Gan_Matrix_f *
 #ifdef HAVE_LAPACK
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
                i++, Cptr++ )
-            stpsv_ ( "U", "T", "N", (long *)&C->cols, U->data,
+            BLAS_STPSV ( "U", "T", "N", (long *)&C->cols, U->data,
                      Cptr, (long *)&C->rows );
 #else /* !HAVE_LAPACK */
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
@@ -1506,7 +1506,7 @@ static Gan_Matrix_f *
 #ifdef HAVE_LAPACK
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
                i++, Cptr++ )
-            stpsv_ ( "U", "N", "N", (long *)&C->cols, U->data,
+            BLAS_STPSV ( "U", "N", "N", (long *)&C->cols, U->data,
                      Cptr, (long *)&C->rows );
 #else /* !HAVE_LAPACK */
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
@@ -1532,10 +1532,10 @@ static Gan_Matrix_f *
       {
          /* compute matrix/vector product C = B*U^-1 */
 #ifdef HAVE_LAPACK
-         if ( B != C ) scopy_ ( &nel, B->data, &onei, C->data, &onei );
+         if ( B != C ) BLAS_SCOPY ( &nel, B->data, &onei, C->data, &onei );
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
                i++, Cptr++ )
-            stpsv_ ( "U", "T", "N", (long *)&C->cols, U->data,
+            BLAS_STPSV ( "U", "T", "N", (long *)&C->cols, U->data,
                      Cptr, (long *)&C->rows );
 #else /* !HAVE_LAPACK */
          if ( B != C )
@@ -1562,11 +1562,10 @@ static Gan_Matrix_f *
       {
          /* compute matrix/vector product C = B*U^-T */
 #ifdef HAVE_LAPACK
-         if ( B != C ) scopy_ ( &nel, B->data, &onei, C->data, &onei );
+         if ( B != C ) BLAS_SCOPY ( &nel, B->data, &onei, C->data, &onei );
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
                i++, Cptr++ )
-            stpsv_ ( "U", "N", "N", (long *)&C->cols, U->data,
-                     Cptr, (long *)&C->rows );
+            BLAS_STPSV ( "U", "N", "N", (long *)&C->cols, U->data, Cptr, (long *)&C->rows );
 #else /* !HAVE_LAPACK */
          if ( B != C ) gan_scopy ( Crows*U->size, B->data, 1, C->data, 1 );
          for ( i = 0, Cptr = C->data; (unsigned long) i < C->rows;
@@ -1865,7 +1864,7 @@ static Gan_SquMatrix_f *
       /* copy input matrix S into L */
       long nel = A->size*(A->size+1)/2, onei = 1;
 
-      scopy_ ( &nel, A->data, &onei, B->data, &onei );
+      BLAS_SCOPY ( &nel, A->data, &onei, B->data, &onei );
    }
 
    /* perform matrix inversion */

@@ -739,8 +739,7 @@ Gan_Bool
    gan_err_test_bool ( A->rows == A->cols && B->rows == A->rows,
                        "gan_clapack_gesv", GAN_ERROR_CLAPACK_ILLEGAL_ARG, "" );
 #ifdef HAVE_LAPACK
-   dgesv_ ( &A->rows, &B->cols, A->data, &A->rows, ipiv, B->data, &B->rows,
-            &info );
+   dgesv_ ( &A->rows, &B->cols, A->data, &A->rows, ipiv, B->data, &B->rows, &info );
    if ( info != 0 )
    {
       gan_err_flush_trace();
