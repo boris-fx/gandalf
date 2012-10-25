@@ -777,6 +777,35 @@ Gan_Bool
  */
 
 /**
+ * \addtogroup ImageTest
+ * \{
+ */
+
+/**
+ * \brief Test image for validity.
+ *
+ * Returns #GAN_TRUE if the given image \a img seems valid
+ *  and #GAN_FALSE otherwise.
+ */
+Gan_Bool gan_image_test_valid ( const Gan_Image *img )
+{
+   return ( img
+      && img->format >= 0 && img->format < GAN_UNDEFINED_IMAGE_FORMAT
+      && img->type   >= 0 && img->type   < GAN_UNDEFINED_TYPE
+      && img->width  >  0 && img->height > 0
+      && img->stride >= gan_image_min_stride( img->format, img->type, img->width, 0 /* alignment */ )
+      && img->pix_data_ptr != NULL && img->pix_data_size > 0
+      && ( ! img->row_data_alloc || img->row_data_ptr != NULL )
+      && ( ( img->row_data_ptr == NULL ) ^ ( img->row_data_size > 0 ) )
+      ) ? GAN_TRUE
+        : GAN_FALSE;
+}
+
+/**
+ * \}
+ */
+
+/**
  * \addtogroup ImageSize
  * \{
  */
@@ -1720,6 +1749,9 @@ Gan_Bool
 Gan_Bool
  gan_image_fill_zero ( Gan_Image *img )
 {
+   if ( ! img )
+      return GAN_FALSE;
+
    switch ( img->format )
    {
       case GAN_GREY_LEVEL_IMAGE:
@@ -6076,6 +6108,17 @@ Gan_Bool gan_image_get_maximum_pixel ( Gan_Image *image, Gan_Image *mask, Gan_Pi
  */
 
 /**
+ * \brief Free the memory associated with the image \a img.
+ *
+ * Handles \c NULL values of \a img and its \t free_func correctly.
+ */
+void gan_image_free_s ( Gan_Image *img )
+{
+   if ( img && img->free_func )
+      gan_image_free ( img );
+}
+
+/**
  * \brief Free a \c NULL terminated variable argument list of images.
  * \return No value.
  *
@@ -6155,7 +6198,7 @@ Gan_Bool gan_image_has_rgb_channels ( const Gan_Image *img )
       case GAN_BGR_COLOUR_ALPHA_IMAGE:
       case GAN_RGBX:
       case GAN_RGBAS:
-	return GAN_TRUE; break;
+        return GAN_TRUE; break;
 
       case GAN_GREY_LEVEL_IMAGE:
       case GAN_GREY_LEVEL_ALPHA_IMAGE:
@@ -6164,7 +6207,7 @@ Gan_Bool gan_image_has_rgb_channels ( const Gan_Image *img )
       case GAN_YUVX444:
       case GAN_YUVA444:
       case GAN_YUV422:
-	return GAN_FALSE; break;
+        return GAN_FALSE; break;
 
       default:
         gan_err_flush_trace();
