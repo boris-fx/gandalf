@@ -226,7 +226,7 @@ typedef struct Gan_Image
    /// function to free image
    void (*free_func) ( struct Gan_Image *img );
 
-#ifndef NDEBUG   
+#ifndef NDEBUG
 
    /// set image pixel for each format
    union
@@ -763,7 +763,7 @@ GANDALF_API Gan_Image *gan_image_form_data ( Gan_Image *img,
 #ifdef GAN_GENERATE_DOCUMENTATION
 GANDALF_API void gan_image_free ( Gan_Image *img );
 #else
-#define gan_image_free(img) ((img)->free_func(img))
+#define gan_image_free(img) ( ( (img) && (img)->free_func ) ? (img)->free_func(img) : (void)0 )
 #endif
 
 /**
@@ -914,6 +914,14 @@ GANDALF_API Gan_Bool gan_image_test_dims ( const Gan_Image *img1, const Gan_Imag
 #else
 #define gan_image_test_dims(img1,img2) ((img1)->width == (img2)->width && (img1)->height == (img2)->height)
 #endif
+
+/**
+ * \brief Test image for validity.
+ *
+ * Returns #GAN_TRUE if the given image \a img seems valid
+ *  and #GAN_FALSE otherwise.
+ */
+GANDALF_API Gan_Bool gan_image_test_valid ( const Gan_Image *img );
 
 /**
  * \}
@@ -1070,6 +1078,20 @@ GANDALF_API Gan_Bool gan_image_get_maximum_pixel ( Gan_Image *image, Gan_Image *
  * \{
  */
 
+/**
+ * \brief Free the memory associated with the image \a img.
+ *
+ * Handles \c NULL values of \a img and its \t free_func correctly.
+ */
+GANDALF_API void gan_image_free_s ( Gan_Image *img );
+
+/**
+ * \brief Free a \c NULL terminated variable argument list of images.
+ * \return No value.
+ *
+ * Free a \c NULL terminated variable argument list of images, starting
+ * with image \a img.
+ */
 GANDALF_API void gan_image_free_va ( Gan_Image *img, ... );
 
 /**

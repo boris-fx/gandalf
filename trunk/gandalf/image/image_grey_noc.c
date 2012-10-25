@@ -142,17 +142,20 @@ static Gan_Bool
    gan_err_test_bool ( img->format == GAN_PIXFMT && img->type == GAN_PIXTYPE, "image_fill_const_?", GAN_ERROR_INCOMPATIBLE, "image format/type" );
 
    /* set all pixels */
-   if ( img->height == 0 ) return GAN_TRUE;
+   if ( img->height == 0 )
+      return GAN_TRUE;
    if ( img->stride == img->width*sizeof(GAN_PIXEL) )
-      /* fill all pixels in one go */
-      GAN_FILL_ARRAY ( img->row_data.gl.GAN_IMTYPE[0], img->height*img->width, 1, pix );
+      if ( img->row_data.gl.GAN_IMTYPE )
+         /* fill all pixels in one go */
+         GAN_FILL_ARRAY ( img->row_data.gl.GAN_IMTYPE[0], img->height*img->width, 1, pix );
    else
    {
       /* fill image one row at a time */
       int r;
 
       for ( r = img->height-1; r >= 0; r-- )
-         GAN_FILL_ARRAY ( img->row_data.gl.GAN_IMTYPE[r], img->width, 1, pix );
+         if ( img->row_data.gl.GAN_IMTYPE )
+            GAN_FILL_ARRAY ( img->row_data.gl.GAN_IMTYPE[r], img->width, 1, pix );
    }
 
    /* success */
