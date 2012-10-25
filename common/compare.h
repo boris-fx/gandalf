@@ -145,6 +145,16 @@ GANDALF_API GAN_COMP_TYPE gan_min6 ( GAN_COMP_TYPE a, GAN_COMP_TYPE b, GAN_COMP_
 #define gan_min6(a,b,c,d,e,f) (gan_min2(gan_min3(a,b,c),gan_min3(d,e,f)))
 #endif
 
+/**
+ * \brief Macro: Return value of any simple type clamped into a range.
+ */
+#ifdef GAN_GENERATE_DOCUMENTATION
+GANDALF_API GAN_COMP_TYPE gan_clamp_q ( GAN_COMP_TYPE value, GAN_COMP_TYPE lower_bound, GAN_COMP_TYPE upper_bound );
+#else
+#define gan_clamp_q( value, lower_bound, upper_bound ) \
+   ( ( value ) < ( lower_bound ) ? ( lower_bound ) : ( ( value ) > ( upper_bound ) ? ( upper_bound ) : ( value ) ) )
+#endif
+
 #ifdef GAN_GENERATE_DOCUMENTATION
 #undef GAN_COMP_TYPE
 #endif

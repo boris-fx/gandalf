@@ -392,7 +392,7 @@ GANDALF_API void *memcpy ( void *dest, const void *src, size_t n );
 #endif
 
 #ifndef M_LN2
-# define M_LN2		0.69314718055994530942
+# define M_LN2    0.69314718055994530942
 #endif
 
 /* extra useful constants */
@@ -413,6 +413,10 @@ GANDALF_API void *memcpy ( void *dest, const void *src, size_t n );
 #ifndef HAVE_SQRTF
 #define sqrtf(x) (float)sqrt((float)(x))
 #endif
+
+// There are plenty of inlined swaps in the sources. Here's the regexp to search for most of them:
+//  /(.+)\s*=\s*(.+)\s*;\s*\2\s*=\s*(.+)\s*;\s*\3\s*=\s*\1\s*;/s
+#define gan_swap_q( type_name, lvalue1, lvalue2 ) do { type_name valueTmp = ( lvalue1 ); ( lvalue1 ) = ( lvalue2 ); ( lvalue2 ) = valueTmp; } while ( 0 )
 
 /**
  * \}
