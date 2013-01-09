@@ -151,7 +151,8 @@ Gan_ImageFileFormat
 
 #ifdef HAVE_TIFF
    if ( strstr ( format_string, "TIF" ) != NULL || strstr ( format_string, "tif" ) != NULL ||
-        strstr ( format_string, "TIFF" ) != NULL || strstr ( format_string, "tiff" ) != NULL)
+        strstr ( format_string, "TIFF" ) != NULL || strstr ( format_string, "tiff" ) != NULL ||
+        strstr ( format_string, "TIM" ) != NULL || strstr ( format_string, "tim" ) != NULL )
       return GAN_TIFF_FORMAT;
 #endif
 
@@ -170,7 +171,11 @@ Gan_ImageFileFormat
    if ( strstr ( format_string, "CIN" ) != NULL || strstr ( format_string, "cin" ) != NULL )
       return GAN_CINEON_FORMAT;
 
-   if ( strstr ( format_string, "SGI" ) != NULL || strstr ( format_string, "sgi" ) != NULL )
+   if ( strstr ( format_string, "SGI" ) != NULL || strstr ( format_string, "sgi" ) != NULL ||
+        strstr ( format_string, "IRIS" ) != NULL || strstr ( format_string, "iris" ) != NULL ||
+        strstr ( format_string, "RGBA" ) != NULL || strstr ( format_string, "rgba" ) != NULL ||
+        strstr ( format_string, "RGB" ) != NULL || strstr ( format_string, "rgb" ) != NULL ||
+        strstr ( format_string, "BW" ) != NULL || strstr ( format_string, "bw" ) != NULL )
       return GAN_SGI_FORMAT;
 
    if ( strstr ( format_string, "TGA" ) != NULL || strstr ( format_string, "tga" ) != NULL ||
