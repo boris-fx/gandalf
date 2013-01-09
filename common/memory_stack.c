@@ -166,6 +166,12 @@ void *
       }
 
       ms->block_ptr[0] = gan_malloc_array ( Gan_BigType, ms->tm_bsize );
+      if ( ms->block_ptr[0] == NULL )
+      {
+         gan_err_flush_trace();
+         gan_err_register_with_number ( "gan_ms_malloc", GAN_ERROR_MALLOC_FAILED, "", ms->tm_bsize*sizeof(Gan_BigType) );
+         return NULL;
+      }
       tm_ptr = ms->block_ptr[0];
       ms->block_end[0] = 0;
       ms->current_tm_block = 0;

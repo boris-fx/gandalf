@@ -50,6 +50,23 @@
  *                       gan_image_form_gen_rgb_d.
  */
 
+#ifndef _MSC_VER
+#include <stdint.h>
+#endif
+
+/* compute the required size of pixel data and optionally report arithmetic overflow */
+static size_t
+ pix_data_size_req ( unsigned long height, unsigned long stride, Gan_Bool * overflow )
+{
+#if ( SIZE_MAX < ULONG_MAX )
+#  error Unsuitable target platform
+#endif
+   /* detect arithmetic overflow in multiplication if image is huge and 'ulong' is shorter than 'size_t' */
+   if( overflow )
+      * overflow = ! ( stride && height ) || ( SIZE_MAX / stride / height ) ? GAN_FALSE : GAN_TRUE;
+   return height * (size_t)stride;
+}
+
 /* function to re-allocate image data */
 static Gan_Bool
  image_realloc ( Gan_Image *img,
@@ -87,7 +104,18 @@ static Gan_Bool
 
    if ( alloc_pix_data )
    {
-      if ( img->pix_data_size < height*stride )
+      Gan_Bool overflow;
+      size_t req_size = pix_data_size_req ( height, stride, & overflow );
+      if ( overflow )
+      {
+         gan_err_flush_trace();
+         gan_err_register ( "image_realloc", GAN_ERROR_TOO_LARGE, "cannot compute image data size" );
+         return GAN_FALSE;
+      }
+
+      /* need to reallocate the data if it is too small OR
+         attempt allocating the data if it failed before and left an inconsistent image */
+      if ( req_size > 0 && (img->pix_data_size < req_size || img->pix_data_ptr == NULL ))
       {
          /* re-allocate image pixel data */
          if ( !img->pix_data_alloc )
@@ -98,7 +126,7 @@ static Gan_Bool
          }
 
          /* reallocate pixel data */
-         img->pix_data_size = height*stride;
+         img->pix_data_size = req_size;
          img->pix_data_ptr = (unsigned char *) realloc ( img->pix_data_ptr, img->pix_data_size );
          if ( img->pix_data_ptr == NULL )
          {
@@ -123,9 +151,24 @@ static Gan_Bool
          return GAN_FALSE;
       }
       
-      img->row_data_size = height*sizeof(GAN_PIXEL *);
-      img->row_data.GAN_IMFMT.GAN_IMTYPE = (GAN_PIXEL **)realloc ( img->row_data_ptr, img->row_data_size );
-
+      {
+         size_t row_data_size = height*sizeof(GAN_PIXEL *);
+         void *row_data_ptr = (GAN_PIXEL **)realloc ( img->row_data_ptr, row_data_size );
+         /* C99 7.20.3.4 The realloc function:
+            If memory for the new object cannot be allocated,
+            the old object is not deallocated and its value is unchanged. */
+         if( row_data_ptr != NULL )
+         {
+            img->row_data_size = row_data_size;
+            img->row_data.GAN_IMFMT.GAN_IMTYPE = row_data_ptr;
+         }
+         else
+         {
+            gan_err_flush_trace();
+            gan_err_register_with_number ( "image_realloc", GAN_ERROR_MALLOC_FAILED, "", row_data_size );
+            return GAN_FALSE;
+         }
+      }
       /* reset generic pointer to row pointer data */
       img->row_data_ptr = (void *) img->row_data.GAN_IMFMT.GAN_IMTYPE;
    }
@@ -347,15 +390,24 @@ Gan_Image *
 
    if ( alloc_pix_data )
    {
+      Gan_Bool overflow;
+      size_t req_size = pix_data_size_req ( height, stride, & overflow );
+      if ( overflow )
+      {
+         gan_err_flush_trace();
+         gan_err_register ( "image_realloc", GAN_ERROR_TOO_LARGE, "cannot compute image data size" );
+         if ( img->struct_alloc ) free(img);  /* prevent a leak */
+         return NULL;
+      }
       gan_err_test_ptr ( pix_data == NULL, "gan_image_form_gen_?", GAN_ERROR_INCOMPATIBLE, "data specified illegally" );
 
       if ( pix_data_size == 0 )
          /* set size of image data to be allocated */
-         img->pix_data_size = height*stride;
+         img->pix_data_size = req_size;
       else
       {
          /* a non-zero data size has been requested */
-         gan_err_test_ptr ( pix_data_size >= height*stride, "gan_image_form_gen_?", GAN_ERROR_INCOMPATIBLE, "data array not large enough" );
+         gan_err_test_ptr ( pix_data_size >= req_size, "gan_image_form_gen_?", GAN_ERROR_INCOMPATIBLE, "data array not large enough" );
          img->pix_data_size = pix_data_size;
       }
 
@@ -369,6 +421,7 @@ Gan_Image *
          {
             gan_err_flush_trace();
             gan_err_register_with_number ( "gan_image_form_gen_?", GAN_ERROR_MALLOC_FAILED, "", img->pix_data_size );
+            if ( img->struct_alloc ) free(img);  /* prevent a leak */
             return NULL;
          }
       }
