@@ -3350,6 +3350,9 @@ void *
 Gan_Bool
  gan_image_get_pix_zero ( const Gan_Image *img, unsigned row, unsigned col )
 {
+   if ( ! img )
+      return GAN_FALSE;
+
    switch ( img->format )
    {
       case GAN_GREY_LEVEL_IMAGE:
@@ -6198,7 +6201,7 @@ Gan_Bool gan_image_has_rgb_channels ( const Gan_Image *img )
       case GAN_BGR_COLOUR_ALPHA_IMAGE:
       case GAN_RGBX:
       case GAN_RGBAS:
-        return GAN_TRUE; break;
+         return GAN_TRUE; break;
 
       case GAN_GREY_LEVEL_IMAGE:
       case GAN_GREY_LEVEL_ALPHA_IMAGE:
@@ -6207,13 +6210,13 @@ Gan_Bool gan_image_has_rgb_channels ( const Gan_Image *img )
       case GAN_YUVX444:
       case GAN_YUVA444:
       case GAN_YUV422:
-        return GAN_FALSE; break;
+         return GAN_FALSE; break;
 
       default:
-        gan_err_flush_trace();
-        gan_err_register ( "gan_image_has_rgb_channels", GAN_ERROR_ILLEGAL_IMAGE_FORMAT, "" );
-        return GAN_FALSE;
-        break;
+         gan_err_flush_trace();
+         gan_err_register ( "gan_image_has_rgb_channels", GAN_ERROR_ILLEGAL_IMAGE_FORMAT, "" );
+         return GAN_FALSE;
+         break;
    }
 }
 
