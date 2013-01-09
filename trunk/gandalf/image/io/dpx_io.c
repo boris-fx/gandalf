@@ -2414,6 +2414,17 @@ static Gan_Bool gan_read_dpx_generic_header ( char *acAlignedHeader, FILE *infil
    return GAN_TRUE;
 }
 
+static gan_uint32 gan_get_dpx_32bit_value(const char* location,
+                                          Gan_Bool swab)
+{
+   gan_uint32 val32 = *((gan_uint32*) location);
+
+   if (swab)
+      vReverseEndianness32(&val32);
+
+   return val32;
+}
+
 static Gan_Bool gan_read_dpx_image_information_header ( Gan_Bool native_type,
                                                         char *acAlignedHeader, FILE *infile, Gan_Bool bReversedEndianness,
                                                         gan_uint32 ui32ImageOffset,
@@ -2423,8 +2434,8 @@ static Gan_Bool gan_read_dpx_image_information_header ( Gan_Bool native_type,
                                                         Gan_ImageFormat *peFormat, Gan_Type *peType,
                                                         gan_uint8 *pui8BitSize, /* bit size for element */
                                                         Gan_Bool *pbPacked,
-                                                        gan_uint32 *pui32eolPadding, /* end of line padding used in element */
-                                                        gan_uint32 *pui32eoImagePadding, /* end of image padding used in element */
+                                                        gan_uint32 *eolPadding, /* end of line padding used in element */
+                                                        gan_uint32 *eoImagePadding, /* end of image padding used in element */
                                                         struct Gan_ImageHeaderStruct *header )
 {
    gan_uint8  ui8DataSign;
@@ -2610,19 +2621,27 @@ static Gan_Bool gan_read_dpx_image_information_header ( Gan_Bool native_type,
    }
    
    /* Determine data offset */
-   ui32DataOffset = *((gan_uint32*)(acAlignedHeader + OFFSET_DATAOFFSET0));
-   if(bReversedEndianness)
-      vReverseEndianness32(&ui32DataOffset);
+   ui32DataOffset = gan_get_dpx_32bit_value(
+      (acAlignedHeader + OFFSET_DATAOFFSET0), bReversedEndianness
+   );
 
    /* Determine end-of-line padding */
-   *pui32eolPadding = *((gan_uint32*)(acAlignedHeader + OFFSET_EOLPADDING0));
-   if(bReversedEndianness)
-      vReverseEndianness32(pui32eolPadding);
+   *eolPadding = gan_get_dpx_32bit_value(
+      (acAlignedHeader + OFFSET_EOLPADDING0), bReversedEndianness 
+   );
+   if (*eolPadding == 0xFFFFFFFF)
+   {
+      *eolPadding = 0;
+   }
 
    /* Determine end-of-image padding */
-   *pui32eoImagePadding = *((gan_uint32*)(acAlignedHeader + OFFSET_EOIMAGEPADDING0));
-   if(bReversedEndianness)
-      vReverseEndianness32(pui32eoImagePadding);
+   *eoImagePadding = gan_get_dpx_32bit_value(
+      (acAlignedHeader + OFFSET_EOIMAGEPADDING0), bReversedEndianness
+   );
+   if (*eoImagePadding == 0xFFFFFFFF)
+   {
+      *eoImagePadding = 0;
+   }
 
    if(ui32DataOffset != ui32ImageOffset)
    {
