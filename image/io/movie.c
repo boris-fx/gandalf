@@ -57,9 +57,9 @@
  * \sa gan_movie_free().
  */
 Gan_MovieStruct *
- gan_movie_new ( const char *directory,
-                 const char *basename, int no_digits,
-                 const char *suffix, int first, int no_images,
+ gan_movie_new ( const Gan_UnicodeChar *directory,
+                 const Gan_UnicodeChar *basename, int no_digits,
+                 const Gan_UnicodeChar *suffix, int first, int no_images,
                  Gan_ImageFileFormat file_format )
 {
    Gan_MovieStruct *movie;
@@ -74,9 +74,9 @@ Gan_MovieStruct *
    }
 
    /* allocate and fill strings inside movie structure */
-   movie->directory = gan_malloc_array ( char, strlen(directory)+1 );
-   movie->basename  = gan_malloc_array ( char, strlen(basename)+1 );
-   movie->suffix    = gan_malloc_array ( char, strlen(suffix)+1 );
+   movie->directory = gan_malloc_array ( Gan_UnicodeChar, gan_strlen(directory)+1 );
+   movie->basename  = gan_malloc_array ( Gan_UnicodeChar, gan_strlen(basename)+1 );
+   movie->suffix    = gan_malloc_array ( Gan_UnicodeChar, gan_strlen(suffix)+1 );
    if ( movie->directory == NULL || movie->basename == NULL ||
         movie->suffix == NULL )
    {
@@ -85,9 +85,9 @@ Gan_MovieStruct *
       return NULL;
    }
 
-   strcpy ( movie->directory, directory );
-   strcpy ( movie->basename,  basename  );
-   strcpy ( movie->suffix,    suffix    );
+   gan_strcpy ( movie->directory, directory );
+   gan_strcpy ( movie->basename,  basename  );
+   gan_strcpy ( movie->suffix,    suffix    );
 
    /* copy other fields */
    movie->no_digits   = no_digits;
@@ -201,12 +201,12 @@ static int decimal_length ( int num )
  *
  * \sa gan_movie_image_read().
  */
-char *
+Gan_UnicodeChar *
  gan_movie_image_name ( Gan_MovieStruct *movie, int number,
-                        char *string, unsigned slen )
+                        Gan_UnicodeChar *string, size_t slen )
 {
-   char fmt[100];
-   int length;
+   Gan_UnicodeChar fmt[100];
+   size_t length;
 
    if ( number < 0 || number >= movie->no_images )
    {
@@ -219,11 +219,11 @@ char *
    number = movie->first+number*movie->step;
 
    /* compute length of string and fill format string for final sprintf */
-   length = strlen(movie->directory) + 1 + strlen(movie->basename);
+   length = gan_strlen(movie->directory) + 1 + gan_strlen(movie->basename);
    if ( movie->no_digits == 0 )
    {
       length += decimal_length(number);
-      strcpy ( fmt, "%s/%s%d%s" );
+      gan_strcpy ( fmt, GAN_STRING("%s/%s%d%s") );
    }
    else
    {
@@ -235,15 +235,15 @@ char *
       }
 
       length += movie->no_digits;
-      sprintf ( fmt, "%%s/%%s%%0%dd%%s", movie->no_digits );
+      gan_sprintf ( fmt, GAN_STRING("%%s/%%s%%0%dd%%s"), movie->no_digits );
    }
 
    /* add length of suffix and null string terminator */
-   length += strlen(movie->suffix) + 1;
+   length += gan_strlen(movie->suffix) + 1;
 
    if ( string == NULL )
    {
-      string = gan_malloc_array ( char, length );
+      string = gan_malloc_array ( Gan_UnicodeChar, length );
       if ( string == NULL )
       {
          gan_err_flush_trace();
@@ -252,14 +252,14 @@ char *
       }
    }
    else
-      if ( length > (int)slen )
+      if ( length > slen )
       {
          gan_err_flush_trace();
          gan_err_register ( "gan_movie_image_name", GAN_ERROR_TOO_SMALL, "image file name string" );
          return NULL;
       }
 
-   sprintf ( string, fmt, movie->directory, movie->basename, number, movie->suffix );
+   gan_sprintf ( string, fmt, movie->directory, movie->basename, number, movie->suffix );
    return string;
 }
 
@@ -279,7 +279,7 @@ char *
 Gan_Image *
  gan_movie_image_read ( Gan_MovieStruct *movie, int number, Gan_Image *image )
 {
-   char *filename;
+   Gan_UnicodeChar *filename;
 
    /* build file name */
    filename = gan_movie_image_name ( movie, number, NULL, 0 );
@@ -293,7 +293,7 @@ Gan_Image *
    image = gan_image_read ( filename, movie->file_format, image, NULL, NULL );
    if ( image == NULL )
    {
-      gan_err_register ( "gan_movie_image_read", GAN_ERROR_FAILURE, filename );
+      gan_err_register_unicode ( "gan_movie_image_read", GAN_ERROR_FAILURE, filename );
       return NULL;
    }
 
@@ -318,7 +318,7 @@ Gan_Image *
 Gan_Bool
  gan_movie_image_write ( Gan_MovieStruct *movie, int number, Gan_Image *image )
 {
-   char *filename;
+   Gan_UnicodeChar *filename;
 
    /* build file name */
    filename = gan_movie_image_name ( movie, number, NULL, 0 );
@@ -331,7 +331,7 @@ Gan_Bool
    /* write file */
    if ( !gan_image_write ( filename, movie->file_format, image, NULL ))
    {
-      gan_err_register ( "gan_movie_image_write", GAN_ERROR_FAILURE, filename );
+      gan_err_register_unicode ( "gan_movie_image_write", GAN_ERROR_FAILURE, filename );
       return GAN_FALSE;
    }
 

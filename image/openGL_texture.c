@@ -431,10 +431,10 @@ GLenum info;
       /* specify colourspace conversion */
       glMatrixMode(GL_COLOR);
       glLoadMatrixd(agldConversionMatrix);
-      glPixelTransferf(GL_POST_COLOR_MATRIX_RED_BIAS,   agldOffset[0]);
-      glPixelTransferf(GL_POST_COLOR_MATRIX_GREEN_BIAS, agldOffset[1]);
-      glPixelTransferf(GL_POST_COLOR_MATRIX_BLUE_BIAS,  agldOffset[2]);
-      glPixelTransferf(GL_POST_COLOR_MATRIX_ALPHA_BIAS, agldOffset[3]);
+      glPixelTransferf(GL_POST_COLOR_MATRIX_RED_BIAS,   (float)agldOffset[0]);
+      glPixelTransferf(GL_POST_COLOR_MATRIX_GREEN_BIAS, (float)agldOffset[1]);
+      glPixelTransferf(GL_POST_COLOR_MATRIX_BLUE_BIAS,  (float)agldOffset[2]);
+      glPixelTransferf(GL_POST_COLOR_MATRIX_ALPHA_BIAS, (float)agldOffset[3]);
    }
 #endif /* #ifdef HAVE_OPENGL_EXT */
 

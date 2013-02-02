@@ -514,17 +514,17 @@ Gan_Image *
  * \sa gan_write_png_image().
  */
 Gan_Image *
-gan_read_png_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+gan_read_png_image(const Gan_UnicodeChar *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
                    Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
 
    /* attempt to open file */
-   infile = fopen ( filename, "rb" );
+   infile = gan_fopen ( filename, GAN_STRING("rb") );
    if ( infile == NULL )
    {
       gan_err_flush_trace();
-      gan_err_register ( "gan_read_png_image", GAN_ERROR_OPENING_FILE, filename );
+      gan_err_register_unicode( "gan_read_png_image", GAN_ERROR_OPENING_FILE, filename );
       return NULL;
    }
  
@@ -532,7 +532,7 @@ gan_read_png_image(const char *filename, Gan_Image *image, const struct Gan_Imag
    fclose(infile);
    if ( image == NULL )
    {
-      gan_err_register ( "gan_read_png_image", GAN_ERROR_FAILURE, filename );
+      gan_err_register_unicode ( "gan_read_png_image", GAN_ERROR_FAILURE, filename );
       return NULL;
    }
 
@@ -754,7 +754,7 @@ Gan_Bool
  * \sa gan_read_png_image().
  */
 Gan_Bool
- gan_write_png_image ( const char *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr )
+ gan_write_png_image ( const Gan_UnicodeChar *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr )
 {
    if(filename == NULL)
       /* check format works OK */
@@ -769,7 +769,7 @@ Gan_Bool
          Gan_Bool merged=GAN_FALSE;
 
          /* check if the file exists */
-         outfile = fopen ( filename, "r" );
+         outfile = gan_fopen ( filename, GAN_STRING("r") );
          if(outfile != NULL)
          {
             /* read temporary image */
@@ -790,11 +790,11 @@ Gan_Bool
                   gan_merge_field_into_image(image, octrlstr->flip, octrlstr->upper, octrlstr->whole_image, pimage);
 
                   /* attempt to open file */
-                  outfile = fopen ( filename, "wb" );
+                  outfile = gan_fopen ( filename, GAN_STRING("wb") );
                   if ( outfile == NULL )
                   {
                      gan_err_flush_trace();
-                     gan_err_register ( "gan_write_png_image", GAN_ERROR_OPENING_FILE, filename );
+                     gan_err_register_unicode ( "gan_write_png_image", GAN_ERROR_OPENING_FILE, filename );
                      return GAN_FALSE;
                   }
 
@@ -813,11 +813,11 @@ Gan_Bool
       }
 
       /* attempt to open file */
-      outfile = fopen ( filename, "wb" );
+      outfile = gan_fopen ( filename, GAN_STRING("wb") );
       if ( outfile == NULL )
       {
          gan_err_flush_trace();
-         gan_err_register ( "gan_write_png_image", GAN_ERROR_OPENING_FILE, filename );
+         gan_err_register_unicode ( "gan_write_png_image", GAN_ERROR_OPENING_FILE, filename );
          return GAN_FALSE;
       }
 

@@ -25,48 +25,49 @@
 */
 
 #include <string.h>
-#include <TestFramework/path_builder.h>
-#include <common/misc_error.h>
+#include <gandalf/TestFramework/path_builder.h>
+#include <gandalf/common/misc_error.h>
+#include <gandalf/common/i18n.h>
 
 #define BUILD_PATHNAME_BUF_SIZE 1024
 
-static char acTempBuffer[BUILD_PATHNAME_BUF_SIZE];
+static Gan_UnicodeChar acTempBuffer[BUILD_PATHNAME_BUF_SIZE];
 
-char * acBuildPathName(char * acBasePath, char * acName)
+Gan_UnicodeChar * acBuildPathName(Gan_UnicodeChar * acBasePath, Gan_UnicodeChar * acName)
 {
-   if ( strlen(acBasePath) == 0 || strlen(acName) == 0 )
+   if ( gan_strlen(acBasePath) == 0 || gan_strlen(acName) == 0 )
    {
       gan_err_flush_trace();
       gan_err_register ( "acBuildPathName", GAN_ERROR_NOT_ENOUGH_DATA, "" );
       return NULL;
    }
                          
-   if ( acBasePath[strlen(acBasePath)-1] == '/' ||
-        acBasePath[strlen(acBasePath)-1] == '\\' )
+   if ( acBasePath[gan_strlen(acBasePath)-1] == GAN_STRING('/') ||
+        acBasePath[gan_strlen(acBasePath)-1] == GAN_STRING('\\') )
    {
       /* directory contains a trailing backslash separator */
-      if ( strlen(acBasePath) + strlen(acName) >= BUILD_PATHNAME_BUF_SIZE )
+      if ( gan_strlen(acBasePath) + gan_strlen(acName) >= BUILD_PATHNAME_BUF_SIZE )
       {
          gan_err_flush_trace();
          gan_err_register ( "acBuildPathName", GAN_ERROR_ARRAY_TOO_SMALL, "" );
          return NULL;
       }
 
-	   strcpy ( acTempBuffer, acBasePath );
-	   strcat ( acTempBuffer, acName );
+	   gan_strcpy ( acTempBuffer, acBasePath );
+	   gan_strcat ( acTempBuffer, acName );
    }
    else
    {
-      if ( strlen(acBasePath) + strlen(acName) + 1 >= BUILD_PATHNAME_BUF_SIZE )
+      if ( gan_strlen(acBasePath) + gan_strlen(acName) + 1 >= BUILD_PATHNAME_BUF_SIZE )
       {
          gan_err_flush_trace();
          gan_err_register ( "acBuildPathName", GAN_ERROR_ARRAY_TOO_SMALL, "" );
          return NULL;
       }
 
-	   strcpy ( acTempBuffer, acBasePath );
-	   strcat ( acTempBuffer, "/" );
-	   strcat ( acTempBuffer, acName );
+	   gan_strcpy ( acTempBuffer, acBasePath );
+	   gan_strcat ( acTempBuffer, GAN_STRING("/") );
+	   gan_strcat ( acTempBuffer, acName );
    }
 
 	return acTempBuffer;

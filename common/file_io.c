@@ -46,24 +46,24 @@
  * \param dest Destination file name
  * \return #GAN_TRUE on success, #GAN_FALSE on failure.
  */
-Gan_Bool gan_file_copy ( const char *source, const char *dest )
+Gan_Bool gan_file_copy ( const Gan_UnicodeChar *source, const Gan_UnicodeChar *dest )
 {
    char array[GAN_FILEIO_BLOCK_SIZE];
    FILE *fpi, *fpo;
 
-   fpi = fopen(source, "r+b");
+   fpi = gan_fopen(source, GAN_STRING("r+b"));
    if(fpi == NULL)
    {
       gan_err_flush_trace();
-      gan_err_register("gan_file_copy", GAN_ERROR_OPENING_FILE, source);
+      gan_err_register_unicode("gan_file_copy", GAN_ERROR_OPENING_FILE, source);
       return GAN_FALSE;
    }
 
-   fpo = fopen(dest, "w+b");
+   fpo = gan_fopen(dest, GAN_STRING("w+b"));
    if(fpo == NULL)
    {
       gan_err_flush_trace();
-      gan_err_register("gan_file_copy", GAN_ERROR_OPENING_FILE, dest);
+      gan_err_register_unicode("gan_file_copy", GAN_ERROR_OPENING_FILE, dest);
       return GAN_FALSE;
    }
 

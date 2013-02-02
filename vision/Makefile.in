@@ -44,15 +44,15 @@ targets: $(OBJS)
 all: test camera-test hough-transform-test
 
 test:
-	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DVISION_TEST_MAIN vision_test.c $(PATH_BUILDER_C) -o vision_test $(LDFLAGS) $(LIB) $(LIBS)
+	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DVISION_TEST_MAIN vision_test.c $(PATH_BUILDER_C) -o vision_test $(LDFLAGS) $(LIB) $(LIBS) $(GLUT_LIBS)
 # -lefence
 
 camera-test:
-	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DCAMERA_TEST_MAIN camera_test.c $(PATH_BUILDER_C) -o camera_test $(LDFLAGS) $(LIB) $(LIBS)
+	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DCAMERA_TEST_MAIN camera_test.c $(PATH_BUILDER_C) -o camera_test $(LDFLAGS) $(LIB) $(LIBS) $(GLUT_LIBS)
 # -lefence
 
 hough-transform-test:
-	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DHOUGH_TRANSFORM_TEST_MAIN hough_transform_test.c $(PATH_BUILDER_C) -o hough_transform_test $(LDFLAGS) $(LIB) $(LIBS)
+	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DHOUGH_TRANSFORM_TEST_MAIN hough_transform_test.c $(PATH_BUILDER_C) -o hough_transform_test $(LDFLAGS) $(LIB) $(LIBS) $(GLUT_LIBS)
 # -lefence
 
 convolve2D-test:

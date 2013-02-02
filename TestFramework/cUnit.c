@@ -14,19 +14,19 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <TestFramework/cUnit.h>
-#include <common/linked_list.h>
-#include <common/allocate.h>
-#include <common/list_test.h>
-#include <common/common_test.h>
-#include <vision/vision_test.h>
-#include <vision/camera_test.h>
-#include <vision/hough_transform_test.h>
-#include <vision/convolve2D_test.h>
-#include <image/image_test.h>
-#include <image/bitmap_test.h>
-#include <linalg/linalg_test.h>
-#include <linalg/matrixf_eigen_test.h>
+#include <gandalf/TestFramework/cUnit.h>
+#include <gandalf/common/linked_list.h>
+#include <gandalf/common/allocate.h>
+#include <gandalf/common/list_test.h>
+#include <gandalf/common/common_test.h>
+#include <gandalf/vision/vision_test.h>
+#include <gandalf/vision/camera_test.h>
+#include <gandalf/vision/hough_transform_test.h>
+#include <gandalf/vision/convolve2D_test.h>
+#include <gandalf/image/image_test.h>
+#include <gandalf/image/bitmap_test.h>
+#include <gandalf/linalg/linalg_test.h>
+#include <gandalf/linalg/matrixf_eigen_test.h>
 
 /* Reads the user selection from the keyboard */
 unsigned int menu()

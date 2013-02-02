@@ -9,8 +9,9 @@
  * Copyright:     (c) 2000 Imagineer Software Limited
  */
 
-#include <common/linked_list.h>
-#include <TestFramework/path_builder.h>
+#include <gandalf/common/linked_list.h>
+#include <gandalf/common/i18n.h>
+#include <gandalf/TestFramework/path_builder.h>
 
 #ifndef CUNIT_H
 #define CUNIT_H
@@ -23,11 +24,11 @@
 // redefition should not be necessary.
 // 
 #ifdef _MSC_VER
-   #define TEST_INPUT_PATH "./../../TestInput/"
-   #define TEST_OUTPUT_PATH "./../../TestOutput/"
+   #define TEST_INPUT_PATH GAN_STRING("./../../TestInput/")
+   #define TEST_OUTPUT_PATH GAN_STRING("./../../TestOutput/")
 #else
-   #define TEST_INPUT_PATH "./../TestInput/"
-   #define TEST_OUTPUT_PATH "./../TestOutput/"
+   #define TEST_INPUT_PATH GAN_STRING("./../TestInput/")
+   #define TEST_OUTPUT_PATH GAN_STRING("./../TestOutput/")
 #endif
 
 /* Use cUnit_assert in the unit tests */

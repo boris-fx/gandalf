@@ -20,7 +20,7 @@ PACKAGE = common
 OBJS = $(patsubst %.c,%$(OBJECT_SUFFIX).lo,$(CFILES))
 CFILES = misc_defs.c compare.c numerics.c allocate.c misc_error.c \
 	 linked_list.c array.c bit_array.c gan_err.c gan_err_trace.c \
-	 endian_io.c memory_stack.c file_io.c
+	 endian_io.c memory_stack.c file_io.c i18n.c
 HFILES = $(patsubst %.c,%.h,$(CFILES)) complex.h
 TOPLEVEL = ..
 

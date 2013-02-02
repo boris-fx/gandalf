@@ -29,6 +29,7 @@
 
 #include <gandalf/image/io/image_io.h>
 #include <gandalf/common/misc_error.h>
+#include <gandalf/common/i18n.h>
 #include <gandalf/image/image_extract.h>
 #include <gandalf/image/image_convert.h>
 #include <gandalf/linalg/3x3matrix.h>
@@ -237,7 +238,7 @@ static void display_image(void)
            /* save image */
            img_rgbx10->format = GAN_RGB_COLOUR_ALPHA_IMAGE;
            img_rgbx10->type = GAN_UINT8;
-           gan_image_write("/store/tmp/rgbx10.tif", GAN_TIFF_FORMAT, img_rgbx10, NULL);
+           gan_image_write(GAN_STRING("/store/tmp/rgbx10.tif"), GAN_TIFF_FORMAT, img_rgbx10, NULL);
            img_rgbx10->format = GAN_RGBX;
            img_rgbx10->type = GAN_UINT10;
 #endif
@@ -276,7 +277,7 @@ static void display_image(void)
            /* save image */
            img_rgbas10->format = GAN_RGB_COLOUR_ALPHA_IMAGE;
            img_rgbas10->type = GAN_UINT8;
-           gan_image_write("/store/tmp/rgbas10.tif", GAN_TIFF_FORMAT, img_rgbas10, NULL);
+           gan_image_write(GAN_STRING("/store/tmp/rgbas10.tif"), GAN_TIFF_FORMAT, img_rgbas10, NULL);
            img_rgbas10->format = GAN_RGBAS;
            img_rgbas10->type = GAN_UINT10;
 #endif
@@ -309,7 +310,7 @@ static void display_image(void)
 #if 1
            /* save image */
            img_rgba12->type = GAN_UINT16;
-           gan_image_write("/store/tmp/rgba12.tif", GAN_TIFF_FORMAT, img_rgba12, NULL);
+           gan_image_write(GAN_STRING("/store/tmp/rgba12.tif"), GAN_TIFF_FORMAT, img_rgba12, NULL);
            img_rgba12->type = GAN_UINT12;
 #endif
            if(bUseTextures && !gan_build_openGL_textures_for_image ( img_rgba12, &rgba12_textures ))
@@ -396,14 +397,14 @@ static void display_image(void)
 #if 1
            /* save image */
            img_yuvx444->format = GAN_RGB_COLOUR_ALPHA_IMAGE;
-           gan_image_write("/store/tmp/yuvx444.tif", GAN_TIFF_FORMAT, img_yuvx444, NULL);
+           gan_image_write(GAN_STRING("/store/tmp/yuvx444.tif"), GAN_TIFF_FORMAT, img_yuvx444, NULL);
            img_yuvx444->format = GAN_YUVX444;
 #endif
 #if 1
            {
               Gan_Image* pgiTmp;
               pgiTmp = gan_image_convert_s(img_yuvx444, GAN_RGB_COLOUR_IMAGE, GAN_UINT8);
-              gan_image_write("/tmp/yuvx444.tif", GAN_TIFF_FORMAT, pgiTmp, NULL);
+              gan_image_write(GAN_STRING("/tmp/yuvx444.tif"), GAN_TIFF_FORMAT, pgiTmp, NULL);
               gan_image_free(pgiTmp);
            }
 #endif
@@ -437,7 +438,7 @@ static void display_image(void)
 #if 1
            /* save image */
            img_yuva444->format = GAN_RGB_COLOUR_ALPHA_IMAGE;
-           gan_image_write("/store/tmp/yuva444.tif", GAN_TIFF_FORMAT, img_yuva444, NULL);
+           gan_image_write(GAN_STRING("/store/tmp/yuva444.tif"), GAN_TIFF_FORMAT, img_yuva444, NULL);
            img_yuva444->format = GAN_YUVA444;
 #endif
         
@@ -471,7 +472,7 @@ static void display_image(void)
            /* save image */
            img_yuv422->format = GAN_GREY_LEVEL_ALPHA_IMAGE;
            img_yuv422->type = GAN_UINT8;
-           gan_image_write("/store/tmp/yuv422.tif", GAN_TIFF_FORMAT, img_yuv422, NULL);
+           gan_image_write(GAN_STRING("/store/tmp/yuv422.tif"), GAN_TIFF_FORMAT, img_yuv422, NULL);
            img_yuv422->format = GAN_YUV422;
            img_yuv422->type = GAN_UINT8;
 #endif
@@ -479,7 +480,7 @@ static void display_image(void)
            {
               Gan_Image* pgiTmp;
               pgiTmp = gan_image_convert_s(img_yuv422, GAN_RGB_COLOUR_IMAGE, GAN_UINT8);
-              gan_image_write("/tmp/yuv422.tif", GAN_TIFF_FORMAT, pgiTmp, NULL);
+              gan_image_write(GAN_STRING("/tmp/yuv422.tif"), GAN_TIFF_FORMAT, pgiTmp, NULL);
               gan_image_free(pgiTmp);
            }
 #endif
@@ -620,10 +621,10 @@ static Gan_Bool run_test(void)
    }
       
 #if 1
-   char *image_file = acBuildPathName(TEST_INPUT_PATH,"MonetLogo.png");
+   Gan_UnicodeChar *image_file = acBuildPathName(TEST_INPUT_PATH, GAN_STRING("MonetLogo.png") );
    Gan_ImageFileFormat file_format = GAN_PNG_FORMAT;
 #else
-   char *image_file = "/store/ndm/Backup/orl.333/examples/example_images/AlphaImages/alpha_image.0000.png";
+   Gan_UnicodeChar *image_file = GAN_STRING("/store/ndm/Backup/orl.333/examples/example_images/AlphaImages/alpha_image.0000.png");
    Gan_ImageFileFormat file_format = GAN_PNG_FORMAT;
 #endif
 
@@ -644,11 +645,39 @@ static Gan_Bool run_test(void)
    /* set black as the background colour */
    glClearColor ( 0.0F, 0.0F, 0.0F, 0.0F );
 
-   if ( !gan_display_new_window ( img_rgba8->height, img_rgba8->width, 1.0, image_file, 0, 0, &window_id ) )
+   /* convert the Unicode string to a UTF-8 charcter array */
+   char *image_file_ascii = NULL; /* UTF-8 converted image_file */
+   size_t          n_uchars; /* size of source buffer */
+   size_t          n_chars; /* size of destination buffer */
+
+   n_uchars = gan_strlen(image_file);
+   n_chars = gan_unicodechar_to_char( image_file, n_uchars, NULL, 0 );
+   image_file_ascii = gan_malloc_array(char, n_chars);
+
+   if( !image_file_ascii )
+   {
+      gan_err_flush_trace();
+      gan_err_register_with_number( "run_test", GAN_ERROR_MALLOC_FAILED, "char[]", n_chars );
+      return GAN_ERROR_MALLOC_FAILED;
+   }
+
+   if ( gan_unicodechar_to_char( image_file, n_uchars, image_file_ascii, n_chars ) != n_chars )
+   {
+      gan_err_flush_trace();
+      gan_err_register("run_test",
+                       GAN_EC_FAIL,
+                       "Failed to convert error message from unicode to char.");
+   }
+
+   if ( !gan_display_new_window ( img_rgba8->height, img_rgba8->width, 1.0, image_file_ascii, 0, 0, &window_id ) )
    {
       fprintf ( stderr, "cannot open create OpenGL window\n" );
+      gan_free_va(image_file_ascii, NULL);
       return GAN_FALSE;
    }
+
+   gan_free_va(image_file_ascii, NULL);
+
 
    /* set up display window with same dimensions as warped image */
    uiWindowHeight = img_rgba8->height;

@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <gandalf/common/gan_err_trace.h>
 #include <gandalf/common/gan_err.h>
+#include <gandalf/common/misc_error.h>
+#include <gandalf/common/allocate.h>
 #ifdef _MSC_VER
 #include <Windows.h>
 #else
@@ -44,23 +46,23 @@
  * \{
  */
 
-/*
+/**
  * \brief Default error reporter.
  * \return No value.
  *
  * Typically the application should provide its own error reporter.
  */
 static void
- gan_err_default_reporter(void)
+ err_default_reporter(void)
 {
    int i, n;                                /* Loop counter */
     
-   const char * func_name;
-   int          err_code;
-   const char * file_name;
-   int          line_number;
-   const char * message;
-   int          number;
+   const char            * func_name;
+   int                     err_code;
+   const char            * file_name;
+   int                     line_number;
+   const char            * message;
+   int                     number;
 
    n = gan_err_get_error_count();
    for ( i = 1; i<=n; i++ )
@@ -76,15 +78,15 @@ static void
       fprintf(stderr, "message     = %s\n", message );
    }
 
-   fprintf(stderr, "gan_err_default_reporter()\n");
+   fprintf(stderr, "err_default_reporter()\n");
 }
 
-/*  Pointer to current error reporting function. This is setup using
+/* Pointer to current error reporting function. This is setup using
  * gan_err_set_reporter(), and typically invoked using gan_err_report().
  *
- * Default reporter is gan_err_default_reporter().
+ * Default reporter is err_default_reporter().
  */
-static Gan_ErrorReporterFunc gan_err_current_reporter = gan_err_default_reporter;
+static Gan_ErrorReporterFunc gan_err_current_reporter = err_default_reporter;
 
 
 /* Flag indicating Trace Mode - see GAN_ERR_TRACE_X in gan_exception.h for
@@ -95,7 +97,7 @@ static Gan_TraceMode gan_err_trace_mode = GAN_ERR_TRACE_OFF;
 
 
 /* The error trace */
-/*  Statically allocate last and 2nd to last records for error trace */
+/* Statically allocate last and 2nd to last records for error trace */
 static Gan_ErrorTrace record_last = { NULL, GAN_ET_YES, GAN_ET_NO,
                                       GAN_ET_YES, NULL,
                                       GAN_EC_DFT_SPARE, NULL, 0, NULL };
@@ -132,13 +134,13 @@ static Gan_ErrorTrace * gan_err_trace_top = &record_2nd_last;
  */
 Gan_ErrorReporterFunc gan_err_set_reporter(Gan_ErrorReporterFunc app_error_reporter )
 {
-   /*  Buffer old handler, so that it can be returned */
+   /* Buffer old handler, so that it can be returned */
    Gan_ErrorReporterFunc gan_err_temp_reporter = gan_err_current_reporter; 
     
    /* Set reporter, noting default (GAN_ERR_DFL) or ignore
       (GAN_ERR_IGN) modes */
    if ( app_error_reporter == GAN_ERR_DFL )
-      gan_err_current_reporter = gan_err_default_reporter;
+      gan_err_current_reporter = err_default_reporter;
    else if ( app_error_reporter == GAN_ERR_IGN )
       gan_err_current_reporter = GAN_ERR_IGN;        
    else
@@ -279,6 +281,94 @@ int
 }
 
 /**
+ * \brief Registers occurence of an error, with a Unicode message.
+ * \param func_name    Name of function in which error occurs
+ * \param err_code     Numeric code of error
+ * \param file_name    Name of file in which error occurs
+ * \param line_number  Line in file at which error occurs
+ * \param message      Message string describing error
+ * \parem number       Number to attach to error, default 0
+ *
+ * \return The error number of error registered. #GAN_EC_DFT_DEEP_ERROR if a
+ *         deep error occurs, \a err_code otherwise.
+ *                
+ * Registers occurence of an error. Intended to be called at the lowest
+ * function level immediately after the occurence of an error, and called at
+ * every level of the function call stack during unwinding, until the error is
+ * handled, or it unwinds into a function level where a different error
+ * handling mechanism is used.
+ *
+ * If the trace mode is #GAN_ERR_TRACE_OFF, this function causes the current
+ * error reporter to called immediately. If the trace mode is
+ * #GAN_ERR_TRACE_ON, this function causes the details of the error to be
+ * placed onto an error trace. The error details are reported in "batch" at a
+ * later time upon invokation of gan_err_report().
+ *
+ * \warning #GAN_EC_DFT_DEEP_ERROR is registered in the top record of the error
+ *          trace if a deep error occurs. The error requested to be registered
+ *          is placed in the second top record of the error trace. This error
+ *          may be missing the message string, because it may have been the
+ *          process of allocating memory for this string that caused the deep
+ *          error to occur.
+ *
+ * This function is typically called using the macro gan_err_register().
+ *
+ * \sa gan_err_register_unicode() (macro), gan_err_set_trace().
+ * \note If trace mode is off then call error reporter immediately, otherwise
+ *       push error details onto error trace.
+ */
+int
+ gan_err_register_fileline_unicode ( const char            *func_name,
+                                     int                    err_code,
+                                     const char            *file_name,
+                                     int                    line_number,
+                                     const Gan_UnicodeChar *umessage,
+                                     int                    number )
+{
+   Gan_ErrorTrace *atrace = NULL;
+   int             the_err_code = GAN_EC_FAIL; /* Registered error code */
+   char           *message = NULL; /* UTF-8 converted message */
+   size_t          n_uchars; /* size of source buffer */
+   size_t          n_chars; /* size of destination buffer */
+
+   /* convert the Unicode string to a UTF-8 charcter array */
+   n_uchars = gan_strlen(umessage);
+   n_chars = gan_unicodechar_to_char( umessage, n_uchars, NULL, 0 );
+   message = gan_malloc_array(char, n_chars);
+   if( !message )
+   {
+      gan_err_flush_trace();
+      gan_err_register_with_number( "gan_err_register_fileline_unicode", GAN_ERROR_MALLOC_FAILED, "char[]", n_chars );
+      return GAN_ERROR_MALLOC_FAILED;
+   }
+
+   * message = '\0';
+   if ( gan_unicodechar_to_char( umessage, n_uchars, message, n_chars ) == n_chars )
+   {
+      /* call the normal gan_err_register_fileline with the converted string */
+      the_err_code = gan_err_register_fileline (func_name,
+                                                err_code,
+                                                file_name,
+                                                line_number,
+                                                message,
+                                                number );
+   }
+   else
+   {
+      /* register a deep error because error registration failed */
+      gan_err_flush_trace();
+      gan_err_register("gan_err_register_fileline_unicode",
+                       GAN_EC_FAIL,
+                       "Failed to convert error message from unicode to char.");
+      the_err_code = GAN_EC_DFT_DEEP_ERROR;
+   }
+   
+   gan_free_va(message, NULL);
+
+   return the_err_code;
+}
+
+/**
  * \brief Invokes current error reporter.
  * \return No value.
  *
@@ -300,7 +390,7 @@ void
  gan_err_report(void)
 {
    if (gan_err_current_reporter == GAN_ERR_DFL )
-      gan_err_default_reporter();
+      err_default_reporter();
    else if ( gan_err_current_reporter != GAN_ERR_IGN )
       gan_err_current_reporter();
     
@@ -478,3 +568,4 @@ int
 /**
  * \}
  */
+
