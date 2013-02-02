@@ -49,16 +49,16 @@ extern "C" {
 typedef struct Gan_MovieStruct
 {
    /// directory in which image sequence is stored
-   char *directory;
+   Gan_UnicodeChar *directory;
 
    /// base name of sequence
-   char *basename;
+   Gan_UnicodeChar *basename;
 
    /// number of digits in number field of file name
    int no_digits;
 
    /// suffix string of each file name
-   char *suffix;
+   Gan_UnicodeChar *suffix;
 
    /// number of first image in the sequence
    int first;
@@ -76,9 +76,9 @@ typedef struct Gan_MovieStruct
    int crop_xlow, crop_xhigh, crop_ylow, crop_yhigh;
 } Gan_MovieStruct;
 
-GANDALF_API Gan_MovieStruct *gan_movie_new ( const char *directory,
-                                 const char *basename, int no_digits,
-                                 const char *suffix,
+GANDALF_API Gan_MovieStruct *gan_movie_new ( const Gan_UnicodeChar *directory,
+                                 const Gan_UnicodeChar *basename, int no_digits,
+                                 const Gan_UnicodeChar *suffix,
                                  int first, int no_images,
                                  Gan_ImageFileFormat file_format );
 GANDALF_API void gan_movie_set_step ( Gan_MovieStruct *movie, int step );
@@ -86,8 +86,8 @@ GANDALF_API void gan_movie_set_crop_window ( Gan_MovieStruct *movie,
                                  int crop_left, int crop_right,
                                  int crop_top,  int crop_bottom );
 GANDALF_API void gan_movie_free ( Gan_MovieStruct *movie );
-GANDALF_API char *gan_movie_image_name ( Gan_MovieStruct *movie, int number,
-                             char *string, unsigned slen );
+GANDALF_API Gan_UnicodeChar *gan_movie_image_name ( Gan_MovieStruct *movie, int number,
+                             Gan_UnicodeChar *string, size_t slen );
 GANDALF_API Gan_Image *gan_movie_image_read ( Gan_MovieStruct *movie, int number,
                                   Gan_Image *image );
 GANDALF_API Gan_Bool   gan_movie_image_write ( Gan_MovieStruct *movie, int number,

@@ -109,13 +109,13 @@ Gan_ImageFileFormat gan_image_determine_file_format_stream ( FILE *infile )
 /**
  * \brief Determine the file format of the given image file
  */
-Gan_ImageFileFormat gan_image_determine_file_format ( const char *filename )
+Gan_ImageFileFormat gan_image_determine_file_format ( const Gan_UnicodeChar *filename )
 {
    FILE *infile;
    Gan_ImageFileFormat file_format;
 
    /* attempt to open file */
-   infile = fopen ( filename, "rb" );
+   infile = gan_fopen ( filename, GAN_STRING("rb") );
    if ( infile == NULL )
       return GAN_UNKNOWN_FORMAT;
 
@@ -484,7 +484,7 @@ Gan_Image *
  * \sa gan_write_image().
  */
 Gan_Image *
- gan_image_read_with_abort_test ( const char *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
+ gan_image_read_with_abort_test ( const Gan_UnicodeChar *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
                                   const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header,
                                   Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
@@ -494,7 +494,7 @@ Gan_Image *
 
    if(file_format == GAN_UNKNOWN_FORMAT)
    {
-      gan_err_register ( "gan_image_read", GAN_ERROR_FAILURE, "" );
+      gan_err_register_unicode( "gan_image_read", GAN_ERROR_FAILURE, "" );
       return NULL;
    }
 
@@ -733,7 +733,7 @@ Gan_Bool
  * \sa gan_read_image().
  */
 Gan_Bool
- gan_image_write ( const char *filename, Gan_ImageFileFormat file_format, const Gan_Image *image,
+ gan_image_write ( const Gan_UnicodeChar *filename, Gan_ImageFileFormat file_format, const Gan_Image *image,
                    const Gan_ImageWriteControlStruct *octrlstr )
 {
    Gan_Bool result;

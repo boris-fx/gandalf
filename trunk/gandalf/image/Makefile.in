@@ -77,13 +77,13 @@ install: installh
 $(CFILES): ../$(PACKAGE).h
 
 test:
-	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DIMAGE_TEST_MAIN image_test.c $(PATH_BUILDER_C) -o image_test $(LDFLAGS) $(LIB) $(LIBS)
+	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DIMAGE_TEST_MAIN image_test.c $(PATH_BUILDER_C) -o image_test $(LDFLAGS) $(LIB) $(LIBS) $(GLUT_LIBS)
 
 bitmap-test:
-	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DBITMAP_TEST_MAIN bitmap_test.c $(PATH_BUILDER_C) -o bitmap_test $(LDFLAGS) $(LIB) $(LIBS)
+	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DBITMAP_TEST_MAIN bitmap_test.c $(PATH_BUILDER_C) -o bitmap_test $(LDFLAGS) $(LIB) $(LIBS) $(GLUT_LIBS)
 
 image-display-test:
-	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DIMAGE_DISPLAY_TEST_MAIN image_display_test.c $(PATH_BUILDER_C) -o image_display_test $(LDFLAGS) $(LIB) $(LIBS)
+	$(LIBTOOL) --mode=link $(CC) -I$(TOPLEVEL)/.. $(CFLAGS) -DIMAGE_DISPLAY_TEST_MAIN image_display_test.c $(PATH_BUILDER_C) -o image_display_test $(LDFLAGS) $(LIB) $(LIBS) $(GLUT_LIBS)
 
 include ../make.targets
 

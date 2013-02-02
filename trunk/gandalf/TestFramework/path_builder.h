@@ -28,14 +28,15 @@
 #define _PATHBUILDER_H
 
 #include <stdlib.h>
-#include <common/misc_defs.h>
+#include <gandalf/common/misc_defs.h>
+#include <gandalf/common/i18n.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Helper function to contruct a path name into a buffer defined in this unit*/
-char * acBuildPathName(char * acBasePath, char * acName);
+Gan_UnicodeChar * acBuildPathName(Gan_UnicodeChar * acBasePath, Gan_UnicodeChar * acName);
 
 #ifdef __cplusplus
 }

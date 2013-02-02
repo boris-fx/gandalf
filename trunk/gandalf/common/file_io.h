@@ -28,6 +28,7 @@
 #define _GAN_FILE_IO_H
 
 #include <gandalf/common/misc_defs.h>
+#include <gandalf/common/i18n.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,7 +44,7 @@ extern "C" {
  * \{
  */
 
-GANDALF_API Gan_Bool gan_file_copy ( const char *source, const char *dest );
+GANDALF_API Gan_Bool gan_file_copy ( const Gan_UnicodeChar *source, const Gan_UnicodeChar *dest );
 
 /**
  * \}

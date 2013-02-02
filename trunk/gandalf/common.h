@@ -7,6 +7,7 @@
 #include <gandalf/common/file_io.h>
 #include <gandalf/common/gan_err.h>
 #include <gandalf/common/gan_err_trace.h>
+#include <gandalf/common/i18n.h>
 #include <gandalf/common/linked_list.h>
 #include <gandalf/common/memory_stack.h>
 #include <gandalf/common/misc_defs.h>

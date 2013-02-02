@@ -468,7 +468,7 @@ Gan_Bool gan_image_is_tiff(const unsigned char *magic_string, size_t length)
  * \sa gan_write_tiff_image().
  */
 Gan_Image *
- gan_read_tiff_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+ gan_read_tiff_image(const Gan_UnicodeChar *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
                      Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    TIFF *tif;
@@ -488,11 +488,15 @@ Gan_Image *
    int st;
 
    /* attempt to open file */
+#if defined(_MSC_VER) && defined(UNICODE)
+   tif = TIFFOpenW(filename, "r");
+#else
    tif = TIFFOpen(filename, "r");
+#endif
    if ( tif == NULL )
    {
       gan_err_flush_trace();
-      gan_err_register ( "gan_read_tiff_image", GAN_ERROR_OPENING_FILE, filename );
+      gan_err_register_unicode ( "gan_read_tiff_image", GAN_ERROR_OPENING_FILE, filename );
       return NULL;
    }
 
@@ -803,7 +807,7 @@ Gan_Bool
  * \sa gan_read_tiff_image().
  */
 Gan_Bool
- gan_write_tiff_image ( const char *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr )
+ gan_write_tiff_image ( const Gan_UnicodeChar *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr )
 {
    TIFF *tif=NULL;
    unsigned uiRow;
@@ -832,7 +836,7 @@ Gan_Bool
       FILE *pfFile;
 
       /* check if the file exists */
-      pfFile = fopen(filename, "r");
+      pfFile = gan_fopen(filename, GAN_STRING("r"));
       if(pfFile != NULL)
       {
          Gan_Image* pimage = gan_read_tiff_image(filename, NULL, NULL, &header, NULL, NULL); /* abortRequested, abortObj */
@@ -865,11 +869,15 @@ Gan_Bool
    /* attempt to open file */
    if(filename != NULL)
    {
+#if defined(_MSC_VER) && defined(UNICODE)
+      tif = TIFFOpenW(filename, "w");
+#else
       tif = TIFFOpen(filename, "w");
+#endif
       if ( tif == NULL )
       {
          gan_err_flush_trace();
-         gan_err_register ( "gan_write_tiff_image", GAN_ERROR_OPENING_FILE, filename );
+         gan_err_register_unicode ( "gan_write_tiff_image", GAN_ERROR_OPENING_FILE, filename );
          return GAN_FALSE;
       }
 

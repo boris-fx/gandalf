@@ -311,7 +311,7 @@ void gan_free ( void *ptr )
  * \c stderr if \a file is passed as \c NULL.
  */
 Gan_Bool
- gan_heap_report(const char *file)
+ gan_heap_report(const Gan_UnicodeChar *file)
 {
    Gan_MallocStruct *lptr;
    FILE *fp;
@@ -320,7 +320,7 @@ Gan_Bool
       fp = stderr;
    else
    {
-      fp = fopen ( file, "w" );
+      fp = gan_fopen ( file, GAN_STRING("w") );
       if ( fp == NULL )
       {
          gan_err_flush_trace();

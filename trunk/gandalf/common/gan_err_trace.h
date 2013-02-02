@@ -168,12 +168,12 @@ typedef struct Gan_ErrorTrace
 #define GAN_ET_NO   1
 
 GANDALF_API Gan_ErrorTrace *gan_et_push ( Gan_ErrorTrace *et_top,
-                                          const char *func_name,
-                                          int         err_code,
-                                          const char *file_name,
-                                          int         line_number,
-                                          const char *message,
-                                          int         number );
+                                          const char     *func_name,
+                                          int             err_code,
+                                          const char     *file_name,
+                                          int             line_number,
+                                          const char     *message,
+                                          int             number );
 GANDALF_API int gan_et_get_record_count ( Gan_ErrorTrace *et_record );
 GANDALF_API Gan_ErrorTrace *gan_et_get_record_next ( Gan_ErrorTrace *et_record );
 GANDALF_API Gan_ErrorTrace *gan_et_get_record_first ( Gan_ErrorTrace *et_record );

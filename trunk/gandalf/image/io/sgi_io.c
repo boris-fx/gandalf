@@ -1165,18 +1165,18 @@ Gan_Image *
  * \sa gan_write_sgi_image().
  */
 Gan_Image *
- gan_read_sgi_image(const char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+ gan_read_sgi_image(const Gan_UnicodeChar *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
                     Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
    Gan_Image *result;
 
    /* attempt to open file */
-   infile = fopen ( filename, "rb" );
+   infile = gan_fopen ( filename, GAN_STRING("rb") );
    if ( infile == NULL )
    {
       gan_err_flush_trace();
-      gan_err_register ( "gan_read_sgi_image", GAN_ERROR_OPENING_FILE, filename );
+      gan_err_register_unicode ( "gan_read_sgi_image", GAN_ERROR_OPENING_FILE, filename );
       return NULL;
    }
 
@@ -1315,7 +1315,7 @@ Gan_Bool
    if(outfile != NULL)
    {
       char *achScanline;
-      int iPlane, r;
+      unsigned int iPlane, r;
 
       achScanline = gan_malloc_array(char, (size_t)ui8BytesPerPixel*image->width);
       if(achScanline == NULL)
@@ -1379,7 +1379,7 @@ Gan_Bool
  * \sa gan_read_sgi_image().
  */
 Gan_Bool
- gan_write_sgi_image ( const char *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr )
+ gan_write_sgi_image ( const Gan_UnicodeChar *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr )
 {
    if(filename == NULL)
       return gan_write_sgi_image_stream ( NULL, image, GAN_FALSE, octrlstr );
@@ -1391,7 +1391,7 @@ Gan_Bool
       if(octrlstr != NULL && octrlstr->single_field)
       {
          /* check if the file exists */
-         outfile = fopen ( filename, "r" );
+         outfile = gan_fopen ( filename, GAN_STRING("r") );
          if(outfile != NULL)
          {
             /* compute file size we will generate */
@@ -1413,14 +1413,14 @@ Gan_Bool
 
       /* attempt to open file */
       if(new_file)
-         outfile = fopen ( filename, "wb" );
+         outfile = gan_fopen ( filename, GAN_STRING("wb") );
       else
-         outfile = fopen ( filename, "rb+" );
+         outfile = gan_fopen ( filename, GAN_STRING("rb+") );
 
       if ( outfile == NULL )
       {
          gan_err_flush_trace();
-         gan_err_register ( "gan_write_sgi_image", GAN_ERROR_OPENING_FILE, filename );
+         gan_err_register_unicode ( "gan_write_sgi_image", GAN_ERROR_OPENING_FILE, filename );
          return GAN_FALSE;
       }
 

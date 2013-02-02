@@ -29,6 +29,7 @@
 #include <gandalf/image/io/image_io.h>
 #include <gandalf/image/image_bit.h>
 #include <gandalf/common/misc_error.h>
+#include <gandalf/common/i18n.h>
 
 #ifdef WIN32
         #include <windows.h>
@@ -117,7 +118,7 @@ static void ModeMenu ( int entry )
 /* Runs the vision bitmap test functions */
 static Gan_Bool run_test(void)
 {
-   char *image_file = acBuildPathName(TEST_INPUT_PATH,"gandalf_bw.png");
+   Gan_UnicodeChar *image_file = acBuildPathName(TEST_INPUT_PATH, GAN_STRING("gandalf_bw.png") );
 
    /* read image from file */
    img = gan_image_read ( image_file, GAN_PNG_FORMAT, NULL, NULL, NULL );
@@ -129,8 +130,34 @@ static Gan_Bool run_test(void)
       cu_assert ( print_file_contents ( img ) );
 
 #ifdef BITMAP_TEST_MAIN   
+   /* convert the Unicode string to a UTF-8 charcter array */
+   char *image_file_ascii = NULL; /* UTF-8 converted image_file */
+   size_t          n_uchars; /* size of source buffer */
+   size_t          n_chars; /* size of destination buffer */
+
+   n_uchars = gan_strlen(image_file);
+   n_chars = gan_unicodechar_to_char( image_file, n_uchars, NULL, 0 );
+   image_file_ascii = gan_malloc_array(char, n_chars);
+
+   if( !image_file_ascii )
+   {
+      gan_err_flush_trace();
+      gan_err_register_with_number( "run_test", GAN_ERROR_MALLOC_FAILED, "char[]", n_chars );
+      return GAN_ERROR_MALLOC_FAILED;
+   }
+
+   if ( gan_unicodechar_to_char( image_file, n_uchars, image_file_ascii, n_chars ) != n_chars )
+   {
+      gan_err_flush_trace();
+      gan_err_register("run_test",
+                       GAN_EC_FAIL,
+                       "Failed to convert error message from unicode to char.");
+   }
+
    cu_assert ( gan_display_new_window ( img->height, img->width, 1.0,
-                                        image_file, 0, 0, &window_id ) );
+                                        image_file_ascii, 0, 0, &window_id ) );
+
+   gan_free_va(image_file_ascii, NULL);
 
    glutDisplayFunc ( display_image );
 

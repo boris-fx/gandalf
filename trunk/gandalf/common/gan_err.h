@@ -164,6 +164,7 @@
 #define _GAN_ERR_H
 
 #include <gandalf/common/misc_defs.h>
+#include <gandalf/common/i18n.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -234,6 +235,26 @@ GANDALF_API void gan_err_register ( const char *func_name, int err_code, const c
 #endif /* #ifdef GAN_GENERATE_DOCUMENTATION */
 
 /**
+ * \brief Macro: Registers an error with a Unicode message.
+ * \param func_name    Name of function in which error occurs
+ * \param err_code     Numeric code of error
+ * \param message      Message string describing error
+ * \return No value.
+ *
+ * This macro abbreviates gan_err_register_fileline() by hiding the file and
+ * line argument. Refer to gan_err_register_fileline() for details on using
+ * this macro.
+ *
+ * \sa gan_err_register_with_number().
+ */
+#ifdef GAN_GENERATE_DOCUMENTATION
+GANDALF_API void gan_err_register_unicode ( const char *func_name, int err_code, const Gan_UnicodeChar *message );
+#else
+#define gan_err_register_unicode(func_name, err_code, message) \
+        gan_err_register_fileline_unicode(func_name, err_code, __FILE__, __LINE__, message, 0)
+#endif /* #ifdef GAN_GENERATE_DOCUMENTATION */
+
+/**
  * \brief Macro: Registers an error.with a number attached
  * \param func_name    Name of function in which error occurs
  * \param err_code     Numeric code of error
@@ -287,6 +308,13 @@ GANDALF_API int gan_err_register_fileline(
                  int          line_number, /* Typically use __LINE__ */
                  const char * message,
                  int          number);
+GANDALF_API int gan_err_register_fileline_unicode(
+                 const char            * func_name,
+                 int                     err_code,
+                 const char            * file_name, /* Typically use __FILE__ */
+                 int                     line_number, /* Typically use __LINE__ */
+                 const Gan_UnicodeChar * message,
+                 int                     number);
 GANDALF_API void gan_err_set_trace( Gan_TraceMode trace_mode );
 GANDALF_API void gan_err_flush_trace(void);
 GANDALF_API int gan_err_get_error_count(void);
@@ -314,8 +342,8 @@ GANDALF_API int gan_err_get_error ( int           n,
  * \sa gan_err_assert_ptr().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_Bool gan_err_test_bool ( Gan_Bool test, char *funcname,
-                             int code, char *message );
+GANDALF_API Gan_Bool gan_err_test_bool ( Gan_Bool test, const char *funcname,
+                             int code, const char *message );
 #else
 #ifndef NDEBUG
 #define gan_err_test_bool(test,fname,code,mes) \
@@ -345,8 +373,8 @@ if (!(test)) \
  * \sa gan_err_assert_ptr().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API int gan_err_test_int ( Gan_Bool test, char *funcname,
-                       int code, char *message );
+GANDALF_API int gan_err_test_int ( Gan_Bool test, const char *funcname,
+                       int code, const char *message );
 #else
 #ifndef NDEBUG
 #define gan_err_test_int(test,fname,code,mes) \
@@ -376,8 +404,8 @@ if (!(test)) \
  * \sa gan_err_assert_ptr().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API int gan_err_test_uint ( Gan_Bool test, char *funcname,
-                        int code, char *message );
+GANDALF_API int gan_err_test_uint ( Gan_Bool test, const char *funcname,
+                        int code, const char *message );
 #else
 #ifndef NDEBUG
 #define gan_err_test_uint(test,fname,code,mes) \
@@ -408,8 +436,8 @@ if (!(test)) \
  * \sa gan_err_assert_bool().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API void *gan_err_test_ptr ( Gan_Bool test, char *funcname,
-                         int code, char *message );
+GANDALF_API void *gan_err_test_ptr ( Gan_Bool test, const char *funcname,
+                         int code, const char *message );
 #else
 #ifndef NDEBUG
 #define gan_err_test_ptr(test,fname,code,mes) \
@@ -439,8 +467,8 @@ if (!(test)) \
  * \sa gan_err_assert_ptr().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API double gan_err_test_double ( Gan_Bool test, char *funcname,
-                             int code, char *message );
+GANDALF_API double gan_err_test_double ( Gan_Bool test, const char *funcname,
+                             int code, const char *message );
 #else
 #ifndef NDEBUG
 #define gan_err_test_double(test,fname,code,mes) \
@@ -470,8 +498,8 @@ if (!(test)) \
  * \sa gan_err_assert_ptr().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API float gan_err_test_float ( Gan_Bool test, char *funcname,
-                           int code, char *message );
+GANDALF_API float gan_err_test_float ( Gan_Bool test, const char *funcname,
+                           int code, const char *message );
 #else
 #ifndef NDEBUG
 #define gan_err_test_float(test,fname,code,mes) \

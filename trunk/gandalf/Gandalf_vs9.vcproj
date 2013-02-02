@@ -386,6 +386,10 @@
 				RelativePath=".\Gandalf2.rc"
 				>
 			</File>
+			<File
+				RelativePath=".\common\i18n.c"
+				>
+			</File>
 			<Filter
 				Name="image"
 				Filter="c"
@@ -14903,6 +14907,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\common\i18n.h"
+				>
+			</File>
+			<File
 				RelativePath="image.h"
 				>
 			</File>
@@ -15088,10 +15096,6 @@
 				</File>
 				<File
 					RelativePath="image\io.h"
-					>
-				</File>
-				<File
-					RelativePath="C:\NICOLAS\myfiles\gandalf\openGL_texture.h"
 					>
 				</File>
 				<File

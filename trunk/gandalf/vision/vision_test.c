@@ -134,7 +134,7 @@ static void cleanup(void)
 static void affiche(unsigned char key,int x,int y)
 {
  printf(" la touche pressee est :s \n");
- glutPlotRedisplay();
+ glutPostRedisplay();
 }
 
 
@@ -509,7 +509,7 @@ static Gan_Bool teardown_test(void)
 /* Tests the vision functions */
 static Gan_Bool run_test(void)
 {
-   char *image_file = acBuildPathName(TEST_INPUT_PATH,"brussels.pgm");
+   Gan_UnicodeChar *image_file = acBuildPathName(TEST_INPUT_PATH,GAN_STRING("brussels.pgm"));
    Gan_ImageFileFormat file_format = GAN_PGM_FORMAT;
 
    Gan_Mask1D *mask;
@@ -568,12 +568,38 @@ static Gan_Bool run_test(void)
    cu_assert ( lmap->nlines >= 676 && lmap->nlines <= 682 );
 
 #ifdef VISION_TEST_MAIN
+   /* convert the Unicode string to a UTF-8 charcter array */
+   char *image_file_ascii = NULL; /* UTF-8 converted image_file */
+   size_t          n_uchars; /* size of source buffer */
+   size_t          n_chars; /* size of destination buffer */
+
+   n_uchars = gan_strlen(image_file);
+   n_chars = gan_unicodechar_to_char( image_file, n_uchars, NULL, 0 );
+   image_file_ascii = gan_malloc_array(char, n_chars);
+
+   if( !image_file_ascii )
+   {
+      gan_err_flush_trace();
+      gan_err_register_with_number( "run_test", GAN_ERROR_MALLOC_FAILED, "char[]", n_chars );
+      return GAN_ERROR_MALLOC_FAILED;
+   }
+
+   if ( gan_unicodechar_to_char( image_file, n_uchars, image_file_ascii, n_chars ) != n_chars )
+   {
+      gan_err_flush_trace();
+      gan_err_register("run_test",
+                       GAN_EC_FAIL,
+                       "Failed to convert error message from unicode to char.");
+   }
+
    if ( !gan_display_new_window ( img_grey->height, img_grey->width, 1.0,
-                                  image_file, 0, 0, &window_id ) )
+                                  image_file_ascii, 0, 0, &window_id ) )
    {
       fprintf ( stderr, "cannot open create OpenGL window\n" );
+      gan_free_va(image_file_ascii, NULL);
       return GAN_FALSE;
    }
+   gan_free_va(image_file_ascii, NULL);
 
    glutDisplayFunc ( display_image );
    glutReshapeFunc ( reshape );
@@ -585,7 +611,6 @@ static Gan_Bool run_test(void)
    glutAddMenuEntry ( "Show corners", SHOW_CORNERS );
    glutAddMenuEntry ( "Show edges",   SHOW_EDGES );
    glutAddMenuEntry ( "Show lines",   SHOW_LINES );
-   glutAddMenuEntry ( "Show bright",   SHOW_BRIGHT );
    glutAddMenuEntry ( "Quit",         QUIT );
    glutAttachMenu(GLUT_RIGHT_BUTTON);
 

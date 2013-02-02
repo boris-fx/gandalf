@@ -77,6 +77,7 @@
 #include <gandalf/common/misc_error.h>
 #include <gandalf/common/numerics.h>
 #include <gandalf/common/compare.h>
+#include <gandalf/common/i18n.h>
 
 /* specialised formats */
 #include <gandalf/image/image_rgbx_uint8.h>
@@ -1350,7 +1351,7 @@ static Gan_Bool run_test(void)
    Gan_Image *img, *img2, *img3=NULL;
    int pix[12], i, j, count, it;
 
-   if(img3!=NULL)gan_image_write("",GAN_PNG_FORMAT,NULL,NULL);
+   if(img3!=NULL)gan_image_write(GAN_STRING(""),GAN_PNG_FORMAT,NULL,NULL);
 
    /* build image */
    for ( i = 11; i >= 0; i-- )

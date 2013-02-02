@@ -27,6 +27,7 @@
 #ifndef _GAN_IMAGE_IO_H
 #define _GAN_IMAGE_IO_H
 
+#include <gandalf/common/i18n.h>
 #include <gandalf/image/image_defs.h>
 #include <gandalf/image/io/png_io.h>
 #include <gandalf/image/io/pbm_io.h>
@@ -179,7 +180,7 @@ typedef struct Gan_ImageWriteControlStruct
 } Gan_ImageWriteControlStruct;
 
 GANDALF_API Gan_ImageFileFormat gan_image_determine_file_format_stream ( FILE *infile );
-GANDALF_API Gan_ImageFileFormat gan_image_determine_file_format ( const char *filename );
+GANDALF_API Gan_ImageFileFormat gan_image_determine_file_format ( const Gan_UnicodeChar *filename );
 GANDALF_API Gan_ImageFileFormat gan_image_interpret_format_string ( const char *format_string );
 GANDALF_API const char *gan_image_file_format_string ( Gan_ImageFileFormat format );
 GANDALF_API const char *gan_image_format_string ( Gan_ImageFormat format );
@@ -188,7 +189,7 @@ GANDALF_API Gan_Bool gan_image_format_type_supported ( Gan_ImageFileFormat file_
                                                        const Gan_ImageHeaderInfo* info );
 GANDALF_API Gan_Bool gan_image_write_field_supported ( Gan_ImageFileFormat file_format );
 GANDALF_API void gan_initialise_image_read_control_struct(Gan_ImageReadControlStruct *ictrlstr);
-GANDALF_API Gan_Image *gan_image_read_with_abort_test ( const char *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
+GANDALF_API Gan_Image *gan_image_read_with_abort_test ( const Gan_UnicodeChar *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
                                                         const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header,
                                                         Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API Gan_Image *gan_image_read_stream_with_abort_test ( FILE *infile, Gan_ImageFileFormat file_format, Gan_Image *image,
@@ -197,7 +198,7 @@ GANDALF_API Gan_Image *gan_image_read_stream_with_abort_test ( FILE *infile, Gan
 GANDALF_API Gan_Bool gan_initialise_image_header_info(Gan_ImageHeaderInfo *ohdrinfo, Gan_ImageFormat image_format, Gan_Type type);
 GANDALF_API Gan_Bool gan_initialise_image_write_control_struct(Gan_ImageWriteControlStruct *octrlstr,
                                                                Gan_ImageFileFormat file_format, Gan_ImageFormat image_format, Gan_Type type);
-GANDALF_API Gan_Bool gan_image_write ( const char *filename, Gan_ImageFileFormat file_format, const Gan_Image *image,
+GANDALF_API Gan_Bool gan_image_write ( const Gan_UnicodeChar *filename, Gan_ImageFileFormat file_format, const Gan_Image *image,
                                        const Gan_ImageWriteControlStruct *octrlstr );
 GANDALF_API Gan_Bool gan_image_write_stream ( FILE *outfile, Gan_ImageFileFormat file_format, const Gan_Image *image,
                                               Gan_Bool new_file, const Gan_ImageWriteControlStruct *octrlstr );
@@ -222,7 +223,7 @@ GANDALF_API Gan_Bool gan_image_write_stream ( FILE *outfile, Gan_ImageFileFormat
  * \sa gan_write_image().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_Image *gan_image_read ( const char *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
+GANDALF_API Gan_Image *gan_image_read ( const Gan_UnicodeChar *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
                                         const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header );
 #else
 #define gan_image_read(name,format,image,ictrlstr,header) \
