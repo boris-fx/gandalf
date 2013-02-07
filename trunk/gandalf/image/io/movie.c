@@ -207,6 +207,7 @@ Gan_UnicodeChar *
 {
    Gan_UnicodeChar fmt[100];
    size_t length;
+   size_t capacity = slen;
 
    if ( number < 0 || number >= movie->no_images )
    {
@@ -218,7 +219,7 @@ Gan_UnicodeChar *
    /* convert number in sequence to file number */
    number = movie->first+number*movie->step;
 
-   /* compute length of string and fill format string for final sprintf */
+   /* compute length of string and fill format string for final snprintf */
    length = gan_strlen(movie->directory) + 1 + gan_strlen(movie->basename);
    if ( movie->no_digits == 0 )
    {
@@ -235,7 +236,8 @@ Gan_UnicodeChar *
       }
 
       length += movie->no_digits;
-      gan_sprintf ( fmt, GAN_STRING("%%s/%%s%%0%dd%%s"), movie->no_digits );
+      gan_snprintf ( fmt, GAN_ARRAY_LEN( fmt ), GAN_STRING("%%s/%%s%%0%dd%%s"), movie->no_digits );
+      GAN_NULL_TERMINATE( fmt );
    }
 
    /* add length of suffix and null string terminator */
@@ -250,6 +252,7 @@ Gan_UnicodeChar *
          gan_err_register ( "gan_movie_image_name", GAN_ERROR_MALLOC_FAILED, "image file name string" );
          return NULL;
       }
+      capacity = length;
    }
    else
       if ( length > slen )
@@ -259,7 +262,8 @@ Gan_UnicodeChar *
          return NULL;
       }
 
-   gan_sprintf ( string, fmt, movie->directory, movie->basename, number, movie->suffix );
+   gan_snprintf ( string, capacity, fmt, movie->directory, movie->basename, number, movie->suffix );
+   string[ capacity - 1 ] = 0;
    return string;
 }
 
