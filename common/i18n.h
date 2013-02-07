@@ -142,19 +142,34 @@ GANDALF_API Gan_UnicodeChar *gan_strcat( Gan_UnicodeChar *dest,
 
 
 /**
- * \brief Macro: Gan_UnicodeChar version of sprintf.
+ * \brief Macro: Gan_UnicodeChar version of snprintf.
  *
  * Note that this function is a macro because you can't easily wrap
- * a function taking variable arguments.
+ *  a function taking variable arguments.
  *
+ * Beware: it's caller's responsibility to zero-terminate the buffer
+ *         if its size is insufficient!
  */
-#if defined(_MSC_VER) && defined(UNICODE)
-#define gan_sprintf swprintf
+#if defined(_MSC_VER)
+#if defined(UNICODE)
+#define gan_snprintf swprintf
 #else
-#define gan_sprintf sprintf
+#define gan_snprintf _snprintf
+#endif /* UNICODE */
+#else
+#define gan_snprintf snprintf
 #endif
 
- /**
+/** Determine length of an array. Note: result is always 1 for pointers (even pointing into an array).
+ * For explanations and useful links, see http://stackoverflow.com/a/1598827
+ * Note: the \a a expression is not computed.
+ */
+#define GAN_ARRAY_LEN( a ) ( ( sizeof( a ) / sizeof( 0[ a ] ) ) / ( (size_t)( ! ( sizeof( a ) % sizeof( 0[ a ] ) ) ) ) )
+
+/** \brief write 0 to the end of the array. */
+#define GAN_NULL_TERMINATE( str ) ( ( str )[ GAN_ARRAY_LEN( str ) - 1 ] = 0 )
+
+/**
  * \}
  */
 
