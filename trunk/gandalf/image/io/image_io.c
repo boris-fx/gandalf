@@ -109,7 +109,7 @@ Gan_ImageFileFormat gan_image_determine_file_format_stream ( FILE *infile )
 /**
  * \brief Determine the file format of the given image file
  */
-Gan_ImageFileFormat gan_image_determine_file_format ( const Gan_UnicodeChar *filename )
+Gan_ImageFileFormat gan_image_determine_file_format ( const Gan_Char *filename )
 {
    FILE *infile;
    Gan_ImageFileFormat file_format;
@@ -484,7 +484,7 @@ Gan_Image *
  * \sa gan_write_image().
  */
 Gan_Image *
- gan_image_read_with_abort_test ( const Gan_UnicodeChar *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
+ gan_image_read_with_abort_test ( const Gan_Char *filename, Gan_ImageFileFormat file_format, Gan_Image *image,
                                   const Gan_ImageReadControlStruct *ictrlstr, Gan_ImageHeaderStruct *header,
                                   Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
@@ -733,7 +733,7 @@ Gan_Bool
  * \sa gan_read_image().
  */
 Gan_Bool
- gan_image_write ( const Gan_UnicodeChar *filename, Gan_ImageFileFormat file_format, const Gan_Image *image,
+ gan_image_write ( const Gan_Char *filename, Gan_ImageFileFormat file_format, const Gan_Image *image,
                    const Gan_ImageWriteControlStruct *octrlstr )
 {
    Gan_Bool result;

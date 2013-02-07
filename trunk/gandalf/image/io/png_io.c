@@ -514,7 +514,7 @@ Gan_Image *
  * \sa gan_write_png_image().
  */
 Gan_Image *
-gan_read_png_image(const Gan_UnicodeChar *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+gan_read_png_image(const Gan_Char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
                    Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    FILE *infile;
@@ -754,7 +754,7 @@ Gan_Bool
  * \sa gan_read_png_image().
  */
 Gan_Bool
- gan_write_png_image ( const Gan_UnicodeChar *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr )
+ gan_write_png_image ( const Gan_Char *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr )
 {
    if(filename == NULL)
       /* check format works OK */

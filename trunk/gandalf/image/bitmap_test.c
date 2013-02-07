@@ -118,7 +118,7 @@ static void ModeMenu ( int entry )
 /* Runs the vision bitmap test functions */
 static Gan_Bool run_test(void)
 {
-   Gan_UnicodeChar *image_file = acBuildPathName(TEST_INPUT_PATH, GAN_STRING("gandalf_bw.png") );
+   Gan_Char *image_file = acBuildPathName(TEST_INPUT_PATH, GAN_STRING("gandalf_bw.png") );
 
    /* read image from file */
    img = gan_image_read ( image_file, GAN_PNG_FORMAT, NULL, NULL, NULL );

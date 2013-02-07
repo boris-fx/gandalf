@@ -509,7 +509,7 @@ static Gan_Bool teardown_test(void)
 /* Tests the vision functions */
 static Gan_Bool run_test(void)
 {
-   Gan_UnicodeChar *image_file = acBuildPathName(TEST_INPUT_PATH,GAN_STRING("brussels.pgm"));
+   Gan_Char *image_file = acBuildPathName(TEST_INPUT_PATH,GAN_STRING("brussels.pgm"));
    Gan_ImageFileFormat file_format = GAN_PGM_FORMAT;
 
    Gan_Mask1D *mask;

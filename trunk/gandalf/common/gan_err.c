@@ -322,7 +322,7 @@ int
                                      int                    err_code,
                                      const char            *file_name,
                                      int                    line_number,
-                                     const Gan_UnicodeChar *umessage,
+                                     const Gan_Char        *umessage,
                                      int                    number )
 {
    Gan_ErrorTrace *atrace = NULL;

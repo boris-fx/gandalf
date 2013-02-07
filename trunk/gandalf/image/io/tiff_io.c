@@ -468,7 +468,7 @@ Gan_Bool gan_image_is_tiff(const unsigned char *magic_string, size_t length)
  * \sa gan_write_tiff_image().
  */
 Gan_Image *
- gan_read_tiff_image(const Gan_UnicodeChar *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
+ gan_read_tiff_image(const Gan_Char *filename, Gan_Image *image, const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
                      Gan_Bool (*abortRequested)(void*), void* abortObj)
 {
    TIFF *tif;
@@ -807,7 +807,7 @@ Gan_Bool
  * \sa gan_read_tiff_image().
  */
 Gan_Bool
- gan_write_tiff_image ( const Gan_UnicodeChar *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr )
+ gan_write_tiff_image ( const Gan_Char *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr )
 {
    TIFF *tif=NULL;
    unsigned uiRow;

@@ -44,7 +44,7 @@ extern "C" {
  * \{
  */
 
-GANDALF_API Gan_Bool gan_file_copy ( const Gan_UnicodeChar *source, const Gan_UnicodeChar *dest );
+GANDALF_API Gan_Bool gan_file_copy ( const Gan_Char *source, const Gan_Char *dest );
 
 /**
  * \}

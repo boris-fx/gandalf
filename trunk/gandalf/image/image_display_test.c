@@ -621,10 +621,10 @@ static Gan_Bool run_test(void)
    }
       
 #if 1
-   Gan_UnicodeChar *image_file = acBuildPathName(TEST_INPUT_PATH, GAN_STRING("MonetLogo.png") );
+   Gan_Char *image_file = acBuildPathName(TEST_INPUT_PATH, GAN_STRING("MonetLogo.png") );
    Gan_ImageFileFormat file_format = GAN_PNG_FORMAT;
 #else
-   Gan_UnicodeChar *image_file = GAN_STRING("/store/ndm/Backup/orl.333/examples/example_images/AlphaImages/alpha_image.0000.png");
+   Gan_Char *image_file = GAN_STRING("/store/ndm/Backup/orl.333/examples/example_images/AlphaImages/alpha_image.0000.png");
    Gan_ImageFileFormat file_format = GAN_PNG_FORMAT;
 #endif
 

@@ -36,7 +36,7 @@ extern "C" {
 #endif
 
 /* Helper function to contruct a path name into a buffer defined in this unit*/
-Gan_UnicodeChar * acBuildPathName(Gan_UnicodeChar * acBasePath, Gan_UnicodeChar * acName);
+Gan_Char * acBuildPathName(Gan_Char * acBasePath, Gan_Char * acName);
 
 #ifdef __cplusplus
 }

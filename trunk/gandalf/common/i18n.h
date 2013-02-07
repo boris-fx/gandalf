@@ -48,29 +48,29 @@ extern "C" {
 /**
  * \brief A unicode string type
  * 
- * Gan_UnicodeChar should be used everywhere platform-dependent
- * unicode Gan_UnicodeChar is required
+ * Gan_Char should be used everywhere platform-dependent
+ * unicode Gan_Char is required
  * for example, to open a file.
  */
 #if defined(_MSC_VER) && defined(UNICODE)
-typedef wchar_t Gan_UnicodeChar;
+typedef wchar_t Gan_Char;
 #else
-typedef char Gan_UnicodeChar;
+typedef char Gan_Char;
 #endif
 
 /**
- * \brief Macro: Construct a Gan_UnicodeChar *constant.
+ * \brief Macro: Construct a Gan_Char *constant.
  *
  * This function should only be used with string constants.
  *
  * For example:
  *
- * const Gan_UnicodeChar *gstr = GAN_STRING("Hello");
+ * const Gan_Char *gstr = GAN_STRING("Hello");
  *
  * Not:
  *
  * const char* cstr = "Hello";
- * const Gan_UnicodeChar *gstr = GAN_STRING(cstr);
+ * const Gan_Char *gstr = GAN_STRING(cstr);
  *
  */
 #if defined(_MSC_VER) && defined(UNICODE)
@@ -82,13 +82,13 @@ typedef char Gan_UnicodeChar;
 /**
  * \brief Open a file - a version of fopen that uses Gan_Strings
  *
- * This function behaves exactly like fopen, but takes const Gan_UnicodeChar *arguments
+ * This function behaves exactly like fopen, but takes const Gan_Char *arguments
  * 
  * \param filename The file top open
  * \param mode The open mode
  * \returns Pointer to opened FILE, NULL is failure.
  */
-GANDALF_API FILE* gan_fopen ( const Gan_UnicodeChar *filename, const Gan_UnicodeChar* mode );
+GANDALF_API FILE* gan_fopen ( const Gan_Char *filename, const Gan_Char* mode );
 
 /**
  * \brief Measure the length of a unicode string.
@@ -96,10 +96,10 @@ GANDALF_API FILE* gan_fopen ( const Gan_UnicodeChar *filename, const Gan_Unicode
  * \param string The string to measure the length of
  * \returns The length of the string
  */
-GANDALF_API size_t gan_strlen ( const Gan_UnicodeChar *string );
+GANDALF_API size_t gan_strlen ( const Gan_Char *string );
 
 /**
- * \brief Convert a string of Gan_UnicodeChar to char*
+ * \brief Convert a string of Gan_Char to char*
  *
  * The conversion takes place using the UTF-8 code page.
  * To determine the size of output buffer required, call
@@ -113,36 +113,34 @@ GANDALF_API size_t gan_strlen ( const Gan_UnicodeChar *string );
  * \returns The required length of the output buffer, or 0 if an error occurred
  *
  */
-GANDALF_API size_t gan_unicodechar_to_char( const Gan_UnicodeChar *ustring,
+GANDALF_API size_t gan_unicodechar_to_char( const Gan_Char *ustring,
                                             const size_t n_uchars,
                                             char *string,
                                             const size_t n_chars);
 
 /**
- * \brief Gan_UnicodeChar version of strcpy.
+ * \brief Gan_Char version of strcpy.
  *
  * \param dest The destination string
  * \param src The source string
  * \returns The argument dest
  *
  */
-GANDALF_API Gan_UnicodeChar *gan_strcpy( Gan_UnicodeChar *dest,
-                                         const Gan_UnicodeChar *src);
+GANDALF_API Gan_Char *gan_strcpy( Gan_Char *dest, const Gan_Char *src);
 
 /**
- * \brief Gan_UnicodeChar version of strcat.
+ * \brief Gan_Char version of strcat.
  *
  * \param dest The destination string
  * \param src The source string
  * \returns The argument dest
  *
  */
-GANDALF_API Gan_UnicodeChar *gan_strcat( Gan_UnicodeChar *dest,
-                                         const Gan_UnicodeChar *src);
+GANDALF_API Gan_Char *gan_strcat( Gan_Char *dest, const Gan_Char *src);
 
 
 /**
- * \brief Macro: Gan_UnicodeChar version of snprintf.
+ * \brief Macro: Gan_Char version of snprintf.
  *
  * Note that this function is a macro because you can't easily wrap
  *  a function taking variable arguments.
