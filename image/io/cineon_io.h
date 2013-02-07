@@ -68,12 +68,12 @@ GANDALF_API Gan_Bool gan_image_is_cineon(const unsigned char *magic_string, size
 GANDALF_API Gan_Image *gan_read_cineon_image_stream(FILE *infile, Gan_Image *image,
                                                     const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
                                                     Gan_Bool (*abortRequested)(void*), void* abortObj);
-GANDALF_API Gan_Image *gan_read_cineon_image ( const Gan_UnicodeChar *filename, Gan_Image *image,
+GANDALF_API Gan_Image *gan_read_cineon_image ( const Gan_Char *filename, Gan_Image *image,
                                              const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
                                              Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API void       gan_initialise_cineon_header_struct(Gan_CineonHeaderStruct *octrlstr, Gan_ImageFormat image_format, Gan_Type type);
 GANDALF_API Gan_Bool   gan_write_cineon_image_stream ( FILE *outfile, const Gan_Image *image, Gan_Bool new_file, const struct Gan_ImageWriteControlStruct *octrlstr );
-GANDALF_API Gan_Bool   gan_write_cineon_image ( const Gan_UnicodeChar *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr );
+GANDALF_API Gan_Bool   gan_write_cineon_image ( const Gan_Char *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr );
 
 /**
  * \}

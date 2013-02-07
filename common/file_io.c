@@ -46,7 +46,7 @@
  * \param dest Destination file name
  * \return #GAN_TRUE on success, #GAN_FALSE on failure.
  */
-Gan_Bool gan_file_copy ( const Gan_UnicodeChar *source, const Gan_UnicodeChar *dest )
+Gan_Bool gan_file_copy ( const Gan_Char *source, const Gan_Char *dest )
 {
    char array[GAN_FILEIO_BLOCK_SIZE];
    FILE *fpi, *fpo;

@@ -31,9 +31,9 @@
 
 #define BUILD_PATHNAME_BUF_SIZE 1024
 
-static Gan_UnicodeChar acTempBuffer[BUILD_PATHNAME_BUF_SIZE];
+static Gan_Char acTempBuffer[BUILD_PATHNAME_BUF_SIZE];
 
-Gan_UnicodeChar * acBuildPathName(Gan_UnicodeChar * acBasePath, Gan_UnicodeChar * acName)
+Gan_Char * acBuildPathName(Gan_Char * acBasePath, Gan_Char * acName)
 {
    if ( gan_strlen(acBasePath) == 0 || gan_strlen(acName) == 0 )
    {

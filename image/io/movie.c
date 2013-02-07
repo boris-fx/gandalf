@@ -57,9 +57,9 @@
  * \sa gan_movie_free().
  */
 Gan_MovieStruct *
- gan_movie_new ( const Gan_UnicodeChar *directory,
-                 const Gan_UnicodeChar *basename, int no_digits,
-                 const Gan_UnicodeChar *suffix, int first, int no_images,
+ gan_movie_new ( const Gan_Char *directory,
+                 const Gan_Char *basename, int no_digits,
+                 const Gan_Char *suffix, int first, int no_images,
                  Gan_ImageFileFormat file_format )
 {
    Gan_MovieStruct *movie;
@@ -74,9 +74,9 @@ Gan_MovieStruct *
    }
 
    /* allocate and fill strings inside movie structure */
-   movie->directory = gan_malloc_array ( Gan_UnicodeChar, gan_strlen(directory)+1 );
-   movie->basename  = gan_malloc_array ( Gan_UnicodeChar, gan_strlen(basename)+1 );
-   movie->suffix    = gan_malloc_array ( Gan_UnicodeChar, gan_strlen(suffix)+1 );
+   movie->directory = gan_malloc_array ( Gan_Char, gan_strlen(directory)+1 );
+   movie->basename  = gan_malloc_array ( Gan_Char, gan_strlen(basename)+1 );
+   movie->suffix    = gan_malloc_array ( Gan_Char, gan_strlen(suffix)+1 );
    if ( movie->directory == NULL || movie->basename == NULL ||
         movie->suffix == NULL )
    {
@@ -201,11 +201,11 @@ static int decimal_length ( int num )
  *
  * \sa gan_movie_image_read().
  */
-Gan_UnicodeChar *
+Gan_Char *
  gan_movie_image_name ( Gan_MovieStruct *movie, int number,
-                        Gan_UnicodeChar *string, size_t slen )
+                        Gan_Char *string, size_t slen )
 {
-   Gan_UnicodeChar fmt[100];
+   Gan_Char fmt[100];
    size_t length;
    size_t capacity = slen;
 
@@ -245,7 +245,7 @@ Gan_UnicodeChar *
 
    if ( string == NULL )
    {
-      string = gan_malloc_array ( Gan_UnicodeChar, length );
+      string = gan_malloc_array ( Gan_Char, length );
       if ( string == NULL )
       {
          gan_err_flush_trace();
@@ -283,7 +283,7 @@ Gan_UnicodeChar *
 Gan_Image *
  gan_movie_image_read ( Gan_MovieStruct *movie, int number, Gan_Image *image )
 {
-   Gan_UnicodeChar *filename;
+   Gan_Char *filename;
 
    /* build file name */
    filename = gan_movie_image_name ( movie, number, NULL, 0 );
@@ -322,7 +322,7 @@ Gan_Image *
 Gan_Bool
  gan_movie_image_write ( Gan_MovieStruct *movie, int number, Gan_Image *image )
 {
-   Gan_UnicodeChar *filename;
+   Gan_Char *filename;
 
    /* build file name */
    filename = gan_movie_image_name ( movie, number, NULL, 0 );

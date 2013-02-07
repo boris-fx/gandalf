@@ -70,12 +70,12 @@ GANDALF_API Gan_Bool gan_image_is_jpeg(const unsigned char *magic_string, size_t
 GANDALF_API Gan_Image* gan_read_jpeg_image_stream(FILE *infile, Gan_Image *image,
                                                   const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
                                                   Gan_Bool (*abortRequested)(void*), void* abortObj);
-GANDALF_API Gan_Image* gan_read_jpeg_image(const Gan_UnicodeChar *filename, Gan_Image *image,
+GANDALF_API Gan_Image* gan_read_jpeg_image(const Gan_Char *filename, Gan_Image *image,
                                            const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
                                            Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API void gan_initialise_jpeg_header_struct(Gan_JPEGHeaderStruct *octrlstr);
 GANDALF_API Gan_Bool gan_write_jpeg_image_stream(FILE *outfile, const Gan_Image *image, Gan_Bool new_file, const struct Gan_ImageWriteControlStruct *octrlstr);
-GANDALF_API Gan_Bool gan_write_jpeg_image(const Gan_UnicodeChar *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr);
+GANDALF_API Gan_Bool gan_write_jpeg_image(const Gan_Char *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr);
 
 #endif /* #ifdef HAVE_JPEG */
 

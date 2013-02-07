@@ -30,7 +30,7 @@
 
 #include "i18n.h"
 
-FILE* gan_fopen ( const Gan_UnicodeChar *filename, const Gan_UnicodeChar* mode )
+FILE* gan_fopen ( const Gan_Char *filename, const Gan_Char* mode )
 {
 #if defined(_MSC_VER) && defined(UNICODE)
    return _wfopen(filename, mode);
@@ -39,7 +39,7 @@ FILE* gan_fopen ( const Gan_UnicodeChar *filename, const Gan_UnicodeChar* mode )
 #endif
 }
 
-size_t gan_strlen ( const Gan_UnicodeChar *string )
+size_t gan_strlen ( const Gan_Char *string )
 {
 #if defined(_MSC_VER) && defined(UNICODE)
    return wcslen(string);
@@ -48,7 +48,7 @@ size_t gan_strlen ( const Gan_UnicodeChar *string )
 #endif
 }
 
-size_t gan_unicodechar_to_char( const Gan_UnicodeChar *ustring,
+size_t gan_unicodechar_to_char( const Gan_Char *ustring,
                                 const size_t n_uchars,
                                 char* mbstring,
                                 const size_t n_chars)
@@ -67,8 +67,7 @@ size_t gan_unicodechar_to_char( const Gan_UnicodeChar *ustring,
 #endif
 }
 
-Gan_UnicodeChar *gan_strcpy( Gan_UnicodeChar *dest,
-                             const Gan_UnicodeChar *src)
+Gan_Char *gan_strcpy( Gan_Char *dest, const Gan_Char *src)
 {
 #if defined(_MSC_VER) && defined(UNICODE)
    return wcscpy(dest, src);
@@ -77,8 +76,7 @@ Gan_UnicodeChar *gan_strcpy( Gan_UnicodeChar *dest,
 #endif
 }
 
-Gan_UnicodeChar *gan_strcat( Gan_UnicodeChar *dest,
-                             const Gan_UnicodeChar *src)
+Gan_Char *gan_strcat( Gan_Char *dest, const Gan_Char *src )
 {
 #if defined(_MSC_VER) && defined(UNICODE)
    return wcscat(dest, src);

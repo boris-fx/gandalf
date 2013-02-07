@@ -67,11 +67,11 @@ struct Gan_ImageWriteControlStruct;
 
 /* Prototypes for public functions in tiff_io.c */
 GANDALF_API Gan_Bool gan_image_is_tiff(const unsigned char *magic_string, size_t length);
-GANDALF_API Gan_Image* gan_read_tiff_image(const Gan_UnicodeChar *filename, Gan_Image *image,
+GANDALF_API Gan_Image* gan_read_tiff_image(const Gan_Char *filename, Gan_Image *image,
                                            const struct Gan_ImageReadControlStruct *ictrlstr, struct Gan_ImageHeaderStruct *header,
                                            Gan_Bool (*abortRequested)(void*), void* abortObj);
 GANDALF_API void gan_initialise_tiff_header_struct(Gan_TIFFHeaderStruct *octrlstr);
-GANDALF_API Gan_Bool gan_write_tiff_image(const Gan_UnicodeChar *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr);
+GANDALF_API Gan_Bool gan_write_tiff_image(const Gan_Char *filename, const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr);
 
 #endif /* #ifdef HAVE_TIFF */
 

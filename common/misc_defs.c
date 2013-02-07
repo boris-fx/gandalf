@@ -311,7 +311,7 @@ void gan_free ( void *ptr )
  * \c stderr if \a file is passed as \c NULL.
  */
 Gan_Bool
- gan_heap_report(const Gan_UnicodeChar *file)
+ gan_heap_report(const Gan_Char *file)
 {
    Gan_MallocStruct *lptr;
    FILE *fp;
