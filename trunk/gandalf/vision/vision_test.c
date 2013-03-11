@@ -584,7 +584,7 @@ static Gan_Bool run_test(void)
       return GAN_ERROR_MALLOC_FAILED;
    }
 
-   if ( gan_unicodechar_to_char( image_file, n_uchars, image_file_ascii, n_chars ) != n_chars )
+   if ( gan_unicodechar_to_char( image_file, n_uchars, image_file_ascii, n_chars ) == 0 )
    {
       gan_err_flush_trace();
       gan_err_register("run_test",
