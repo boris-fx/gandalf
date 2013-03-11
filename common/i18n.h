@@ -88,7 +88,7 @@ typedef char Gan_Char;
  * \param mode The open mode
  * \returns Pointer to opened FILE, NULL is failure.
  */
-GANDALF_API FILE* gan_fopen ( const Gan_Char *filename, const Gan_Char* mode );
+GANDALF_API FILE* gan_fopen ( const Gan_Char *filename, const Gan_Char *mode );
 
 /**
  * \brief Measure the length of a unicode string.
@@ -103,20 +103,22 @@ GANDALF_API size_t gan_strlen ( const Gan_Char *string );
  *
  * The conversion takes place using the UTF-8 code page.
  * To determine the size of output buffer required, call
- * gan_unicode_to_char with n_chars = 0. The function will return
- * the length of buffer required.
+ * gan_unicode_to_char with \a n_chars = 0.
  *
- * \param ustring The unicode string
+ * \param ustring  The unicode string
  * \param n_uchars The length of the unicode string
- * \param string The output buffer for the char string
- * \param n_chars The length of the output buffer
- * \returns The required length of the output buffer, or 0 if an error occurred
+ * \param string   The output buffer for the char string, the string will be NUL terminated
+ * \param n_chars  The size of the output buffer
  *
+ * \returns
+ *   0 if an error occurred;
+ *   required size of the output buffer (including NUL), if \a n_chars is 0;
+ *   resulting length of the string written (not including NUL), if \a n_chars is not 0.
  */
 GANDALF_API size_t gan_unicodechar_to_char( const Gan_Char *ustring,
                                             const size_t n_uchars,
                                             char *string,
-                                            const size_t n_chars);
+                                            const size_t n_chars );
 
 /**
  * \brief Gan_Char version of strcpy.
@@ -126,7 +128,7 @@ GANDALF_API size_t gan_unicodechar_to_char( const Gan_Char *ustring,
  * \returns The argument dest
  *
  */
-GANDALF_API Gan_Char *gan_strcpy( Gan_Char *dest, const Gan_Char *src);
+GANDALF_API Gan_Char *gan_strcpy( Gan_Char *dest, const Gan_Char *src );
 
 /**
  * \brief Gan_Char version of strcat.

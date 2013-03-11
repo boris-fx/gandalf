@@ -342,11 +342,10 @@ int
       return GAN_ERROR_MALLOC_FAILED;
    }
 
-   * message = '\0';
-   if ( gan_unicodechar_to_char( umessage, n_uchars, message, n_chars ) == n_chars )
+   if( gan_unicodechar_to_char( umessage, n_uchars, message, n_chars ) != 0 /* ok */ || ! *umessage /* empty */ )
    {
       /* call the normal gan_err_register_fileline with the converted string */
-      the_err_code = gan_err_register_fileline (func_name,
+      the_err_code = gan_err_register_fileline( func_name,
                                                 err_code,
                                                 file_name,
                                                 line_number,

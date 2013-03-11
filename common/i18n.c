@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "i18n.h"
 
@@ -51,20 +52,41 @@ size_t gan_strlen ( const Gan_Char *string )
 size_t gan_unicodechar_to_char( const Gan_Char *ustring,
                                 const size_t n_uchars,
                                 char* mbstring,
-                                const size_t n_chars)
+                                const size_t n_chars )
 {
+   size_t size;
+
+   if( ! ustring )
+      return 0;
 #if defined(_MSC_VER) && defined(UNICODE)
-   return WideCharToMultiByte(CP_UTF8, 0, ustring, n_uchars, mbstring, n_chars, NULL, NULL);
+   size = WideCharToMultiByte(CP_UTF8, 0, ustring, n_uchars, mbstring, n_chars, NULL, NULL);
+   if( *ustring && size == 0 )
+      return 0;  /* error */
+
+   if( n_chars == 0 )
+      return size + 1;
+
+   if( ! mbstring )
+      return 0;
+
+   assert( size <= n_chars );
+   if( size == n_chars )
+      -- size;
 #else
    /* emulate the behaviour of WideCharToMultiByte using memcpy and strlen */
-   if (0 == n_chars)
-      return strlen(ustring);
-   else
-      if (NULL == memcpy(mbstring, ustring, n_chars))
-         return 0;
-      else
-         return n_chars;
+   if( 0 == n_chars )
+      return strlen( ustring ) + 1;
+
+   if( n_uchars >= n_chars )
+      size = n_chars - 1;
+   else // n_uchars < n_chars
+      size = n_uchars;
+
+   if( ! mbstring || memcpy( mbstring, ustring, size ) == NULL )
+      return 0;
 #endif
+   mbstring[ size ] = '\0';
+   return size;
 }
 
 Gan_Char *gan_strcpy( Gan_Char *dest, const Gan_Char *src)
