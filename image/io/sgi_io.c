@@ -86,7 +86,7 @@ static Gan_Bool
            gan_err_flush_trace();
            gan_err_register("convert_scanline", GAN_ERROR_ILLEGAL_TYPE, "");
            return GAN_FALSE;
-        }           
+        }
 
         switch(image->type)
         {
@@ -130,7 +130,7 @@ static Gan_Bool
            gan_err_flush_trace();
            gan_err_register("convert_scanline", GAN_ERROR_ILLEGAL_TYPE, "");
            return GAN_FALSE;
-        }           
+        }
 
         switch(image->type)
         {
@@ -176,7 +176,7 @@ static Gan_Bool
            gan_err_flush_trace();
            gan_err_register("convert_scanline", GAN_ERROR_ILLEGAL_TYPE, "");
            return GAN_FALSE;
-        }           
+        }
 
         switch(image->type)
         {
@@ -238,7 +238,7 @@ static Gan_Bool
            gan_err_flush_trace();
            gan_err_register("convert_to_scanline", GAN_ERROR_ILLEGAL_TYPE, "");
            return GAN_FALSE;
-        }           
+        }
 
         switch(image->type)
         {
@@ -282,7 +282,7 @@ static Gan_Bool
            gan_err_flush_trace();
            gan_err_register("convert_to_scanline", GAN_ERROR_ILLEGAL_TYPE, "");
            return GAN_FALSE;
-        }           
+        }
 
         switch(image->type)
         {
@@ -328,7 +328,7 @@ static Gan_Bool
            gan_err_flush_trace();
            gan_err_register("convert_to_scanline", GAN_ERROR_ILLEGAL_TYPE, "");
            return GAN_FALSE;
-        }           
+        }
 
         switch(image->type)
         {
@@ -411,7 +411,7 @@ static Gan_Bool
             gan_err_flush_trace();
             gan_err_register("bExpandRLEData8Bit", GAN_ERROR_ILLEGAL_TYPE, "");
             return GAN_FALSE;
-         }           
+         }
 
          if(aui8Imptr == NULL)
             for(;;)
@@ -473,7 +473,7 @@ static Gan_Bool
             gan_err_flush_trace();
             gan_err_register("bExpandRLEData8Bit", GAN_ERROR_ILLEGAL_TYPE, "");
             return GAN_FALSE;
-         }           
+         }
 
          if(argbui8Imptr == NULL)
             for(;;)
@@ -541,7 +541,7 @@ static Gan_Bool
             gan_err_flush_trace();
             gan_err_register("bExpandRLEData8Bit", GAN_ERROR_ILLEGAL_TYPE, "");
             return GAN_FALSE;
-         }           
+         }
 
          if(argbaui8Imptr == NULL)
             for(;;)
@@ -627,7 +627,7 @@ static Gan_Bool
             gan_err_flush_trace();
             gan_err_register("bExpandRLEData16Bit", GAN_ERROR_ILLEGAL_TYPE, "");
             return GAN_FALSE;
-         }           
+         }
 
          if(aui16Imptr == NULL)
             for(;;)
@@ -689,7 +689,7 @@ static Gan_Bool
             gan_err_flush_trace();
             gan_err_register("bExpandRLEData16Bit", GAN_ERROR_ILLEGAL_TYPE, "");
             return GAN_FALSE;
-         }           
+         }
 
          if(argbui16Imptr == NULL)
             for(;;)
@@ -757,7 +757,7 @@ static Gan_Bool
             gan_err_flush_trace();
             gan_err_register("bExpandRLEData16Bit", GAN_ERROR_ILLEGAL_TYPE, "");
             return GAN_FALSE;
-         }           
+         }
 
          if(argbaui16Imptr == NULL)
             for(;;)
@@ -808,7 +808,7 @@ static Gan_Bool
 
    return GAN_TRUE;
 }
-   
+
 /**
  * \brief Reads a RGB colour image file in SGI format from a stream.
  * \param infile The file stream to be read
@@ -839,7 +839,7 @@ Gan_Image *
    Gan_Type eType;
 
    /* align the header array */
-   acAlignedHeader = (char*)((unsigned long int)acHeader + 7 - (((unsigned long int)acHeader + 7) % 8));
+   acAlignedHeader = (char*)((uintptr_t)acHeader + 7 - (((uintptr_t)acHeader + 7) % 8));
 
    /* read the file header */
    if(fread(acAlignedHeader, 1, 512, infile) != 512)
@@ -894,7 +894,7 @@ Gan_Image *
         }
 
         break;
-        
+
       case 3:
         eFormat = GAN_RGB_COLOUR_IMAGE;
         if(ui16Dimension != 3)
@@ -933,7 +933,7 @@ Gan_Image *
         gan_err_register ( "gan_read_sgi_image_stream", GAN_ERROR_CORRUPTED_FILE, "bpc" );
         return NULL;
    }
-      
+
    /* check colourmap type */
    if(ui32Colourmap != 0)
    {
@@ -1093,7 +1093,7 @@ Gan_Image *
             vReverseEndiannessArray32(aui32StartTab, uiTabLen);
             vReverseEndiannessArray32(aui32LengthTab, uiTabLen);
          }
-         
+
          for(uiCtr=0; uiCtr<uiTabLen; uiCtr++)
          {
             if(aui32StartTab[uiCtr] != ui32FileOffset)
@@ -1265,9 +1265,9 @@ Gan_Bool
       gan_uint32 ui32PixMin = 0; /* minimum pixel value */
       gan_uint32 ui32PixMax = (image->type == GAN_UINT8) ? 0xff : 0xffff; /* maximum pixel value */
 
-         
+
       /* align the header array */
-      acAlignedHeader = (char*)((unsigned long int)acHeader + 7 - (((unsigned long int)acHeader + 7) % 8));
+      acAlignedHeader = (char*)((uintptr_t)acHeader + 7 - (((uintptr_t)acHeader + 7) % 8));
       memset(acAlignedHeader, 0, 512);
 
       *((gan_uint16*)&acAlignedHeader[SGI_MAGIC_NUMBER_OFFSET])     = ui16Magic;
@@ -1406,7 +1406,7 @@ Gan_Bool
             fseek(outfile, 0, SEEK_END);
             if(ftell(outfile) == uiFileSize)
                new_file = GAN_FALSE;
-         
+
             fclose(outfile);
          }
       }

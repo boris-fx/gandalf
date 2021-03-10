@@ -274,7 +274,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead1BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "image format not supported" );
         return NULL;
-   }        
+   }
 
    /* build a buffer to hold a single line of image data and align it to a four byte boundary*/
    acBuffer = malloc(uiRowSizeInBytes+3);
@@ -285,7 +285,7 @@ Gan_Image *
       return NULL;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* form bit array around the aligned buffer */
    gan_bit_array_form_data ( &gbaAlignedBuffer, (Gan_BitWord *)acAlignedBuffer, GAN_NO_BITWORDS(pgiImage->width), pgiImage->width );
@@ -323,7 +323,7 @@ Gan_Image *
                     gan_err_register ( "pgiRead1BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
                     return NULL;
                  }
-                 
+
                  gan_bit_array_copy_q ( &gbaAlignedBuffer, &pgiImage->ba[bWholeImage ? (bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow) : (bFlip ? (uiInternalHeight-uiRow/2-1) : uiRow/2)] );
               }
               /* otherwise ignore this scanline */
@@ -369,7 +369,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead1BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "unsupported format" );
         return NULL;
-   }        
+   }
 
    free(acBuffer);
 
@@ -448,7 +448,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead8BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "image format not supported" );
         return NULL;
-   }        
+   }
 
    /* build a buffer to hold a single line of image data and align it to a four byte boundary*/
    acBuffer = malloc(uiRowSizeInBytes+3);
@@ -459,7 +459,7 @@ Gan_Image *
       return NULL;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* allocate the image */
    if ( pgiImage == NULL )
@@ -496,7 +496,7 @@ Gan_Image *
                     gan_err_register ( "pgiRead8BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
                     return NULL;
                  }
-                 
+
                  for(iCol=(int)ui32PixelsPerLine-1,
                      pui8ImPix = gan_image_get_pixptr_gl_ui8(pgiImage, bWholeImage ? (bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow) : (bFlip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), iCol),
                      pui8BufPix = ((gan_uint8*)acAlignedBuffer) + iCol; iCol >= 0; iCol--)
@@ -576,7 +576,7 @@ Gan_Image *
 
 
 
-                 
+
               }
            }
            else
@@ -588,7 +588,7 @@ Gan_Image *
                  gan_err_register ( "pgiRead8BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
                  return NULL;
               }
-                 
+
               for(iCol=(int)ui32PixelsPerLine-1,
                   pui8rgbImPix = gan_image_get_pixptr_rgb_ui8(pgiImage, bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow, iCol),
                   pui8rgbBufPix = ((Gan_RGBPixel_ui8*)acAlignedBuffer) + iCol; iCol >= 0; iCol--)
@@ -744,7 +744,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead8BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "unsupported format" );
         return NULL;
-   }        
+   }
 
    free(acBuffer);
 
@@ -825,7 +825,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead10BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "image format not supported" );
         return NULL;
-   }        
+   }
 
    /* build a buffer to hold a single line of image data and align it to a four byte boundary*/
    acBuffer = malloc(uiRowSizeInBytes+3);
@@ -836,7 +836,7 @@ Gan_Image *
       return NULL;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* allocate the image */
    if ( pgiImage == NULL )
@@ -995,7 +995,7 @@ Gan_Image *
                          pui32Pix++;
                          if(bReversedEndianness)
                             vReverseEndianness32(pui32Pix);
-                         
+
                          pui16rgbaPix->A = (gan_uint16)(((*pui32Pix) & 0xffc00000) >> 16);
                          break;
 
@@ -1058,7 +1058,7 @@ Gan_Image *
                       pui32Pix++;
                       if(bReversedEndianness)
                          vReverseEndianness32(pui32Pix);
-                         
+
                       pui16rgbaPix->A = (gan_uint16)(((*pui32Pix) & 0xffc00000) >> 16);
                       break;
 
@@ -1142,7 +1142,7 @@ Gan_Image *
                          pui32Pix++;
                          if(bReversedEndianness)
                             vReverseEndianness32(pui32Pix);
-                         
+
                          pui16yuvPix->Y = (gan_uint16)(((*pui32Pix) & 0xffc00000) >> 16);
                          break;
 
@@ -1191,7 +1191,7 @@ Gan_Image *
                       pui32Pix++;
                       if(bReversedEndianness)
                          vReverseEndianness32(pui32Pix);
-                         
+
                       pui16yuvPix->Y = (gan_uint16)(((*pui32Pix) & 0xffc00000) >> 16);
                       break;
 
@@ -1224,7 +1224,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead10BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "image format not supported" );
         return NULL;
-   }        
+   }
 
    free(acBuffer);
 
@@ -1332,7 +1332,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead12BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "image format not supported" );
         return NULL;
-   }        
+   }
 
    /* build a buffer to hold a single line of image data and align it to a four byte boundary*/
    acBuffer = malloc(uiRowSizeInBytes+3);
@@ -1343,7 +1343,7 @@ Gan_Image *
       return NULL;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* allocate the image */
    if ( pgiImage == NULL )
@@ -1447,7 +1447,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead12BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "image format not supported" );
         return NULL;
-   }        
+   }
 
    free(acBuffer);
 
@@ -1525,7 +1525,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "image format not supported" );
         return NULL;
-   }        
+   }
 
    /* build a buffer to hold a single line of image data and align it to a four byte boundary*/
    acBuffer = malloc(uiRowSizeInBytes+3);
@@ -1536,7 +1536,7 @@ Gan_Image *
       return NULL;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* allocate the image */
    if ( pgiImage == NULL )
@@ -1573,7 +1573,7 @@ Gan_Image *
                     gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
                     return NULL;
                  }
-                 
+
                  if(bReversedEndianness)
                  {
                     for(iCol=(int)ui32PixelsPerLine-1,
@@ -1660,7 +1660,7 @@ Gan_Image *
                     gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
                     return NULL;
                  }
-                 
+
                  if(bReversedEndianness)
                  {
                     for(iCol=(int)ui32PixelsPerLine-1,
@@ -1751,7 +1751,7 @@ Gan_Image *
                     gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
                     return NULL;
                  }
-                 
+
                  if(bReversedEndianness)
                  {
                     for(iCol=(int)ui32PixelsPerLine-1,
@@ -1843,7 +1843,7 @@ Gan_Image *
                     gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
                     return NULL;
                  }
-                 
+
                  if(bReversedEndianness)
                  {
                     for(iCol=(int)ui32PixelsPerLine-1,
@@ -1920,7 +1920,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "unsupported format" );
         return NULL;
-   }        
+   }
 
    free(acBuffer);
 
@@ -1998,7 +1998,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead32BitFloatDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "image format not supported" );
         return NULL;
-   }        
+   }
 
    /* build a buffer to hold a single line of image data and align it to a four byte boundary*/
    acBuffer = malloc(uiRowSizeInBytes+3);
@@ -2009,7 +2009,7 @@ Gan_Image *
       return NULL;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* allocate the image */
    if ( pgiImage == NULL )
@@ -2046,7 +2046,7 @@ Gan_Image *
                     gan_err_register ( "pgiRead16BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
                     return NULL;
                  }
-                 
+
                  if(bReversedEndianness)
                  {
                     for(iCol=(int)ui32PixelsPerLine-1,
@@ -2128,7 +2128,7 @@ Gan_Image *
                     gan_err_register ( "pgiRead32BitFloatDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
                     return NULL;
                  }
-                 
+
                  if(bReversedEndianness)
                  {
                     for(iCol=(int)ui32PixelsPerLine-1,
@@ -2218,7 +2218,7 @@ Gan_Image *
                     gan_err_register ( "pgiRead32BitFloatDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
                     return NULL;
                  }
-                 
+
                  if(bReversedEndianness)
                  {
                     for(iCol=(int)ui32PixelsPerLine-1,
@@ -2302,7 +2302,7 @@ Gan_Image *
         gan_err_flush_trace();
         gan_err_register ( "pgiRead32BitFloatDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "unsupported format" );
         return NULL;
-   }        
+   }
 
    free(acBuffer);
 
@@ -2389,7 +2389,7 @@ static Gan_Bool gan_read_dpx_generic_header ( char *acAlignedHeader, FILE *infil
          vReverseEndianness32(&header->info.dpx.generic.encryption_key);
       }
    }
-      
+
    return GAN_TRUE;
 }
 
@@ -2598,7 +2598,7 @@ static Gan_Bool gan_read_dpx_image_information_header ( Gan_Bool native_type,
       header->info.dpx.image_info.encoding = ui16Encoding;
       strncpy(header->info.dpx.image_info.description, (char *)(acAlignedHeader + OFFSET_DESCRIPTION0), 32);
    }
-   
+
    /* Determine data offset */
    ui32DataOffset = gan_get_dpx_32bit_value(
       (acAlignedHeader + OFFSET_DATAOFFSET0), bReversedEndianness
@@ -2606,7 +2606,7 @@ static Gan_Bool gan_read_dpx_image_information_header ( Gan_Bool native_type,
 
    /* Determine end-of-line padding */
    *eolPadding = gan_get_dpx_32bit_value(
-      (acAlignedHeader + OFFSET_EOLPADDING0), bReversedEndianness 
+      (acAlignedHeader + OFFSET_EOLPADDING0), bReversedEndianness
    );
    if (*eolPadding == 0xFFFFFFFF)
    {
@@ -2676,7 +2676,7 @@ static Gan_Bool gan_read_dpx_orientation_header ( char *acAlignedHeader, FILE *i
          vReverseEndianness32(&header->info.dpx.orientation.pixel_aspect[1]);
       }
    }
-      
+
 #define OFFSET_ORIENTATION_FILENAME      24
 #define OFFSET_ORIENTATION_CREATIONTIME 124
 #define OFFSET_ORIENTATION_INPUTDEV     148
@@ -2851,7 +2851,7 @@ Gan_Image *
    gan_uint32 ui32ImageOffset;  /* Offset to start of image data in bytes */
 
    /* align the header array */
-   acAlignedHeader = (char*)((unsigned long int)acHeader + 7 - (((unsigned long int)acHeader + 7) % 8));
+   acAlignedHeader = (char*)((uintptr_t)acHeader + 7 - (((uintptr_t)acHeader + 7) % 8));
 
    /* read the generic file header */
    if(!gan_read_dpx_generic_header(acAlignedHeader, infile, &bReversedEndianness, &ui32ImageOffset, header))
@@ -2883,7 +2883,7 @@ Gan_Image *
       gan_err_register ( "gan_read_dpx_image_stream", GAN_ERROR_FAILURE, "" );
       return NULL;
    }
-      
+
    /* read the TV information header */
    if(!gan_read_dpx_tv_information_header(acAlignedHeader, infile, bReversedEndianness, header))
    {
@@ -2971,7 +2971,7 @@ Gan_Image *
         gan_err_register ( "gan_read_dpx_image_stream", GAN_ERROR_NOT_IMPLEMENTED, "unsupported DPX bit depth" );
         return NULL;
    }
-        
+
    if(image == NULL)
    {
       gan_err_register ( "gan_read_dpx_image_stream", GAN_ERROR_FAILURE, "" );
@@ -3035,11 +3035,11 @@ void gan_initialise_dpx_header_struct(Gan_DPXHeaderStruct *octrlstr, Gan_ImageFo
       case GAN_BOOL:
         octrlstr->image_info.bit_size = 1;
         break;
-        
+
       case GAN_UINT8:
         octrlstr->image_info.bit_size = 8;
         break;
-        
+
       case GAN_UINT16:
         if(image_format == GAN_RGB_COLOUR_IMAGE)
            octrlstr->image_info.bit_size = 10;
@@ -3047,7 +3047,7 @@ void gan_initialise_dpx_header_struct(Gan_DPXHeaderStruct *octrlstr, Gan_ImageFo
            octrlstr->image_info.bit_size = 16;
 
         break;
-        
+
       case GAN_FLOAT32:
         octrlstr->image_info.bit_size = 32;
         break;
@@ -3090,7 +3090,7 @@ gan_uint32
            default: return UINT_MAX;
         }
         break;
-        
+
       case 8:
         switch(eFormat)
         {
@@ -3131,11 +3131,11 @@ gan_uint32
              }
 
              break;
-             
+
            default: return UINT_MAX;
         }
         break;
-        
+
       case 12:
         switch(eFormat)
         {
@@ -3155,7 +3155,7 @@ gan_uint32
              }
 
              break;
-             
+
            default: return UINT_MAX;
         }
         break;
@@ -3219,7 +3219,7 @@ gan_uint32
 
    if(pui32eolPadding != NULL)
       *pui32eolPadding = uieolPadding;
-   
+
    return (uiImageDataOffset + uiHeight*(uiRowBytes + uieolPadding));
 }
 
@@ -3266,7 +3266,7 @@ Gan_Bool
       return GAN_FALSE;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + sizeof(Gan_BitWord) - 1 - (((unsigned long int)acBuffer + sizeof(Gan_BitWord) - 1) % sizeof(Gan_BitWord)));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + sizeof(Gan_BitWord) - 1 - (((uintptr_t)acBuffer + sizeof(Gan_BitWord) - 1) % sizeof(Gan_BitWord)));
 
    /* form bit array around the aligned buffer */
    gan_bit_array_form_data ( &gbaAlignedBuffer, (Gan_BitWord *)acAlignedBuffer, GAN_NO_BITWORDS(pgiImage->width), pgiImage->width );
@@ -3313,7 +3313,7 @@ Gan_Bool
          }
          else
             uiImRow = (bFlip ? (pgiImage->height-uiRow-1) : uiRow);
-      
+
          switch(pgiImage->format)
          {
             case GAN_GREY_LEVEL_IMAGE:
@@ -3340,7 +3340,7 @@ Gan_Bool
          }
       }
    }
-   
+
    free(acBuffer);
    gan_bit_array_free ( &gbaAlignedBuffer );
    return GAN_TRUE;
@@ -3401,7 +3401,7 @@ Gan_Bool
       return GAN_FALSE;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* write the image data */
    for(uiRow = 0; uiRow<uiHeight; uiRow++)
@@ -3445,7 +3445,7 @@ Gan_Bool
          }
          else
             uiImRow = (bFlip ? (pgiImage->height-uiRow-1) : uiRow);
-      
+
          switch(pgiImage->format)
          {
             case GAN_GREY_LEVEL_IMAGE:
@@ -3543,7 +3543,7 @@ Gan_Bool
          }
       }
    }
-   
+
    free(acBuffer);
    return GAN_TRUE;
 }
@@ -3591,7 +3591,7 @@ Gan_Bool
         gan_err_flush_trace();
         gan_err_register ( "pgiWrite10BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "only RGB format supported" );
         return GAN_FALSE;
-   }        
+   }
 
    /* build a buffer to hold a single line of image data and align it to a four byte boundary*/
    acBuffer = malloc(uiRowSizeInBytes+uieolPadding+3);
@@ -3602,7 +3602,7 @@ Gan_Bool
       return GAN_FALSE;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* write the image data */
    for(uiRow = 0; uiRow<uiHeight; uiRow++)
@@ -3778,7 +3778,7 @@ Gan_Bool
               gan_err_register ( "pgiWrite10BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "only RGB and RGBA formats supported" );
               return GAN_FALSE;
          }
-      }        
+      }
    }
 
    free(acBuffer);
@@ -3828,7 +3828,7 @@ Gan_Bool
         gan_err_flush_trace();
         gan_err_register ( "pgiWrite12BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "only RGB format supported" );
         return GAN_FALSE;
-   }        
+   }
 
    /* build a buffer to hold a single line of image data and align it to a four byte boundary*/
    acBuffer = malloc(uiRowSizeInBytes+uieolPadding+3);
@@ -3839,7 +3839,7 @@ Gan_Bool
       return GAN_FALSE;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* write the image data */
    for(uiRow = 0; uiRow<uiHeight; uiRow++)
@@ -3930,7 +3930,7 @@ Gan_Bool
               gan_err_register ( "pgiWrite12BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "only RGB format supported" );
               return GAN_FALSE;
          }
-      }        
+      }
    }
 
    free(acBuffer);
@@ -3988,7 +3988,7 @@ Gan_Bool
       return GAN_FALSE;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* write the image data */
    for(uiRow = 0; uiRow<uiHeight; uiRow++)
@@ -4143,7 +4143,7 @@ Gan_Bool
               gan_err_flush_trace();
               gan_err_register ( "pgiWrite16BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "image format not supported" );
               return GAN_FALSE;
-         }        
+         }
       }
    }
 
@@ -4202,7 +4202,7 @@ Gan_Bool
       return GAN_FALSE;
    }
 
-   acAlignedBuffer = (char*)((unsigned long int)acBuffer + 3 - (((unsigned long int)acBuffer + 3) % 4));
+   acAlignedBuffer = (char*)((uintptr_t)acBuffer + 3 - (((uintptr_t)acBuffer + 3) % 4));
 
    /* write the image data */
    for(uiRow = 0; uiRow<uiHeight; uiRow++)
@@ -4357,7 +4357,7 @@ Gan_Bool
               gan_err_flush_trace();
               gan_err_register ( "pgiWrite32BitFloatDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "image format not supported" );
               return GAN_FALSE;
-         }        
+         }
       }
    }
 
@@ -4368,7 +4368,7 @@ Gan_Bool
 static gan_uint8 ui8GetDPXBitSize(const Gan_Image *image, const Gan_ImageWriteControlStruct *octrlstr)
 {
    gan_uint8 ui8BitSize = GAN_UINT8_MAX;
-   
+
    if(octrlstr != NULL && octrlstr->info.dpx.image_info.bit_size != 0)
    {
       ui8BitSize = (gan_uint8)octrlstr->info.dpx.image_info.bit_size;
@@ -4509,7 +4509,7 @@ static Gan_Bool gan_write_dpx_image_information_header ( char *acAlignedHeader, 
       ui32RefHighData = octrlstr->info.dpx.image_info.ref_high_data;
       f32RefHighQuantity = octrlstr->info.dpx.image_info.ref_high_quantity;
    }
-   
+
    if(bReversedEndianness)
    {
       ui16Orientation   = ui16ReverseEndianness(ui16Orientation);
@@ -4532,7 +4532,7 @@ static Gan_Bool gan_write_dpx_image_information_header ( char *acAlignedHeader, 
    *((gan_float32*)(acAlignedHeader + OFFSET_REFLOWQUANTITY0)) = f32RefLowQuantity;
    *((gan_uint32*)(acAlignedHeader + OFFSET_REFHIGHDATA0)) = ui32RefHighData;
    *((gan_float32*)(acAlignedHeader + OFFSET_REFHIGHQUANTITY0)) = f32RefHighQuantity;
-   
+
    switch(image->format)
    {
       case GAN_GREY_LEVEL_IMAGE:
@@ -4588,7 +4588,7 @@ static Gan_Bool gan_write_dpx_image_information_header ( char *acAlignedHeader, 
 
    if(octrlstr != NULL)
       strncpy((char *)(acAlignedHeader + OFFSET_DESCRIPTION0), octrlstr->info.dpx.image_info.description,  200);
-      
+
    /* write image information header */
    if(outfile != NULL && fwrite((const void *)acAlignedHeader, 1, 640, outfile) != 640)
    {
@@ -4606,7 +4606,7 @@ static Gan_Bool gan_write_dpx_orientation_header ( char *acAlignedHeader, FILE *
    gan_uint32 ui32XOffset=0, ui32YOffset=0, ui32XCentre=0, ui32YCentre=0, ui32XOrigSize=0, ui32YOrigSize=0;
    gan_uint16 aui16Border[4] = {0,0,0,0};
    gan_uint32 aui32PixelAspect[2] = {1,1};
-       
+
    memset((void*)acAlignedHeader, 0, 256);
 
    if(octrlstr != NULL)
@@ -4655,7 +4655,7 @@ static Gan_Bool gan_write_dpx_orientation_header ( char *acAlignedHeader, FILE *
       strncpy((char *)(acAlignedHeader + OFFSET_ORIENTATION_INPUTDEV), octrlstr->info.dpx.orientation.input_dev, 24);
       strncpy((char *)(acAlignedHeader + OFFSET_ORIENTATION_INPUTSERIAL), octrlstr->info.dpx.orientation.input_serial, 32);
    }
-      
+
    *((gan_uint16*)(acAlignedHeader + OFFSET_ORIENTATION_BORDER + 0)) = aui16Border[0];
    *((gan_uint16*)(acAlignedHeader + OFFSET_ORIENTATION_BORDER + 2)) = aui16Border[1];
    *((gan_uint16*)(acAlignedHeader + OFFSET_ORIENTATION_BORDER + 4)) = aui16Border[2];
@@ -4678,7 +4678,7 @@ static Gan_Bool gan_write_dpx_film_header ( char *acAlignedHeader, FILE *outfile
 {
    gan_float32 f32FrameRate=24.0F, f32ShutterAngle=25.0F;
    gan_uint32 ui32FramePosition=0, ui32SequenceLen=1, ui32HeldCount=1;
-   
+
    memset((void*)acAlignedHeader, 0, 256);
    if(octrlstr != NULL)
    {
@@ -4771,7 +4771,7 @@ static Gan_Bool gan_write_dpx_tv_header ( char *acAlignedHeader, FILE *outfile, 
       vReverseEndianness32((gan_uint32 *)(void *)&f32WhiteLevel);
       vReverseEndianness32((gan_uint32 *)(void *)&f32IntegrationTimes);
    }
-   
+
    *((gan_uint32*)(acAlignedHeader + OFFSET_TV_TIMECODE)) = ui32TimeCode;
    *((gan_uint32*)(acAlignedHeader + OFFSET_TV_USERBITS)) = ui32UserBits;
    *((gan_float32*)(acAlignedHeader + OFFSET_TV_HORZSAMPLERATE)) = f32HorSampleRate;
@@ -4839,11 +4839,11 @@ Gan_Bool
    }
 
    /* align the header array */
-   acAlignedHeader = (char*)((unsigned long int)acHeader + 7 - (((unsigned long int)acHeader + 7) % 8));
+   acAlignedHeader = (char*)((uintptr_t)acHeader + 7 - (((uintptr_t)acHeader + 7) % 8));
 
    /* build file header */
    memset((void*)acAlignedHeader, 0, 768);
-   
+
    /* determine whether to pack the data */
    if(octrlstr != NULL)
       bPacked = octrlstr->info.dpx.image_info.packed;
@@ -4863,7 +4863,7 @@ Gan_Bool
       gan_err_register ( "gan_write_dpx_image_stream", GAN_ERROR_FAILURE, "" );
       return GAN_FALSE;
    }
-   
+
    /* write the orientation header */
    if(!gan_write_dpx_orientation_header ( acAlignedHeader, outfile, bReversedEndianness, octrlstr ))
    {
@@ -4877,7 +4877,7 @@ Gan_Bool
       gan_err_register ( "gan_write_dpx_image_stream", GAN_ERROR_FAILURE, "" );
       return GAN_FALSE;
    }
-   
+
    /* write the TV information header */
    if(!gan_write_dpx_tv_header ( acAlignedHeader, outfile, bReversedEndianness, octrlstr ))
    {
@@ -5022,7 +5022,7 @@ Gan_Bool
             fseek(outfile, 0, SEEK_END);
             if(ftell(outfile) == uiFileSize)
                new_file = GAN_FALSE;
-         
+
             fclose(outfile);
          }
       }

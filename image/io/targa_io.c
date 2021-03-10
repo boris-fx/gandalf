@@ -146,7 +146,7 @@ Gan_Image *
    gan_uint16 *pixRow = NULL;
 
    /* align the header array */
-   acAlignedHeader = (char*)((unsigned long int)acHeader + 7 - (((unsigned long int)acHeader + 7) % 8));
+   acAlignedHeader = (char*)((uintptr_t)acHeader + 7 - (((uintptr_t)acHeader + 7) % 8));
 
    /* read the file header */
    if(fread(acAlignedHeader, 1, 18, infile) != 18)
@@ -208,7 +208,7 @@ Gan_Image *
                if(apxlColourmap != NULL) free(apxlColourmap);
                return NULL;
             }
-            
+
             /* read the colourmap */
             if(fread(aui8Colourmap, 1, ui16ColourmapLength, infile) != ui16ColourmapLength)
             {
@@ -227,7 +227,7 @@ Gan_Image *
                apxlColourmap[ui16Entry].data.rgb.ui8.G = aui8Colourmap[ui16Entry];
                apxlColourmap[ui16Entry].data.rgb.ui8.B = aui8Colourmap[ui16Entry];
             }
-            
+
             free(aui8Colourmap);
          }
          break;
@@ -246,7 +246,7 @@ Gan_Image *
                if(apxlColourmap != NULL) free(apxlColourmap);
                return NULL;
             }
-            
+
             /* read the colourmap */
             if(fread(aui8Colourmap, 2, ui16ColourmapLength, infile) != ui16ColourmapLength)
             {
@@ -266,7 +266,7 @@ Gan_Image *
                apxlColourmap[ui16Entry].data.rgb.ui8.G = (ui16Val &  0x3e0) >> 2;
                apxlColourmap[ui16Entry].data.rgb.ui8.B = (ui16Val &   0x1f) << 3;
             }
-            
+
             free(aui8Colourmap);
          }
          break;
@@ -284,7 +284,7 @@ Gan_Image *
                if(apxlColourmap != NULL) free(apxlColourmap);
                return NULL;
             }
-            
+
             /* read the colourmap */
             if(fread(aui8Colourmap, 3, ui16ColourmapLength, infile) != ui16ColourmapLength)
             {
@@ -303,14 +303,14 @@ Gan_Image *
                apxlColourmap[ui16Entry].data.rgb.ui8.G = aui8Colourmap[3*ui16Entry+1];
                apxlColourmap[ui16Entry].data.rgb.ui8.B = aui8Colourmap[3*ui16Entry+0];
             }
-            
+
             free(aui8Colourmap);
          }
 
          break;
       }
    }
-   
+
    if(ui8PixelSize == 32)
       eFormat = GAN_RGB_COLOUR_ALPHA_IMAGE;
    else if(ui8PixelSize == 16 || ui8PixelSize == 24)
@@ -322,7 +322,7 @@ Gan_Image *
       if(apxlColourmap != NULL) free(apxlColourmap);
       return NULL;
    }
-        
+
    /* read elements of control structure if one was provided */
    if(ictrlstr != NULL)
    {
@@ -555,7 +555,7 @@ Gan_Image *
                   }
 
                   extract16BittoRGB(pixRow, iWidth, image->row_data.rgb.uc[flip ? (iHeight-iRow-1) : iRow]);
-                  
+
                   /* check for abort every 10 rows */
                   if(abortRequested != NULL && (iRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
                      break;
@@ -653,7 +653,7 @@ Gan_Image *
 
                         // extract RGB
                         extract16BittoRGB(&aPix[iPacketPos], 1, &pixTmp);
-                        
+
                         if(single_field)
                         {
                            if((upper && (iRow % 2) == 0) || (!upper && (iRow % 2) == 1))
@@ -668,7 +668,7 @@ Gan_Image *
                   if(abortRequested != NULL && GAN_TRUE == abortRequested(abortObj))
                      break;
                }
-               
+
                free(aPix);
             }
             break;
@@ -756,7 +756,7 @@ Gan_Image *
                         rgbPixTmp.R = argbPix[iPacketPos].B;
                         rgbPixTmp.G = argbPix[iPacketPos].G;
                         rgbPixTmp.B = argbPix[iPacketPos].R;
-                        
+
                         if(single_field)
                         {
                            if((upper && (iRow % 2) == 0) || (!upper && (iRow % 2) == 1))
@@ -771,7 +771,7 @@ Gan_Image *
                   if(abortRequested != NULL && GAN_TRUE == abortRequested(abortObj))
                      break;
                }
-               
+
                free(argbPix);
             }
             break;
@@ -861,7 +861,7 @@ Gan_Image *
                         rgbaPixTmp.G = argbaPix[iPacketPos].G;
                         rgbaPixTmp.B = argbaPix[iPacketPos].R;
                         rgbaPixTmp.A = argbaPix[iPacketPos].A;
-                        
+
                         if(single_field)
                         {
                            if((upper && (iRow % 2) == 0) || (!upper && (iRow % 2) == 1))
@@ -876,7 +876,7 @@ Gan_Image *
                   if(abortRequested != NULL && GAN_TRUE == abortRequested(abortObj))
                      break;
                }
-               
+
                free(argbaPix);
             }
             break;
@@ -889,7 +889,7 @@ Gan_Image *
               return NULL;
             }
          }
-         
+
       break;
 
       default:
@@ -1020,7 +1020,7 @@ Gan_Bool
       char acHeader[BIG_BUFFER_SIZE], *acAlignedHeader;
 
       /* align the header array */
-      acAlignedHeader = (char*)((unsigned long int)acHeader + 7 - (((unsigned long int)acHeader + 7) % 8));
+      acAlignedHeader = (char*)((uintptr_t)acHeader + 7 - (((uintptr_t)acHeader + 7) % 8));
 
       acAlignedHeader[TARGA_ID_LENGTH_OFFSET]      = 0; /* no user comment */
       acAlignedHeader[TARGA_COLOURMAP_TYPE_OFFSET] = 0; /* no colourmap */
@@ -1179,7 +1179,7 @@ Gan_Bool
             fseek(outfile, 0, SEEK_END);
             if(ftell(outfile) == uiFileSize)
                new_file = GAN_FALSE;
-         
+
             fclose(outfile);
          }
       }

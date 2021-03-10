@@ -147,7 +147,7 @@ Gan_Image *
    gan_uint32 ui32eoImagePadding;       /* end of image padding used in element */
 
    /* align the header array */
-   acAlignedHeader = (char*)((unsigned long int)acHeader + 7 - (((unsigned long int)acHeader + 7) % 8));
+   acAlignedHeader = (char*)((uintptr_t)acHeader + 7 - (((uintptr_t)acHeader + 7) % 8));
 
    /* read the generic file header */
    if(fread(acAlignedHeader, 1, 1024, infile) != 1024)
@@ -265,7 +265,7 @@ Gan_Image *
         return NULL;
         break;
    }
-   
+
    /* Determine end-of-line padding */
    ui32eolPadding = *((gan_uint32*)(acAlignedHeader + OFFSET_EOLPADDING));
    if(bReversedEndianness)
@@ -344,7 +344,7 @@ Gan_Image *
         gan_err_register ( "gan_read_cineon_image_stream", GAN_ERROR_NOT_IMPLEMENTED, "unsupported Cineon bit depth" );
         return NULL;
    }
-        
+
    /* success */
    return image;
 }
@@ -400,15 +400,15 @@ void gan_initialise_cineon_header_struct(Gan_CineonHeaderStruct *octrlstr, Gan_I
       case GAN_BOOL:
         octrlstr->bit_size = 1;
         break;
-        
+
       case GAN_UINT8:
         octrlstr->bit_size = 8;
         break;
-        
+
       case GAN_UINT16:
         octrlstr->bit_size = 10;
         break;
-        
+
       case GAN_FLOAT32:
         octrlstr->bit_size = 32;
         break;
@@ -425,7 +425,7 @@ void gan_initialise_cineon_header_struct(Gan_CineonHeaderStruct *octrlstr, Gan_I
 static gan_uint8 ui8GetCineonBitSize(const Gan_Image *image, const struct Gan_ImageWriteControlStruct *octrlstr)
 {
    gan_uint8 ui8BitSize = GAN_UINT8_MAX;
-   
+
    if(octrlstr != NULL && octrlstr->info.dpx.image_info.bit_size != 0)
    {
       ui8BitSize = (gan_uint8)octrlstr->info.cineon.bit_size;
@@ -521,7 +521,7 @@ Gan_Bool
    }
 
    /* align the header array */
-   acAlignedHeader = (char*)((unsigned long int)acHeader + 7 - (((unsigned long int)acHeader + 7) % 8));
+   acAlignedHeader = (char*)((uintptr_t)acHeader + 7 - (((uintptr_t)acHeader + 7) % 8));
 
    /* build header */
    memset((void*)acAlignedHeader, 0, 1024);
@@ -529,7 +529,7 @@ Gan_Bool
    /* determine whether to pack the data */
    if(octrlstr != NULL)
       bPacked = octrlstr->info.cineon.packed;
-   
+
    *((gan_uint32*)(acAlignedHeader + OFFSET_MAGIC)) = 0x802a5fd7; /* Magic number */
    *((gan_uint32*)(acAlignedHeader + OFFSET_IMAGEOFFSET)) = IMAGE_DATA_OFFSET;
    *((gan_uint32*)(acAlignedHeader + OFFSET_GENERICSIZE)) = 0x400;
@@ -652,7 +652,7 @@ Gan_Bool
       if(reverse_bytes)
          vReverseEndianness32((gan_uint32*)(acAlignedHeader + uiVal*4));
    }
-   
+
    *((gan_uint32*)(acAlignedHeader + 44)) = 0xffffffff;
    *((gan_uint32*)(acAlignedHeader + 48)) = 0x7f800000;
    if(reverse_bytes)
@@ -660,7 +660,7 @@ Gan_Bool
       vReverseEndianness32((gan_uint32*)(acAlignedHeader + 44));
       vReverseEndianness32((gan_uint32*)(acAlignedHeader + 48));
    }
-   
+
    /* write motion picture info header */
    if(outfile != NULL && fwrite((const void *)acAlignedHeader, 1, 1024, outfile) != 1024)
    {
@@ -773,7 +773,7 @@ Gan_Bool
             fseek(outfile, 0, SEEK_END);
             if(ftell(outfile) == uiFileSize)
                new_file = GAN_FALSE;
-         
+
             fclose(outfile);
          }
       }
