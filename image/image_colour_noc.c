@@ -46,9 +46,9 @@
 
 /* forward declaration of function defined in image_common_noc.c */
 static Gan_Bool
- image_realloc ( Gan_Image *img,
-                 unsigned long height, unsigned long width,
-                 unsigned long stride, Gan_Bool alloc_pix_data );
+image_realloc(
+   Gan_Image *img, unsigned long height, unsigned long width,
+   unsigned long stride, Gan_Bool alloc_pix_data );
 
 #ifndef NDEBUG
 
@@ -131,12 +131,10 @@ static Gan_Image *
    /* allocate image img_d if necessary */
    if ( img_d == NULL )
    {
+      unsigned long stride = gan_image_min_stride(GAN_PIXFMT, GAN_PIXTYPE, img_s->width, 0);
+
       img_d = GAN_IMAGE_FORM_GEN ( NULL, img_s->height, img_s->width,
-                                            gan_image_min_stride(GAN_PIXFMT,
-                                                                 GAN_PIXTYPE,
-                                                                 img_s->width,
-                                                                 0),
-                                            GAN_TRUE, NULL, 0, NULL, 0 );
+                                  stride, GAN_TRUE, NULL, 0, NULL, 0 );
       if ( img_d == NULL )
       {
          gan_err_register("image_copy", GAN_ERROR_FAILURE, "");
@@ -148,9 +146,9 @@ static Gan_Image *
       if ( img_d->format != img_s->format || img_d->type != img_s->type )
       {
          /* make formats and types compatible */
-         img_d = GAN_IMAGE_SET_GEN ( img_d, img_s->height, img_s->width,
-                                     gan_image_min_stride(GAN_PIXFMT, GAN_PIXTYPE, img_s->width,0),
-                                     GAN_TRUE );
+         img_d = GAN_IMAGE_SET_GEN( img_d, img_s->height, img_s->width,
+                                    gan_image_min_stride(GAN_PIXFMT, GAN_PIXTYPE, img_s->width,0),
+                                    GAN_TRUE );
          if ( img_d == NULL )
          {
             gan_err_register("image_copy", GAN_ERROR_FAILURE, "");
@@ -160,14 +158,16 @@ static Gan_Image *
       else
       {
          /* reallocate image if necessary */
-         if ( !image_realloc ( img_d, img_s->height, img_s->width,
-                               gan_image_min_stride(GAN_PIXFMT, GAN_PIXTYPE, img_s->width, 0), GAN_TRUE ) )
+         if ( !image_realloc( img_d, img_s->height, img_s->width,
+                              gan_image_min_stride(GAN_PIXFMT, GAN_PIXTYPE, img_s->width, 0), GAN_TRUE ) )
          {
             gan_err_register("image_copy", GAN_ERROR_FAILURE, "");
             return NULL;
          }
       }
    }
+
+   img_d->premult = img_s->premult;
 
    /* if the image has no pixels, return immediately */
    if ( img_s->width == 0 || img_s->height == 0 ) return img_d;
@@ -176,7 +176,7 @@ static Gan_Image *
    if ( img_s->stride == img_s->width*sizeof(GAN_PIXEL) &&
         img_d->stride == img_d->width*sizeof(GAN_PIXEL) )
       /* copy all pixels in one go */
-      memcpy ( (void *)img_d->pix_data_ptr, (void *)img_s->pix_data_ptr,
+      memcpy ( (void *)img_d->pix_data.ptr, (void *)img_s->pix_data.ptr,
                img_s->height*img_s->width*sizeof(GAN_PIXEL) );
    else
    {

@@ -242,7 +242,7 @@ int
                              const char *file_name,
                              int         line_number,
                              const char *message,
-                             int         number )
+                             size_t      number )
 {
    Gan_ErrorTrace *atrace = NULL;
    int             the_err_code = GAN_EC_FAIL; /* Registered error code */
@@ -323,7 +323,7 @@ int
                                      const char            *file_name,
                                      int                    line_number,
                                      const Gan_Char        *umessage,
-                                     int                    number )
+                                     size_t                 number )
 {
    Gan_ErrorTrace *atrace = NULL;
    int             the_err_code = GAN_EC_FAIL; /* Registered error code */
@@ -522,42 +522,47 @@ int
    int count;
    int i;                                /* Loop counter */
    Gan_ErrorTrace *a_record = NULL;
+   int return_code = GAN_EC_OK;
 
    /* use thread-safe access to static global gan_err_trace_top */
    gan_err_sem_wait();
 
-   if ( (count = gan_et_get_record_count(gan_err_trace_top)) < 1 )
-      return GAN_EC_DFT_EMPTY;                /* Error trace is empty */
-    
-   /*  Boundary check on n */
-   if ( (n < 1) || (n > count) )
-      return GAN_EC_DFT_BAD_N;                /* Out of bounds, bye */
+   if ((count = gan_et_get_record_count(gan_err_trace_top)) < 1)
+   {
+      return_code = GAN_EC_DFT_EMPTY;                /* Error trace is empty */
+   }
+   else if ((n < 1) || (n > count)) /*  Boundary check on n */
+   {
+      return_code = GAN_EC_DFT_BAD_N;                /* Out of bounds, bye */
+   }
+   else
+   {
+      for ( a_record = gan_et_get_record_first(gan_err_trace_top), i = 1; i < n; i++ )
+         a_record = gan_et_get_record_next(a_record); /* Step to N-th error */
 
-   for ( a_record = gan_et_get_record_first(gan_err_trace_top), i = 1; i < n; i++ )
-      a_record = gan_et_get_record_next(a_record); /* Step to N-th error */
+      if (func_name != NULL)
+         *func_name = a_record->func_name;
 
-   if ( func_name != NULL )
-      *func_name = a_record->func_name;
+      if (err_code != NULL)
+         *err_code = a_record->err_code;
 
-   if ( err_code != NULL )
-      *err_code = a_record->err_code;
+      if (file_name != NULL)
+         *file_name = a_record->file_name;
 
-   if ( file_name != NULL )
-      *file_name = a_record->file_name;
-    
-   if ( line_number != NULL )
-      *line_number = a_record->line_number;
-    
-   if ( message != NULL )
-      *message = a_record->message;
+      if (line_number != NULL)
+         *line_number = a_record->line_number;
 
-   if ( number != NULL )
-      *number = a_record->number;
+      if (message != NULL)
+         *message = a_record->message;
+
+      if (number != NULL)
+         *number = a_record->number;
+   }
 
    /* free mutex */
    gan_err_sem_post();
 
-   return GAN_EC_OK;
+   return return_code;
 } /* gan_err_get_error() */
 
 /**

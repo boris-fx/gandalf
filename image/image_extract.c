@@ -119,7 +119,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gl.ui8[r] = gan_image_get_pixptr_gl_ui8(source,r0s+r,c0s);
 
-                dest->pix_data_ptr = gan_image_get_pixptr_gl_ui8(source, r0s, c0s);
+                dest->pix_data.ptr = gan_image_get_pixptr_gl_ui8(source, r0s, c0s);
              }
 
              break;
@@ -205,7 +205,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gl.ui16[r] = gan_image_get_pixptr_gl_ui16(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gl_ui16(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gl_ui16(source, r0s, c0s);
              }
 
              break;
@@ -292,7 +292,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gl.ui32[r] = gan_image_get_pixptr_gl_ui32(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gl_ui32(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gl_ui32(source, r0s, c0s);
              }
 
              break;
@@ -412,7 +412,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gl.f32[r] = gan_image_get_pixptr_gl_f32(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gl_f32(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gl_f32(source, r0s, c0s);
              }
 
              break;
@@ -497,7 +497,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gl.f64[r] = gan_image_get_pixptr_gl_f64(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gl_f64(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gl_f64(source, r0s, c0s);
              }
 
              break;
@@ -571,7 +571,7 @@ static Gan_Image *
                    dest->ba[r].no_words = GAN_NO_BITWORDS(width);
                 }
 
-                dest->pix_data_ptr = (unsigned char *)&source->row_data.gl.b[r0s][c0s/GAN_BITWORD_SIZE];
+                dest->pix_data.ptr = (unsigned char *)&source->row_data.gl.b[r0s][c0s/GAN_BITWORD_SIZE];
              }
 
              break;
@@ -612,7 +612,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gl.ui10[r] = gan_image_get_pixptr_gl_ui10(source,r0s+r,c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gl_ui10(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gl_ui10(source, r0s, c0s);
              }
 
              break;
@@ -667,7 +667,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gl.ui12[r] = gan_image_get_pixptr_gl_ui12(source,r0s+r,c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gl_ui12(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gl_ui12(source, r0s, c0s);
              }
 
              break;
@@ -1081,7 +1081,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gla.ui8[r] = gan_image_get_pixptr_gla_ui8(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gla_ui8(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gla_ui8(source, r0s, c0s);
              }
              break;
          
@@ -1194,7 +1194,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gla.ui16[r] = gan_image_get_pixptr_gla_ui16(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gla_ui16(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gla_ui16(source, r0s, c0s);
              }
              break;
          
@@ -1307,7 +1307,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gla.ui32[r] = gan_image_get_pixptr_gla_ui32(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gla_ui32(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gla_ui32(source, r0s, c0s);
              }
              break;
          
@@ -1419,7 +1419,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gla.f32[r] = gan_image_get_pixptr_gla_f32(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gla_f32(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gla_f32(source, r0s, c0s);
              }
              break;
             
@@ -1527,7 +1527,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.gla.f64[r] = gan_image_get_pixptr_gla_f64(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_gla_f64(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_gla_f64(source, r0s, c0s);
              }
              break;
             
@@ -4257,7 +4257,7 @@ static Gan_Image *
                    dest->row_data.rgb.ui8[r] =
                                           &source->row_data.rgb.ui8[r0s+r][c0s];
 
-                dest->pix_data_ptr = (unsigned char *)
+                dest->pix_data.ptr = (unsigned char *)
                                      gan_image_get_pixptr_rgb_ui8(source, r0s, c0s);
              }
              break;
@@ -4385,7 +4385,7 @@ static Gan_Image *
                    dest->row_data.rgb.ui16[r] =
                                           &source->row_data.rgb.ui16[r0s+r][c0s];
 
-                dest->pix_data_ptr = (unsigned char *)
+                dest->pix_data.ptr = (unsigned char *)
                                      gan_image_get_pixptr_rgb_ui16(source, r0s, c0s);
              }
              break;
@@ -4578,7 +4578,7 @@ static Gan_Image *
                    dest->row_data.rgb.ui32[r] =
                                           &source->row_data.rgb.ui32[r0s+r][c0s];
 
-                dest->pix_data_ptr = (unsigned char *)
+                dest->pix_data.ptr = (unsigned char *)
                                      gan_image_get_pixptr_rgb_ui32(source, r0s, c0s);
              }
              break;
@@ -4703,7 +4703,7 @@ static Gan_Image *
                    dest->row_data.rgb.f32[r] =
                                           &source->row_data.rgb.f32[r0s+r][c0s];
 
-                dest->pix_data_ptr = (unsigned char *)
+                dest->pix_data.ptr = (unsigned char *)
                                      gan_image_get_pixptr_rgb_f32(source, r0s, c0s);
              }
              break;
@@ -4826,7 +4826,7 @@ static Gan_Image *
                    dest->row_data.rgb.f64[r] =
                                           &source->row_data.rgb.f64[r0s+r][c0s];
 
-                dest->pix_data_ptr = (unsigned char *)
+                dest->pix_data.ptr = (unsigned char *)
                                      gan_image_get_pixptr_rgb_f64(source, r0s, c0s);
              }
              break;
@@ -6281,7 +6281,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.rgba.ui8[r] = gan_image_get_pixptr_rgba_ui8(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_rgba_ui8(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_rgba_ui8(source, r0s, c0s);
              }
              break;
          
@@ -6424,7 +6424,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.rgba.ui12[r] = gan_image_get_pixptr_rgba_ui12(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_rgba_ui12(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_rgba_ui12(source, r0s, c0s);
              }
              break;
          
@@ -6509,7 +6509,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.rgba.ui16[r] = &source->row_data.rgba.ui16[r0s+r][c0s];
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_rgba_ui16(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_rgba_ui16(source, r0s, c0s);
              }
              break;
 
@@ -6595,7 +6595,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.rgba.i32[r] = gan_image_get_pixptr_rgba_i32(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_rgba_i32(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_rgba_i32(source, r0s, c0s);
              }
              break;
          
@@ -6701,7 +6701,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.rgba.ui32[r] = &source->row_data.rgba.ui32[r0s+r][c0s];
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_rgba_ui32(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_rgba_ui32(source, r0s, c0s);
              }
              break;
          
@@ -6823,7 +6823,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.rgba.f32[r] = &source->row_data.rgba.f32[r0s+r][c0s];
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_rgba_f32(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_rgba_f32(source, r0s, c0s);
              }
              break;
             
@@ -6941,7 +6941,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.rgba.f64[r] = gan_image_get_pixptr_rgba_f64(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_rgba_f64(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_rgba_f64(source, r0s, c0s);
              }
              break;
             
@@ -7559,7 +7559,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.rgbx.ui8[r] = gan_image_get_pixptr_rgbx_ui8(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_rgbx_ui8(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_rgbx_ui8(source, r0s, c0s);
              }
              break;
          
@@ -7625,7 +7625,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.rgbx.ui10[r] = &source->row_data.rgbx.ui10[r0s+r][c0s];
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_rgbx_ui10(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_rgbx_ui10(source, r0s, c0s);
              }
              break;
 
@@ -7675,7 +7675,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.rgbas.ui10[r] = &source->row_data.rgbas.ui10[r0s+r][c0s];
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_rgbas_ui10(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_rgbas_ui10(source, r0s, c0s);
              }
              break;
 
@@ -7725,7 +7725,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.vfield2D.f32[r] = gan_image_get_pixptr_vfield2D_f32(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_vfield2D_f32(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_vfield2D_f32(source, r0s, c0s);
              }
              break;
          
@@ -7775,7 +7775,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.yuvx444.ui8[r] = gan_image_get_pixptr_yuvx444_ui8(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_yuvx444_ui8(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_yuvx444_ui8(source, r0s, c0s);
              }
              break;
          
@@ -7801,7 +7801,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.yuvx444.ui16[r] = gan_image_get_pixptr_yuvx444_ui16(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_yuvx444_ui16(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_yuvx444_ui16(source, r0s, c0s);
              }
              break;
          
@@ -7851,7 +7851,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.yuva444.ui8[r] = gan_image_get_pixptr_yuva444_ui8(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_yuva444_ui8(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_yuva444_ui8(source, r0s, c0s);
              }
              break;
          
@@ -7877,7 +7877,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.yuva444.ui16[r] = gan_image_get_pixptr_yuva444_ui16(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_yuva444_ui16(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_yuva444_ui16(source, r0s, c0s);
              }
              break;
          
@@ -7930,7 +7930,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.yuv422.ui8[r] = gan_image_get_pixptr_yuv422_ui8(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_yuv422_ui8(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_yuv422_ui8(source, r0s, c0s);
              }
              break;
          
@@ -7956,7 +7956,7 @@ static Gan_Image *
                 for ( r=0; r < height; r++ )
                    dest->row_data.yuv422.ui16[r] = gan_image_get_pixptr_yuv422_ui16(source, r0s+r, c0s);
 
-                dest->pix_data_ptr = (unsigned char *)gan_image_get_pixptr_yuv422_ui16(source, r0s, c0s);
+                dest->pix_data.ptr = (unsigned char *)gan_image_get_pixptr_yuv422_ui16(source, r0s, c0s);
              }
              break;
          
@@ -9460,18 +9460,17 @@ static Gan_Image *
  *
  * \sa gan_image_extract_s().
  */
-Gan_Image *
- gan_image_extract_q ( const Gan_Image *source,
-                       int      r0,     int      c0,
-                       unsigned height, unsigned width,
-                       Gan_ImageFormat format, Gan_Type type,
-                       Gan_Bool copy_pixels, Gan_Image *dest )
+Gan_Image * gan_image_extract_q(
+   const Gan_Image *source,
+   int r0, int c0, unsigned long height, unsigned long width,
+   Gan_ImageFormat format, Gan_Type type,
+   Gan_Bool copy_pixels, Gan_Image *dest )
 {
    unsigned long stride;
-   unsigned r0d=0, c0d=0, offset;
+   unsigned r0d = 0, c0d = 0, offset;
    Gan_Bool alloc_dest = (Gan_Bool) (dest == NULL), fill_dest = GAN_FALSE;
 
-   if ( copy_pixels && !alloc_dest && !dest->pix_data_alloc )
+   if ( copy_pixels && !alloc_dest && !dest->pix_data.alloc )
    {
       /* we're copying pixels into a sub-image which already points into
          another image, so we can't change any property of the sub-image */
@@ -9518,7 +9517,9 @@ Gan_Image *
    /* set offsets in destination image*/
    dest->offset_x = source->offset_x + (int)c0;
    dest->offset_y = source->offset_y + (int)r0;
-      
+
+   dest->premult = source->premult;
+
    /* compute actual region to copy, compressing it to be inside the source
       image, and computing the offsets in the destination image */
    if ( c0 < 0 )

@@ -43,27 +43,21 @@
 /// Forms an bright feature map structure.
 
 
-Gan_brightFeatureMap * 
- gan_bright_feature_map_form ( Gan_brightFeatureMap *bmap,unsigned max_nbright  )
+Gan_brightFeatureMap * gan_bright_feature_map_alloc( unsigned max_nbright )
 {
+   Gan_brightFeatureMap * bmap;
+
+   /* dynamically allocate the feature map structure */
+   bmap = gan_malloc_object(Gan_brightFeatureMap);
    if ( bmap == NULL )
    {
-      /* dynamically allocate the feature map structure */
-      bmap = gan_malloc_object(Gan_brightFeatureMap);
-      if ( bmap == NULL )
-      {
-         gan_err_flush_trace();
-         gan_err_register_with_number ( "gan_bright_feature_map_form", GAN_ERROR_MALLOC_FAILED, "", sizeof(*bmap) );
-         return NULL;
-      }
-
-      /* mark the structure as dynamically allocated */
-      bmap->alloc = GAN_TRUE;
+      gan_err_flush_trace();
+      gan_err_register_with_number ( "gan_bright_feature_map_alloc", GAN_ERROR_MALLOC_FAILED, "", sizeof(*bmap) );
+      return NULL;
    }
-   else
-      /* this structure is not dynamically allocated */
-      bmap->alloc = GAN_FALSE;
 
+   /* mark the structure as dynamically allocated */
+   bmap->alloc = GAN_TRUE;
 
    /* allocate array of edge features */
    if ( max_nbright > 0 )
@@ -72,7 +66,7 @@ Gan_brightFeatureMap *
       if (bmap->bright == NULL )
       {
          gan_err_flush_trace();
-         gan_err_register_with_number ( "gan_bright_feature_map_form", GAN_ERROR_MALLOC_FAILED, "", max_nbright*sizeof(Gan_brightFeature) );
+         gan_err_register_with_number ( "gan_bright_feature_map_alloc", GAN_ERROR_MALLOC_FAILED, "", max_nbright*sizeof(Gan_brightFeature) );
          return NULL;
       }
    }
@@ -88,14 +82,14 @@ Gan_brightFeatureMap *
    /* create empty local feature map for this feature map */
    if ( !gan_local_feature_map_form ( &bmap->local_fmap, 0, 0, NULL ) )
    {
-      gan_err_register ( "gan_bright_feature_map_form", GAN_ERROR_FAILURE, "");
+      gan_err_register ( "gan_bright_feature_map_alloc", GAN_ERROR_FAILURE, "");
       return NULL;
    }
 
    /* clear bright feature map */
    if ( !gan_bright_feature_map_clear ( bmap, 0, 0, NULL, NULL, NULL ) )
    {
-      gan_err_register ( "gan_bright_feature_map_form", GAN_ERROR_FAILURE, "");
+      gan_err_register ( "gan_bright_feature_map_alloc", GAN_ERROR_FAILURE, "");
       return NULL;
    }
 
@@ -110,7 +104,7 @@ Gan_brightFeatureMap *
  * Frees a previously formed/allocated structure that holds edge features.
  *
  * \return No value.
- * \sa gan_edge_feature_map_form(), gan_edge_feature_map_alloc().
+ * \sa gan_edge_feature_map_alloc().
  */
 void
  gan_bright_feature_map_free ( Gan_brightFeatureMap * bmap )

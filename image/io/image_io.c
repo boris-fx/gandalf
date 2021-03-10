@@ -494,7 +494,7 @@ Gan_Image *
 
    if(file_format == GAN_UNKNOWN_FORMAT)
    {
-      gan_err_register_unicode( "gan_image_read", GAN_ERROR_FAILURE, "" );
+      gan_err_register_unicode( L"gan_image_read", GAN_ERROR_FAILURE, "" );
       return NULL;
    }
 

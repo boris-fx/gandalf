@@ -73,11 +73,11 @@ typedef enum
    GAN_ALL_CHANNELS
 } Gan_ImageChannelType;
 
-GANDALF_API Gan_Image *gan_image_extract_channel_q ( const Gan_Image *source,
-                                                     Gan_ImageChannelType channel,
-                                                     unsigned r0,     unsigned c0,
-                                                     unsigned height, unsigned width,
-                                                     Gan_Image *dest );
+GANDALF_API Gan_Image *gan_image_extract_channel_q(
+   const Gan_Image *source, Gan_ImageChannelType channel,
+   int r0, int c0, unsigned long height, unsigned long width,
+   Gan_Image *dest );
+
 GANDALF_API Gan_Bool   gan_image_insert_channel ( const Gan_Image *source,
                                                   Gan_ImageChannelType schannel,
                                                   Gan_Image *dest,
@@ -115,10 +115,9 @@ GANDALF_API Gan_Image* gan_image_threshold_channel_q ( const Gan_Image *source,
  * \sa gan_image_extract_channel_q().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_Image *gan_image_extract_channel_s ( const Gan_Image *source,
-                                         Gan_ImageChannelType channel,
-                                         unsigned r0,     unsigned c0,
-                                         unsigned height, unsigned width );
+GANDALF_API Gan_Image *gan_image_extract_channel_s(
+   const Gan_Image *source, Gan_ImageChannelType channel,
+   int r0, int c0, unsigned long height, unsigned long width );
 #else
 #define gan_image_extract_channel_s(source,channel,r0,c0,height,width)\
            gan_image_extract_channel_q(source,channel,r0,c0,height,width,NULL)

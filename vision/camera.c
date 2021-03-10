@@ -39,6 +39,9 @@
 #include <gandalf/vision/camera_radial_dist1_inv.h>
 #include <gandalf/vision/camera_cubic_Bspline.h>
 #include <gandalf/vision/camera_cubic_Bspline_inv.h>
+#include <gandalf/vision/camera_ST_map.h>
+#include <gandalf/vision/camera_equirectangular.h>
+#include <gandalf/image/image_defs.h>
 #include <gandalf/common/numerics.h>
 
 /**
@@ -180,6 +183,21 @@ Gan_Bool
          Gan_CubicBSplineSupport *support  = va_arg ( ap, Gan_CubicBSplineSupport *);
 
          result = gan_camera_build_cubic_Bspline_inv ( camera, zh, fx, fy, x0, y0, skew, kyx, kzx, kzy, weight, support );
+      }
+      break;
+      case GAN_STMAP_CAMERA:
+      {
+         struct Gan_Image *stmap = va_arg ( ap, struct Gan_Image * );
+         struct Gan_Image *stmap_inv = va_arg ( ap, struct Gan_Image * );
+         result = gan_camera_build_ST_map( camera, zh, fx, fy, x0, y0, stmap, stmap_inv );
+      }
+      break;
+      case GAN_EQUIRECTANGULAR_CAMERA:
+      {
+         double longitude = va_arg ( ap, double );
+         double latitude  = va_arg ( ap, double );
+         double FoV       = va_arg ( ap, double );
+         result = gan_camera_build_equirectangular( camera, zh, fx, fy, x0, y0, longitude, latitude, FoV );
       }
       break;
 
@@ -403,6 +421,21 @@ Gan_Bool
                      camera->nonlinear.cbspline.weight,
                      camera->nonlinear.cbspline.support );
         break;
+      case GAN_STMAP_CAMERA:
+        result = gan_camera_build_ST_map(
+                     camera, camera->zh,
+                     camera->fx, camera->fy,
+                     camera->x0, camera->y0,
+                     camera->nonlinear.stmap.stmap_dir,
+                     camera->nonlinear.stmap.stmap_inv );
+        break;
+      case GAN_EQUIRECTANGULAR_CAMERA:
+         result = gan_camera_build_equirectangular( camera, camera->zh,
+            camera->fx, camera->fy, camera->x0, camera->y0,
+            camera->nonlinear.equirectangular.longitude,
+            camera->nonlinear.equirectangular.latitude,
+            camera->nonlinear.equirectangular.FoV );
+         break;
 
       default:
         gan_err_flush_trace();
@@ -505,6 +538,15 @@ Gan_Bool
             }
       }
       break;
+      case GAN_STMAP_CAMERA:
+        gan_err_flush_trace();
+        gan_err_register ( "gan_camera_identical", GAN_ERROR_NOT_IMPLEMENTED, "" );
+        return GAN_FALSE;
+      case GAN_EQUIRECTANGULAR_CAMERA:
+        if ( camera1->nonlinear.equirectangular.longitude != camera2->nonlinear.equirectangular.longitude )return GAN_FALSE;
+        if ( camera1->nonlinear.equirectangular.latitude != camera2->nonlinear.equirectangular.latitude )return GAN_FALSE;
+        if ( camera1->nonlinear.equirectangular.FoV != camera2->nonlinear.equirectangular.FoV )return GAN_FALSE;
+        break;
         
       default:
         gan_err_flush_trace();

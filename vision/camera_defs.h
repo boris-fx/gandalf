@@ -91,6 +91,12 @@ typedef enum
    /// affine camera model
    GAN_AFFINE_CAMERA,
 
+   /// camera model driven by ST map
+   GAN_STMAP_CAMERA,
+
+   /// equirectangular camera model
+   GAN_EQUIRECTANGULAR_CAMERA,
+
    GAN_CAMERA_TYPE_ENUM_COUNT
 } Gan_CameraType;
 

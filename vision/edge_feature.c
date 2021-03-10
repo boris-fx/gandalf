@@ -53,29 +53,23 @@
  * \return non-\c NULL the formed feature map \a emap, or \c NULL on failure.
  * \sa gan_edge_feature_map_alloc(), gan_edge_feature_map_free().
  */
-Gan_EdgeFeatureMap *
- gan_edge_feature_map_form ( Gan_EdgeFeatureMap *emap,
-                             unsigned max_nedges,
-                             unsigned max_nstrings )
+Gan_EdgeFeatureMap * gan_edge_feature_map_alloc(
+   unsigned max_nedges,
+   unsigned max_nstrings )
 {
+   Gan_EdgeFeatureMap *emap;
+
+   /* dynamically allocate the feature map structure */
+   emap = gan_malloc_object(Gan_EdgeFeatureMap);
    if ( emap == NULL )
    {
-      /* dynamically allocate the feature map structure */
-      emap = gan_malloc_object(Gan_EdgeFeatureMap);
-      if ( emap == NULL )
-      {
-         gan_err_flush_trace();
-         gan_err_register_with_number ( "gan_edge_feature_map_form", GAN_ERROR_MALLOC_FAILED, "", sizeof(*emap) );
-         return NULL;
-      }
-
-      /* mark the structure as dynamically allocated */
-      emap->alloc = GAN_TRUE;
+      gan_err_flush_trace();
+      gan_err_register_with_number ( "gan_edge_feature_map_alloc", GAN_ERROR_MALLOC_FAILED, "", sizeof(*emap) );
+      return NULL;
    }
-   else
-      /* this structure is not dynamically allocated */
-      emap->alloc = GAN_FALSE;
 
+   /* mark the structure as dynamically allocated */
+   emap->alloc = GAN_TRUE;
 
    /* allocate array of edge features */
    if ( max_nedges > 0 )
@@ -84,7 +78,7 @@ Gan_EdgeFeatureMap *
       if ( emap->edge == NULL )
       {
          gan_err_flush_trace();
-         gan_err_register_with_number ( "gan_edge_feature_map_form", GAN_ERROR_MALLOC_FAILED, "", max_nedges*sizeof(Gan_EdgeFeature) );
+         gan_err_register_with_number ( "gan_edge_feature_map_alloc", GAN_ERROR_MALLOC_FAILED, "", max_nedges*sizeof(Gan_EdgeFeature) );
          return NULL;
       }
    }
@@ -101,7 +95,7 @@ Gan_EdgeFeatureMap *
       if ( emap->string == NULL )
       {
          gan_err_flush_trace();
-         gan_err_register_with_number ( "gan_edge_feature_map_form", GAN_ERROR_MALLOC_FAILED, "", max_nstrings*sizeof(Gan_EdgeString) );
+         gan_err_register_with_number ( "gan_edge_feature_map_alloc", GAN_ERROR_MALLOC_FAILED, "", max_nstrings*sizeof(Gan_EdgeString) );
          return NULL;
       }
    }
@@ -117,14 +111,14 @@ Gan_EdgeFeatureMap *
    /* create empty local feature map for this feature map */
    if ( !gan_local_feature_map_form ( &emap->local_fmap, 0, 0, NULL ) )
    {
-      gan_err_register ( "gan_edge_feature_map_form", GAN_ERROR_FAILURE, "");
+      gan_err_register ( "gan_edge_feature_map_alloc", GAN_ERROR_FAILURE, "");
       return NULL;
    }
 
    /* clear edge feature map */
    if ( !gan_edge_feature_map_clear ( emap, 0, 0, NULL, NULL, NULL ) )
    {
-      gan_err_register ( "gan_edge_feature_map_form", GAN_ERROR_FAILURE, "");
+      gan_err_register ( "gan_edge_feature_map_alloc", GAN_ERROR_FAILURE, "");
       return NULL;
    }
 
@@ -139,7 +133,7 @@ Gan_EdgeFeatureMap *
  * Frees a previously formed/allocated structure that holds edge features.
  *
  * \return No value.
- * \sa gan_edge_feature_map_form(), gan_edge_feature_map_alloc().
+ * \sa gan_edge_feature_map_alloc().
  */
 void
  gan_edge_feature_map_free ( Gan_EdgeFeatureMap *emap )

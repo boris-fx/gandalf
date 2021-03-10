@@ -315,7 +315,7 @@ Gan_Bool
                {
                   total = 0.0;
                   for ( j = half_size; j > 0; j-- )
-                     total += mask->data.f[j-1]*(source[SHIFT_DOWN_REPEAT(i+j,dsize)*sstride] + source[SHIFT_UP_REPEAT(i-j,dsize)*sstride]);
+                     total += mask->data.f[j-1]*(source[SHIFT_DOWN_REPEAT(i+j,dsize)*sstride] - source[SHIFT_UP_REPEAT(i-j,dsize)*sstride]);
 
                   dest[i*dstride] = total;
                }
@@ -328,7 +328,7 @@ Gan_Bool
                {
                   total = 0.0;
                   for ( j = half_size; j > 0; j-- )
-                     total += mask->data.f[j-1]*(source[SHIFT_DOWN_CIRCULAR(i+j,dsize)*sstride] + source[SHIFT_UP_CIRCULAR(i-j,dsize)*sstride]);
+                     total += mask->data.f[j-1]*(source[SHIFT_DOWN_CIRCULAR(i+j,dsize)*sstride] - source[SHIFT_UP_CIRCULAR(i-j,dsize)*sstride]);
 
                   dest[i*dstride] = total;
                }
@@ -541,7 +541,7 @@ Gan_Bool
                {
                   total = 0.0;
                   for ( j = half_size; j > 0; j-- )
-                     total += mask->data.d[j-1]*(source[SHIFT_DOWN_REPEAT(i+j,dsize)*sstride] + source[SHIFT_UP_REPEAT(i-j,dsize)*sstride]);
+                     total += mask->data.d[j-1]*(source[SHIFT_DOWN_REPEAT(i+j,dsize)*sstride] - source[SHIFT_UP_REPEAT(i-j,dsize)*sstride]);
 
                   dest[i*dstride] = total;
                }
@@ -555,7 +555,7 @@ Gan_Bool
                   total = 0.0;
                   for ( j = half_size; j > 0; j-- )
                      total += mask->data.d[j-1]
-                        *(source[SHIFT_DOWN_CIRCULAR(i+j,dsize)*sstride] + source[SHIFT_UP_CIRCULAR(i-j,dsize)*sstride]);
+                        *(source[SHIFT_DOWN_CIRCULAR(i+j,dsize)*sstride] - source[SHIFT_UP_CIRCULAR(i-j,dsize)*sstride]);
 
                   dest[i*dstride] = total;
                }
@@ -769,7 +769,7 @@ Gan_Bool
                {
                   total = 0;
                   for ( j = half_size; j > 0; j-- )
-                     total += mask->data.i[j-1]*(source[SHIFT_DOWN_REPEAT(i+j,dsize)*sstride] + source[SHIFT_UP_REPEAT(i-j,dsize)*sstride]);
+                     total += mask->data.i[j-1]*(source[SHIFT_DOWN_REPEAT(i+j,dsize)*sstride] - source[SHIFT_UP_REPEAT(i-j,dsize)*sstride]);
 
                   dest[i*dstride] = total;
                }
@@ -782,7 +782,7 @@ Gan_Bool
                {
                   total = 0;
                   for ( j = half_size; j > 0; j-- )
-                     total += mask->data.i[j-1]*(source[SHIFT_DOWN_CIRCULAR(i+j,dsize)*sstride] + source[SHIFT_UP_CIRCULAR(i-j,dsize)*sstride]);
+                     total += mask->data.i[j-1]*(source[SHIFT_DOWN_CIRCULAR(i+j,dsize)*sstride] - source[SHIFT_UP_CIRCULAR(i-j,dsize)*sstride]);
 
                   dest[i*dstride] = total;
                }
@@ -1092,7 +1092,7 @@ Gan_Bool
                {
                   total = 0.0F;
                   for ( j = half_size; j > 0; j-- )
-                     total += mask->data.f[j-1]*((float)source[SHIFT_DOWN_REPEAT(i+j,dsize)*sstride] + (float)source[SHIFT_UP_REPEAT(i-j,dsize)*sstride]);
+                     total += mask->data.f[j-1]*((float)source[SHIFT_DOWN_REPEAT(i+j,dsize)*sstride] - (float)source[SHIFT_UP_REPEAT(i-j,dsize)*sstride]);
 
                   dest[i*dstride] = (unsigned char) (total+0.5F);
                }
@@ -1105,7 +1105,7 @@ Gan_Bool
                {
                   total = 0.0F;
                   for ( j = half_size; j > 0; j-- )
-                     total += mask->data.f[j-1]*((float)source[SHIFT_DOWN_CIRCULAR(i+j,dsize)*sstride] + (float)source[SHIFT_UP_CIRCULAR(i-j,dsize)*sstride]);
+                     total += mask->data.f[j-1]*((float)source[SHIFT_DOWN_CIRCULAR(i+j,dsize)*sstride] - (float)source[SHIFT_UP_CIRCULAR(i-j,dsize)*sstride]);
 
                   dest[i*dstride] = (unsigned char) (total+0.5F);
                }
@@ -2009,7 +2009,7 @@ Gan_Bool
                   total = 0.0F;
                   for ( j = half_size; j > 0; j-- )
                      total += mask->data.f[j-1]
-                        *((float)source[SHIFT_DOWN_REPEAT(i+j,dsize)*sstride] +
+                        *((float)source[SHIFT_DOWN_REPEAT(i+j,dsize)*sstride] -
                           (float)source[SHIFT_UP_REPEAT(i-j,dsize)*sstride]);
 
                   dest[i*dstride] = (unsigned short) (total+0.5F);
@@ -2024,7 +2024,7 @@ Gan_Bool
                   total = 0.0F;
                   for ( j = half_size; j > 0; j-- )
                      total += mask->data.f[j-1]
-                        *((float)source[SHIFT_DOWN_CIRCULAR(i+j,dsize)*sstride] +
+                        *((float)source[SHIFT_DOWN_CIRCULAR(i+j,dsize)*sstride] -
                           (float)source[SHIFT_UP_CIRCULAR(i-j,dsize)*sstride]);
 
                   dest[i*dstride] = (unsigned short) (total+0.5F);

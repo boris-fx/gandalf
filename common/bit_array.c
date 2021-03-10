@@ -189,7 +189,7 @@ Gan_Bool
          return GAN_FALSE;
       }
          
-      ba->data = gan_realloc_array ( Gan_BitWord, ba->data, ba->no_words );
+      ba->data = gan_realloc_array( Gan_BitWord, ba->data, ba->no_words );
       if ( ba->data == NULL )
       {
          gan_err_flush_trace();

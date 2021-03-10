@@ -114,37 +114,30 @@ typedef struct Gan_brightFeatureMap
    Gan_Bool alloc;
 } Gan_brightFeatureMap;
 
-GANDALF_API Gan_brightFeatureMap *gan_bright_feature_map_form ( Gan_brightFeatureMap *bmap,
-                                                unsigned max_nbright);
-GANDALF_API void gan_bright_feature_map_free ( Gan_brightFeatureMap *bmap );
-GANDALF_API Gan_Bool gan_bright_feature_map_clear ( Gan_brightFeatureMap *bmap,
-                              unsigned height, unsigned width,
-                              Gan_Matrix23_f *A, Gan_Camera *camera,
-                                                    Gan_LocalFeatureMapParams *lpms );
-GANDALF_API Gan_brightFeature *gan_bright_feature_add ( Gan_brightFeatureMap *bmap,
-                        unsigned r,  unsigned c,
-                          float rf, float cf,int status);
-
-
-GANDALF_API Gan_Bool gan_bright_feature_map_postprocess ( Gan_brightFeatureMap *bmap );
-
-/// Macro: Allocates a edge feature map structure.
+/// Allocates a new Gan_brightFeatureMap structure.
 /**
- * \param max_nedges The number of edges initially to allocate for
- * \param max_nstrings The number of strings initially to allocate for
+ * \param max_nbright The number of features initially to allocate for
  *
- * Allocates a structure to hold edge features, and sets
- * it to be empty. This macro calls gan_edge_feature_map_form().
+ * Allocates a structure to hold edge features, and sets it to be empty.
  *
  * \return non-\c NULL the allocated feature map, or \c NULL on failure.
- * \sa gan_edge_feature_map_form(), gan_edge_feature_map_free().
+ * \sa gan_bright_feature_map_free().
  */
-#ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_brightFeatureMap *gan_bright_feature_map_alloc ( unsigned max_nbright );
-#else
-#define gan_bright_feature_map_alloc(max_nbright)\
-   gan_bright_feature_map_form(NULL,max_nbright)
-#endif
+GANDALF_API Gan_brightFeatureMap * gan_bright_feature_map_alloc( unsigned max_nbright );
+
+GANDALF_API void gan_bright_feature_map_free( Gan_brightFeatureMap *bmap );
+GANDALF_API Gan_Bool gan_bright_feature_map_clear(
+   Gan_brightFeatureMap *bmap,
+   unsigned height, unsigned width,
+   Gan_Matrix23_f *A, Gan_Camera *camera,
+   Gan_LocalFeatureMapParams *lpms );
+
+GANDALF_API Gan_brightFeature * gan_bright_feature_add(
+   Gan_brightFeatureMap *bmap,
+   unsigned r,  unsigned c,
+   float rf, float cf,int status);
+
+GANDALF_API Gan_Bool gan_bright_feature_map_postprocess( Gan_brightFeatureMap *bmap );
 
 /**
  * \}

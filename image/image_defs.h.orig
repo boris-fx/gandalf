@@ -35,55 +35,6 @@
 extern "C" {
 #endif
 
-/// Blind declaration for a handle to image memory
-/// returned by the image memory management routines
-typedef struct ImageMemoryStruct * ImageMemoryHandle;
-
-typedef int GanStatus;
-
-/// Status code indicating all was fine
-#define kGanStatOK (0)
-
-/// Status error code for a failed operation
-#define kGanStatFailed  (1)
-
-/// Status error code for a fatal error
-#define kGanStatErrFatal (2)
-
-/// Status error code for an operation on or request for an unknown object
-#define kGanStatErrUnknown (3)
-
-/// Status error code indicating that something failed due to memory shortage
-#define kGanStatErrMemory  (8)
-
-/// Status error code for an operation on a bad handle
-#define kGanStatErrBadHandle (9)
-
-typedef struct Gan_Image * Gan_Image_Ptr;
-
-/// A group of function pointers for memory allocation.
-struct Gan_ImageHostSuite
-{
-   /** \brief Allocate memory from the host's image memory pool
-   \arg nBytes          - the number of bytes to allocate
-   \arg memoryHandle    - pointer to the memory handle where a return value is placed
-
-   Memory handles allocated by this should be freed by Gan_ImageHostSuite::imageMemoryFree.
-
-   \returns
-   - kGanStatOK if all went well, a valid memory handle is placed in \e memoryHandle
-   - kGanStatErrBadHandle if instanceHandle is not valid, memoryHandle is set to NULL
-   - kGanStatErrMemory if there was not enough memory to satisfy the call, memoryHandle is set to NULL
-   */
-   GanStatus (*imageMemoryAlloc)(struct Gan_ImageHostSuite * suite, size_t nBytes, Gan_Image_Ptr);
-
-   GanStatus (*imageMemoryRealloc)(struct Gan_ImageHostSuite * suite, size_t nBytes, Gan_Image_Ptr);
-   GanStatus (*imageMemoryFree)(struct Gan_ImageHostSuite * suite, Gan_Image_Ptr);
-
-   GanStatus (*imageMemoryLock)(struct Gan_ImageHostSuite * suite, Gan_Image_Ptr);
-   GanStatus (*imageMemoryUnlock)(struct Gan_ImageHostSuite * suite, Gan_Image_Ptr);
-};
-
 /**
  * \addtogroup ImagePackage
  * \{
@@ -92,8 +43,6 @@ struct Gan_ImageHostSuite
 /// structure definition for image
 typedef struct Gan_Image
 {
-   int ref_count;
-
    /// format of image: grey-level, RGB colour etc.
    Gan_ImageFormat format;
 
@@ -108,6 +57,16 @@ typedef struct Gan_Image
    unsigned long stride;
 
    Gan_Premult premult;
+
+   /// generic pointer to pixel data, as a byte pointer so that we can do
+   /// pointer arithmetic in bytes with it
+   unsigned char *pix_data_ptr;
+
+   /// allocated size of image data in bytes
+   size_t pix_data_size;
+
+   /// flag indicating whether image data was dynamically allocated
+   Gan_Bool pix_data_alloc;
 
    /// pointers to start of each row
    union
@@ -266,29 +225,8 @@ typedef struct Gan_Image
    /// function to free image data, defaulting to free() if this field is NULL
    void (*data_free_func) (void *);
 
-   /// function to free image. Default is image_free in image_common_noc.c
-   void (*image_free_func) ( struct Gan_Image *img );
-
-   struct PixData
-   {
-      /// generic pointer to pixel data, as a byte pointer so that we can do
-      /// pointer arithmetic in bytes with it
-      unsigned char *ptr;
-
-      /// allocated size of image data in bytes
-      size_t size;
-
-      /// flag indicating whether image data was dynamically allocated
-      Gan_Bool alloc;
-
-      struct Gan_ImageHostSuite * host_suite;
-
-      ImageMemoryHandle image_memory_handle;
-
-   } pix_data;
-
-   /// copy image
-   struct Gan_Image * (*copy) ( const struct Gan_Image *, struct Gan_Image * );
+   /// function to free image
+   void (*free_func) ( struct Gan_Image *img );
 
 #ifndef NDEBUG
 
@@ -692,13 +630,12 @@ typedef struct Gan_Image
          Gan_Bool (*ui16) ( struct Gan_Image *, Gan_YUV422Pixel_ui16 *pix );
       } yuv422;
    } fill_const;
+
+   /// copy image
+   struct Gan_Image * (*copy) ( const struct Gan_Image *, struct Gan_Image * );
 } Gan_Image;
 
 #define GAN_IMAGE_STRUCT_DEFINED
-
-/// Default initialises \a image
-GANDALF_API void gan_image_struct_init(Gan_Image * image);
-
 
 /// Definition of a rectangular sub-part of an image
 typedef struct Gan_ImageWindow
@@ -728,29 +665,12 @@ typedef struct Gan_ImageWindow
  * \sa gan_image_form().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_Image *gan_image_alloc( Gan_ImageFormat format, Gan_Type type,
-                                        unsigned long height, unsigned long width );
+GANDALF_API Gan_Image *gan_image_alloc ( Gan_ImageFormat format, Gan_Type type,
+                                         unsigned long height, unsigned long width );
 #else
 #define gan_image_alloc(f,t,h,w)\
   gan_image_form_gen(NULL,f,t,h,w,gan_image_min_stride(f,t,w,0),GAN_TRUE,NULL,0,NULL,0)
 #endif
-
-/**
- * \brief Returns a new image using the given \a host_suite for memory allocation.
- *
- * Allocates and returns a new image with given
- * \a format, \a type, \a height, \a width and \a stride.
- *
- * If stride is zero, then uses gan_image_min_stride(\a format, \a type, \a width, 0)
- * If stride is too small for the given width, the function returns NULL.
- *
- * If \a host_suite is null then this function is equivalent to calling gan_image_alloc.
- *
- */
-GANDALF_API Gan_Image *gan_image_alloc_suite(
-   Gan_ImageFormat format, Gan_Type type,
-   unsigned long height, unsigned long width, unsigned long stride,
-   struct Gan_ImageHostSuite * host_suite);
 
 /**
  * \brief Macro: Forms and returns a new image.
@@ -767,9 +687,9 @@ GANDALF_API Gan_Image *gan_image_alloc_suite(
  * \sa gan_image_alloc().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_Image *gan_image_form( Gan_Image *img,
-                                       Gan_ImageFormat format, Gan_Type type,
-                                       unsigned long height, unsigned long width );
+GANDALF_API Gan_Image *gan_image_form ( Gan_Image *img,
+                                        Gan_ImageFormat format, Gan_Type type,
+                                        unsigned long height, unsigned long width );
 #else
 #define gan_image_form(img,f,t,h,w)\
   gan_image_form_gen(img,f,t,h,w,gan_image_min_stride(f,t,w,0),GAN_TRUE,NULL,0,NULL,0)
@@ -797,10 +717,10 @@ GANDALF_API Gan_Image *gan_image_form( Gan_Image *img,
  * \sa gan_image_alloc() and gan_image_form().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_Image *gan_image_alloc_data( Gan_ImageFormat format, Gan_Type type,
-                                             unsigned long height, unsigned long width,
-                                             void *pix_data, size_t pix_data_size,
-                                             void *row_data, size_t row_data_size );
+GANDALF_API Gan_Image *gan_image_alloc_data ( Gan_ImageFormat format, Gan_Type type,
+                                              unsigned long height, unsigned long width,
+                                              void *pix_data, size_t pix_data_size,
+                                              void *row_data, size_t row_data_size );
 #else
 #define gan_image_alloc_data(f,t,h,w,pd,pds,rd,rds)\
   gan_image_form_gen(NULL,f,t,h,w,gan_image_min_stride(f,t,w,0),GAN_FALSE,pd,pds,rd,rds)
@@ -827,11 +747,11 @@ GANDALF_API Gan_Image *gan_image_alloc_data( Gan_ImageFormat format, Gan_Type ty
  * \sa gan_image_alloc() and gan_image_form().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_Image *gan_image_form_data( Gan_Image *img,
-                                            Gan_ImageFormat format, Gan_Type type,
-                                            unsigned long height, unsigned long width,
-                                            void *pix_data, size_t pix_data_size,
-                                            void *row_data, size_t row_data_size );
+GANDALF_API Gan_Image *gan_image_form_data ( Gan_Image *img,
+                                             Gan_ImageFormat format, Gan_Type type,
+                                             unsigned long height, unsigned long width,
+                                             void *pix_data, size_t pix_data_size,
+                                             void *row_data, size_t row_data_size );
 #else
 #define gan_image_form_data(img,f,t,h,w,pd,pds,rd,rds)\
   gan_image_form_gen(img,f,t,h,w,gan_image_min_stride(f,t,w,0),GAN_FALSE,pd,pds,rd,rds)
@@ -845,7 +765,7 @@ GANDALF_API Gan_Image *gan_image_form_data( Gan_Image *img,
 #ifdef GAN_GENERATE_DOCUMENTATION
 GANDALF_API void gan_image_free ( Gan_Image *img );
 #else
-#define gan_image_free(img) ( ((img) && (img)->image_free_func) ? (img)->image_free_func(img) : (void)0 )
+#define gan_image_free(img) ( ( (img) && (img)->free_func ) ? (img)->free_func(img) : (void)0 )
 #endif
 
 /**
@@ -905,8 +825,7 @@ GANDALF_API Gan_Image *gan_image_set_format_type_dims ( Gan_Image *img,
                                                         unsigned long height,
                                                         unsigned long width );
 #else
-#define gan_image_set_format_type_dims(img, f, t, h, w) \
-   gan_image_set_format_type_dims_gen(img, f, t, h, w, gan_image_min_stride(f, t, w, 0), GAN_TRUE)
+#define gan_image_set_format_type_dims(img,f,t,h,w) gan_image_set_format_type_dims_gen(img,f,t,h,w,gan_image_min_stride(f,t,w,0),GAN_TRUE)
 #endif
 
 /**
@@ -1051,11 +970,9 @@ GANDALF_API Gan_Bool gan_image_fill_zero_mask ( Gan_Image *img, Gan_Image *mask 
 GANDALF_API Gan_Image *gan_image_form_gen ( Gan_Image *img,
                                             Gan_ImageFormat format, Gan_Type type,
                                             unsigned long height, unsigned long width,
-                                            unsigned long stride,
-                                            Gan_Bool alloc_pix_data,
+                                            unsigned long stride, Gan_Bool alloc_pix_data,
                                             void *pix_data, size_t pix_data_size,
                                             void *row_data, size_t row_data_size );
-
 GANDALF_API Gan_Bool gan_image_set_data_free_func ( Gan_Image *img,
                                                     void (*data_free_func)(void *) );
 
@@ -1068,20 +985,9 @@ GANDALF_API Gan_Bool gan_image_set_data_free_func ( Gan_Image *img,
  * \{
  */
 
-GANDALF_API size_t gan_image_pixel_size( Gan_ImageFormat format, Gan_Type type );
-
-GANDALF_API unsigned long gan_image_min_stride(
-   Gan_ImageFormat format, Gan_Type type,
-   unsigned long width, unsigned long alignment );
-
-/* compute the required size of pixel data and optionally report arithmetic overflow */
-GANDALF_API size_t gan_pix_data_size( Gan_ImageFormat format, Gan_Type type,
-                                      unsigned long height, unsigned long width,
-                                      Gan_Bool * overflow );
-
-/* compute the required size of pixel data and optionally report arithmetic overflow */
-GANDALF_API size_t gan_pix_data_size_with_stride( unsigned long height, unsigned long stride,
-                                                  Gan_Bool *overflow );
+GANDALF_API size_t gan_image_pixel_size ( Gan_ImageFormat format, Gan_Type type );
+GANDALF_API size_t gan_image_min_stride ( Gan_ImageFormat format, Gan_Type type,
+                                          unsigned long width, size_t alignment );
 
 /**
  * \}
@@ -1177,7 +1083,7 @@ GANDALF_API Gan_Bool gan_image_get_maximum_pixel ( Gan_Image *image, Gan_Image *
 /**
  * \brief Free the memory associated with the image \a img.
  *
- * Handles \c NULL values of \a img and its \t image_free_func correctly.
+ * Handles \c NULL values of \a img and its \t free_func correctly.
  */
 GANDALF_API void gan_image_free_s ( Gan_Image *img );
 
@@ -1212,11 +1118,13 @@ GANDALF_API Gan_Bool gan_image_has_rgb_channels ( const Gan_Image *img );
  */
 
 /* not user functions: use macros instead */
-GANDALF_API Gan_Image *gan_image_set_format_type_dims_gen(
-   Gan_Image *img,
-   Gan_ImageFormat format, Gan_Type type,
-   unsigned long height, unsigned long width, unsigned long stride,
-   Gan_Bool alloc_pix_data );
+GANDALF_API Gan_Image *gan_image_set_format_type_dims_gen  ( Gan_Image *img,
+                                                 Gan_ImageFormat format,
+                                                 Gan_Type type,
+                                                 unsigned long height,
+                                                 unsigned long width,
+                                                 unsigned long stride,
+                                                 Gan_Bool alloc_pix_data );
 
 /**
  * \}

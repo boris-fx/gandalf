@@ -127,40 +127,39 @@ typedef struct Gan_LineFeatureMap
    Gan_Bool alloc;
 } Gan_LineFeatureMap;
 
-GANDALF_API Gan_LineFeatureMap *gan_line_feature_map_form ( Gan_LineFeatureMap *lmap,
-                                                            unsigned max_nlines );
-GANDALF_API Gan_LineFeatureMap *gan_line_feature_map_copy ( Gan_LineFeatureMap *lmap );
-GANDALF_API void gan_line_feature_map_free ( Gan_LineFeatureMap *lmap );
-GANDALF_API Gan_Bool gan_line_feature_map_clear ( Gan_LineFeatureMap *lmap,
-                                      unsigned height, unsigned width,
-                                      Gan_Matrix23_f *A,
-                                      Gan_LocalFeatureMapParams *lpms );
-GANDALF_API Gan_LineFeature *gan_line_feature_add ( Gan_LineFeatureMap *lmap,
-                                        float y1, float x1,
-                                        float y2, float x2,
-                                        Gan_SquMatrix22_f *N,
-                                        int status, int index,
-                                        float strength,
-                                        Gan_Vector2_f *point,
-                                        unsigned npoints );
-GANDALF_API Gan_Bool gan_line_feature_map_postprocess ( Gan_LineFeatureMap *lmap );
-
 /**
- * \brief Macro: Allocates a line feature map structure.
+ * \brief Allocates a line feature map structure.
  * \param max_nlines The number of lines initially to allocate for
  *
  * Allocates a structure to hold line features, and sets it to be empty.
- * This macro calls gan_line_feature_map_form().
  *
  * \return non-\c NULL the allocated feature map, or \c NULL on failure.
- * \sa gan_line_feature_map_form(), gan_line_feature_map_free().
+ * \sa gan_line_feature_map_free().
  */
-#ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_LineFeatureMap *gan_line_feature_map_alloc ( unsigned max_nlines );
-#else
-#define gan_line_feature_map_alloc(max_nlines)\
-   gan_line_feature_map_form(NULL,max_nlines)
-#endif
+GANDALF_API Gan_LineFeatureMap *gan_line_feature_map_alloc( unsigned max_nlines );
+
+GANDALF_API Gan_LineFeatureMap *gan_line_feature_map_copy( Gan_LineFeatureMap *lmap );
+
+GANDALF_API void gan_line_feature_map_free( Gan_LineFeatureMap *lmap );
+
+GANDALF_API Gan_Bool gan_line_feature_map_clear(
+   Gan_LineFeatureMap *lmap,
+   unsigned height, unsigned width,
+   Gan_Matrix23_f *A,
+   Gan_LocalFeatureMapParams *lpms );
+
+GANDALF_API Gan_LineFeature *gan_line_feature_add(
+   Gan_LineFeatureMap *lmap,
+   float y1, float x1,
+   float y2, float x2,
+   Gan_SquMatrix22_f *N,
+   int status, int index,
+   float strength,
+   Gan_Vector2_f *point,
+   unsigned npoints );
+
+GANDALF_API Gan_Bool gan_line_feature_map_postprocess( Gan_LineFeatureMap *lmap );
+
 
 /**
  * \}

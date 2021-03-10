@@ -52,11 +52,10 @@ GAN_PIXEL;
 /**
  * \brief Not a user function
  */
-GANDALF_API struct Gan_Image *GAN_IMAGE_SET_GEN ( Gan_Image *img,
-                                      unsigned long height,
-                                      unsigned long width,
-                                      unsigned long stride,
-                                      Gan_Bool alloc_pix_data );
+GANDALF_API struct Gan_Image *GAN_IMAGE_SET_GEN(
+   Gan_Image *img,
+   unsigned long height, unsigned long width, unsigned long stride,
+   Gan_Bool alloc_pix_data );
 
 /**
  * \}
@@ -70,16 +69,12 @@ GANDALF_API struct Gan_Image *GAN_IMAGE_SET_GEN ( Gan_Image *img,
 /**
  * \brief Not a user function
  */
-GANDALF_API struct Gan_Image *GAN_IMAGE_FORM_GEN ( Gan_Image *img,
-                                       unsigned long height,
-                                       unsigned long width,
-                                       unsigned long stride,
-                                       Gan_Bool alloc_pix_data,
-                                       GAN_PIXEL  *pix_data,
-                                       size_t      pix_data_size,
-                                       GAN_PIXEL **row_data,
-                                       size_t      row_data_size );
-
+GANDALF_API struct Gan_Image *GAN_IMAGE_FORM_GEN(
+   Gan_Image *img,
+   unsigned long height, unsigned long width, unsigned long stride,
+   Gan_Bool alloc_pix_data,
+   GAN_PIXEL  *pix_data, size_t pix_data_size,
+   GAN_PIXEL **row_data, size_t row_data_size );
 /**
  * \}
  */
@@ -225,10 +220,10 @@ GANDALF_API Gan_Image *GAN_IMAGE_FORM ( Gan_Image *img,
  * array.
  */
 GANDALF_API Gan_Image *GAN_IMAGE_ALLOC_DATA ( unsigned long height,
-                                  unsigned long width,
-                                  unsigned long stride,
-                                  GAN_PIXEL  *pix_data, size_t pix_data_size,
-                                  GAN_PIXEL **row_data, size_t row_data_size );
+                                              unsigned long width,
+                                              unsigned long stride,
+                                              GAN_PIXEL  *pix_data, size_t pix_data_size,
+                                              GAN_PIXEL **row_data, size_t row_data_size );
 
 /**
  * \brief Macro: Forms and returns a new GAN_PIXEL_FORMAT \c GAN_PIXEL_TYPE image.

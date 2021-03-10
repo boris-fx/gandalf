@@ -102,32 +102,6 @@ GANDALF_API float gan_vec2f_cross_q ( const Gan_Vector2_f * p, const Gan_Vector2
  * \}
  */
 
-/**
- * \addtogroup FixedSizeVectorProduct
- * \{
- */
-
-/**
- * \brief Macro: Compute Z-coordinate of vector product of 2-vectors.
- *
- * Compute Z-coordinate of vector product of 3-vectors \a p and \a q, \f$(p \times q)_z\f$.
- *
- * \return Z-coordinate of vector product of 3-vectors \a p and \a q.
- */
-#ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API float gan_vec2f_cross_q ( const Gan_Vector2_f * p, const Gan_Vector2_f * q );
-#else
-#define gan_vec2f_cross_q( p, q ) \
-  ( \
-    GAN_TEST_OP2( p, q, Gan_Vector2_f, Gan_Vector2_f ), \
-    ( (p)->x * (q)->y - (p)->y * (q)->x ) \
-  )
-#endif
-
-/**
- * \}
- */
-
 #ifndef GAN_GENERATE_DOCUMENTATION
 
 GANDALF_API Gan_Vector2_f gan_vec2f_fill_s ( float X, float Y );

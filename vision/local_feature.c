@@ -56,10 +56,13 @@
  * \return non-\c NULL the formed local feature map, or \c NULL on failure.
  * \sa gan_local_feature_map_form(), gan_local_feature_map_free().
  */
-Gan_LocalFeatureMap *
- gan_local_feature_map_form ( Gan_LocalFeatureMap *pmap, unsigned height, unsigned width, Gan_LocalFeatureMapParams *pms )
+Gan_LocalFeatureMap * gan_local_feature_map_form(
+   Gan_LocalFeatureMap *pmap, unsigned height, unsigned width, Gan_LocalFeatureMapParams *pms )
 {
    unsigned yblocks, xblocks;
+
+   gan_image_struct_init( &pmap->nfeatures );
+   gan_image_struct_init( &pmap->index );
 
    if ( pmap == NULL )
    {

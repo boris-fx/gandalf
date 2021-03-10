@@ -28,6 +28,10 @@ CFILES = camera.c  camera_linear.c  camera_affine.c  camera_stereographic.c  \
 	 camera_xy_dist4.c  camera_radial_dist1_inv.c  camera_cubic_Bspline.c  camera_cubic_Bspline_inv.c \
 	 cameraf_xy_dist4.c cameraf_radial_dist1_inv.c cameraf_cubic_Bspline.c cameraf_cubic_Bspline_inv.c \
 	 camera_convert.c \
+	 camera_ST_map.c \
+	 cameraf_ST_map.c \
+         camera_equirectangular.c \
+         cameraf_equirectangular.c \
 	 fundamental.c essential.c \
 	 homog33_fit.c affine33_fit.c homog34_fit.c \
 	 mask1D.c mask2D.c convolve1D.c convolve2D.c \

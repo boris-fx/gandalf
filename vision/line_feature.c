@@ -44,7 +44,6 @@
 
 /**
  * \brief Forms a line feature map structure.
- * \param lmap A line feature map
  * \param max_nlines The number of lines initially to allocate for
  *
  * Fills a structure to hold line features, and sets it to be empty.
@@ -52,28 +51,21 @@
  * \return non-\c NULL The formed feature map \a lmap, or \c NULL on failure.
  * \sa gan_line_feature_map_alloc(), gan_line_feature_map_free().
  */
-Gan_LineFeatureMap *
- gan_line_feature_map_form ( Gan_LineFeatureMap *lmap,
-                             unsigned max_nlines )
+Gan_LineFeatureMap * gan_line_feature_map_alloc( unsigned max_nlines )
 {
+   Gan_LineFeatureMap *lmap;
+
+   /* dynamically allocate the feature map structure */
+   lmap = gan_malloc_object(Gan_LineFeatureMap);
    if ( lmap == NULL )
    {
-      /* dynamically allocate the feature map structure */
-      lmap = gan_malloc_object(Gan_LineFeatureMap);
-      if ( lmap == NULL )
-      {
-         gan_err_flush_trace();
-         gan_err_register_with_number ( "gan_line_feature_map_form", GAN_ERROR_MALLOC_FAILED, "", sizeof(*lmap) );
-         return NULL;
-      }
-
-      /* mark the structure as dynamically allocated */
-      lmap->alloc = GAN_TRUE;
+      gan_err_flush_trace();
+      gan_err_register_with_number ( "gan_line_feature_map_alloc", GAN_ERROR_MALLOC_FAILED, "", sizeof(*lmap) );
+      return NULL;
    }
-   else
-      /* this structure is not dynamically allocated */
-      lmap->alloc = GAN_FALSE;
 
+   /* mark the structure as dynamically allocated */
+   lmap->alloc = GAN_TRUE;
 
    /* allocate array of line features */
    if ( max_nlines > 0 )
@@ -82,7 +74,7 @@ Gan_LineFeatureMap *
       if ( lmap->line == NULL )
       {
          gan_err_flush_trace();
-         gan_err_register_with_number ( "gan_line_feature_map_form", GAN_ERROR_MALLOC_FAILED, "", max_nlines*sizeof(Gan_LineFeature) );
+         gan_err_register_with_number ( "gan_line_feature_map_alloc", GAN_ERROR_MALLOC_FAILED, "", max_nlines*sizeof(Gan_LineFeature) );
          return NULL;
       }
    }
@@ -102,14 +94,14 @@ Gan_LineFeatureMap *
    /* create empty local feature map for this feature map */
    if ( !gan_local_feature_map_form ( &lmap->local_fmap, 0, 0, NULL ) )
    {
-      gan_err_register ( "gan_line_feature_map_form", GAN_ERROR_FAILURE, "");
+      gan_err_register ( "gan_line_feature_map_alloc", GAN_ERROR_FAILURE, "");
       return NULL;
    }
 
    /* clear line feature map */
    if ( !gan_line_feature_map_clear ( lmap, 0, 0, NULL, NULL ) )
    {
-      gan_err_register ( "gan_line_feature_map_form", GAN_ERROR_FAILURE, "");
+      gan_err_register ( "gan_line_feature_map_alloc", GAN_ERROR_FAILURE, "");
       return NULL;
    }
 
@@ -123,7 +115,7 @@ Gan_LineFeatureMap *
  * \result Copy of input structure or \c NULL on error
  *
  * Copies a structure that holds line features.
- * \sa gan_line_feature_map_form(), gan_line_feature_map_alloc().
+ * \sa gan_line_feature_map_alloc().
  */
 Gan_LineFeatureMap *
  gan_line_feature_map_copy ( Gan_LineFeatureMap *lmap )
@@ -172,7 +164,7 @@ Gan_LineFeatureMap *
  * Frees a previously formed/allocated structure that holds line features.
  *
  * \return No value.
- * \sa gan_line_feature_map_form(), gan_line_feature_map_alloc().
+ * \sa gan_line_feature_map_alloc().
  */
 void
  gan_line_feature_map_free ( Gan_LineFeatureMap *lmap )

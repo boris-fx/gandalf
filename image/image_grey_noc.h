@@ -54,11 +54,10 @@ extern "C" {
 
 /** \brief Not a user function
  */
-GANDALF_API struct Gan_Image *GAN_IMAGE_SET_GEN ( Gan_Image *img,
-                                      unsigned long height,
-                                      unsigned long width,
-                                      unsigned long stride,
-                                      Gan_Bool alloc_pix_data );
+GANDALF_API struct Gan_Image *GAN_IMAGE_SET_GEN(
+   Gan_Image *img,
+   unsigned long height, unsigned long width, unsigned long stride,
+   Gan_Bool alloc_pix_data );
 /**
  * \}
  */
@@ -70,15 +69,12 @@ GANDALF_API struct Gan_Image *GAN_IMAGE_SET_GEN ( Gan_Image *img,
 
 /** \brief Not a user function
  */
-GANDALF_API struct Gan_Image *GAN_IMAGE_FORM_GEN (
-                                 Gan_Image *img,
-                                 unsigned long height,
-                                 unsigned long width,
-                                 unsigned long stride,
-                                 Gan_Bool alloc_pix_data,
-                                 GAN_PIXEL  *pix_data, size_t pix_data_size,
-                                 GAN_PIXEL **row_data, size_t row_data_size );
-
+GANDALF_API struct Gan_Image *GAN_IMAGE_FORM_GEN(
+   Gan_Image *img,
+   unsigned long height, unsigned long width, unsigned long stride,
+   Gan_Bool alloc_pix_data,
+   GAN_PIXEL  *pix_data, size_t pix_data_size,
+   GAN_PIXEL **row_data, size_t row_data_size );
 /**
  * \}
  */

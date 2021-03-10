@@ -1692,12 +1692,10 @@ static Gan_Image *
  *
  * \sa gan_image_extract_channel_s().
  */
-Gan_Image *
- gan_image_extract_channel_q ( const Gan_Image *source,
-                               Gan_ImageChannelType channel,
-                               unsigned r0,     unsigned c0,
-                               unsigned height, unsigned width,
-                               Gan_Image *dest )
+Gan_Image * gan_image_extract_channel_q(
+   const Gan_Image *source, Gan_ImageChannelType channel,
+   int r0, int c0, unsigned long height, unsigned long width,
+   Gan_Image *dest )
 {
    gan_err_test_ptr ( r0+height <= source->height && c0+width <= source->width,
                       "gan_image_extract_channel_q", GAN_ERROR_INCOMPATIBLE,
@@ -1906,6 +1904,8 @@ Gan_Image *
    /* set offsets */
    dest->offset_x = source->offset_x+(int)c0;
    dest->offset_y = source->offset_x+(int)r0;
+
+   dest->premult = source->premult;
 
    /* success */
    return dest;

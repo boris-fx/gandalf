@@ -148,7 +148,7 @@ static Gan_ErrorTrace *
                      const char *message,
                      int         number )
 {
-   int n_chars;                        /* Size of string */
+   size_t n_chars;  /* Size of string */
 
    et_top->prev->f_spare = GAN_ET_NO;        /* No longer spare */
    et_top->prev->func_name   = func_name;

@@ -114,37 +114,33 @@ typedef struct Gan_CornerFeatureMap
    Gan_Bool alloc;
 } Gan_CornerFeatureMap;
 
-GANDALF_API Gan_CornerFeatureMap *gan_corner_feature_map_form ( Gan_CornerFeatureMap *cmap,
-                                                    unsigned max_ncorners );
-GANDALF_API void gan_corner_feature_map_free ( Gan_CornerFeatureMap *cmap );
-GANDALF_API Gan_Bool gan_corner_feature_map_clear ( Gan_CornerFeatureMap *cmap,
-                                        unsigned height, unsigned width,
-                                        Gan_Matrix23_f *A, Gan_Camera *camera,
-                                        Gan_LocalFeatureMapParams *lpms );
-GANDALF_API Gan_CornerFeature *gan_corner_feature_add ( Gan_CornerFeatureMap *cmap,
-                                            unsigned r, unsigned c,
-                                            float rf, float cf,
-                                            Gan_SquMatrix22_f *N,
-                                            int status, int index,
-                                            float strength );
-GANDALF_API Gan_Bool gan_corner_feature_map_postprocess ( Gan_CornerFeatureMap *cmap );
-
 /**
- * \brief Macro: Allocates a corner feature map structure.
+ * \brief Allocates a corner feature map structure.
  * \param max_ncorners The number of corners initially to allocate for
  *
- * Allocates a structure to hold corner features, and sets
- * it to be empty. This macro calls gan_corner_feature_map_form().
+ * Allocates a structure to hold corner features, and sets it to be empty.
  *
  * \return non-\c NULL the allocated feature map, \c NULL on failure.
- * \sa gan_corner_feature_map_form(), gan_corner_feature_map_free().
+ * \sa gan_corner_feature_map_free().
  */
-#ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_CornerFeatureMap *gan_corner_feature_map_alloc ( unsigned max_ncorners );
-#else
-#define gan_corner_feature_map_alloc(max_ncorners)\
-   gan_corner_feature_map_form(NULL,max_ncorners)
-#endif
+GANDALF_API Gan_CornerFeatureMap *gan_corner_feature_map_alloc( unsigned max_ncorners );
+
+GANDALF_API void gan_corner_feature_map_free( Gan_CornerFeatureMap *cmap );
+GANDALF_API Gan_Bool gan_corner_feature_map_clear(
+   Gan_CornerFeatureMap *cmap,
+   unsigned height, unsigned width,
+   Gan_Matrix23_f *A, Gan_Camera *camera,
+   Gan_LocalFeatureMapParams *lpms );
+
+GANDALF_API Gan_CornerFeature *gan_corner_feature_add(
+   Gan_CornerFeatureMap *cmap,
+   unsigned r, unsigned c,
+   float rf, float cf,
+   Gan_SquMatrix22_f *N,
+   int status, int index,
+   float strength );
+
+GANDALF_API Gan_Bool gan_corner_feature_map_postprocess( Gan_CornerFeatureMap *cmap );
 
 /**
  * \}

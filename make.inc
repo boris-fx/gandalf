@@ -1,5 +1,7 @@
 LIB = $(TOPLEVEL)/libgandalf.la
-if [ ! $(support_png) == no ]; then PNG_LIBS=; fi
+ifeq ($(support_png), no)
+   PNG_LIBS=
+endif
 
 LIBS += $(PNG_LIBS) $(JPEG_LIB) $(TIFF_LIB) $(LAPACK_LIBS) $(GLUT_LIBS) $(OPENGL_LIBS) -lm $(X_LIBS)
 

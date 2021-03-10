@@ -269,7 +269,7 @@ GANDALF_API void gan_err_register_unicode ( const char *func_name, int err_code,
  * \sa gan_err_register().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API void gan_err_register_with_number ( const char *func_name, int err_code, const char *message, int number );
+GANDALF_API void gan_err_register_with_number ( const char *func_name, int err_code, const char *message, size_t number );
 #else
 #define gan_err_register_with_number(func_name, err_code, message, number) \
         gan_err_register_fileline(func_name, err_code, __FILE__, __LINE__, message, number)
@@ -307,14 +307,14 @@ GANDALF_API int gan_err_register_fileline(
                  const char * file_name, /* Typically use __FILE__ */
                  int          line_number, /* Typically use __LINE__ */
                  const char * message,
-                 int          number);
+                 size_t       number);
 GANDALF_API int gan_err_register_fileline_unicode(
                  const char            * func_name,
                  int                     err_code,
                  const char            * file_name, /* Typically use __FILE__ */
                  int                     line_number, /* Typically use __LINE__ */
                  const Gan_Char        * message,
-                 int                     number);
+                 size_t                  number);
 GANDALF_API void gan_err_set_trace( Gan_TraceMode trace_mode );
 GANDALF_API void gan_err_flush_trace(void);
 GANDALF_API int gan_err_get_error_count(void);

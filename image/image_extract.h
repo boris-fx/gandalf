@@ -43,12 +43,12 @@ extern "C" {
  * \{
  */
 
-GANDALF_API Gan_Image *gan_image_extract_q ( const Gan_Image *source,
-                                             int      r0,     int      c0,
-                                             unsigned height, unsigned width,
-                                             Gan_ImageFormat format, Gan_Type type,
-                                             Gan_Bool copy_pixels,
-                                             Gan_Image *dest );
+GANDALF_API Gan_Image *gan_image_extract_q(
+   const Gan_Image *source,
+   int r0, int c0, unsigned long height, unsigned long width,
+   Gan_ImageFormat format, Gan_Type type,
+   Gan_Bool copy_pixels,
+   Gan_Image *dest );
 
 /**
  * \brief Macro: Extracts part of an image.
@@ -68,11 +68,11 @@ GANDALF_API Gan_Image *gan_image_extract_q ( const Gan_Image *source,
  * \sa gan_image_extract_q().
  */
 #ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_Image *gan_image_extract_s ( const Gan_Image *source,
-                                             int      r0,     int      c0,
-                                             unsigned height, unsigned width,
-                                             Gan_ImageFormat format, Gan_Type type,
-                                             Gan_Bool copy_pixels );
+GANDALF_API Gan_Image *gan_image_extract_s(
+   const Gan_Image *source,
+   int r0, int c0, unsigned long height, unsigned long width,
+   Gan_ImageFormat format, Gan_Type type,
+   Gan_Bool copy_pixels );
 #else
 #define gan_image_extract_s(source,r0,c0,height,width,format,type,copy_pixels)\
     gan_image_extract_q(source,r0,c0,height,width,format,type,copy_pixels,NULL)

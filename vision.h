@@ -6,6 +6,7 @@
 #include <gandalf/vision/camera_defs.h>
 #include <gandalf/vision/camera_equidistant.h>
 #include <gandalf/vision/camera_equi_solid_angle.h>
+#include <gandalf/vision/camera_ST_map.h>
 #include <gandalf/vision/cameraf_affine.h>
 #include <gandalf/vision/cameraf_cubic_Bspline.h>
 #include <gandalf/vision/cameraf_cubic_Bspline_inv.h>
@@ -20,6 +21,7 @@
 #include <gandalf/vision/cameraf_sine_law.h>
 #include <gandalf/vision/cameraf_stereographic.h>
 #include <gandalf/vision/cameraf_xy_dist4.h>
+#include <gandalf/vision/cameraf_ST_map.h>
 #include <gandalf/vision/camera.h>
 #include <gandalf/vision/camera_linear.h>
 #include <gandalf/vision/camera_radial_dist1.h>

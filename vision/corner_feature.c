@@ -44,35 +44,28 @@
 
 /**
  * \brief Forms a corner feature map structure.
- * \param cmap A corner feature map
  * \param max_ncorners The number of corners initially to allocate for
  *
  * Fills a structure to hold corner features, and sets it to be empty.
  *
  * \return non-\c NULL the formed feature map \a cmap, or \c NULL on failure.
- * \sa gan_corner_feature_map_alloc(), gan_corner_feature_map_free().
+ * \sa gan_corner_feature_map_free().
  */
-Gan_CornerFeatureMap *
- gan_corner_feature_map_form ( Gan_CornerFeatureMap *cmap,
-                               unsigned max_ncorners )
+Gan_CornerFeatureMap * gan_corner_feature_map_alloc( unsigned max_ncorners )
 {
+   Gan_CornerFeatureMap * cmap;
+
+   /* dynamically allocate the feature map structure */
+   cmap = gan_malloc_object(Gan_CornerFeatureMap);
    if ( cmap == NULL )
    {
-      /* dynamically allocate the feature map structure */
-      cmap = gan_malloc_object(Gan_CornerFeatureMap);
-      if ( cmap == NULL )
-      {
-         gan_err_flush_trace();
-         gan_err_register_with_number ( "gan_corner_feature_map_form", GAN_ERROR_MALLOC_FAILED, "", sizeof(*cmap) );
-         return NULL;
-      }
-
-      /* mark the structure as dynamically allocated */
-      cmap->alloc = GAN_TRUE;
+      gan_err_flush_trace();
+      gan_err_register_with_number ( "gan_corner_feature_map_alloc", GAN_ERROR_MALLOC_FAILED, "", sizeof(*cmap) );
+      return NULL;
    }
-   else
-      /* this structure is not dynamically allocated */
-      cmap->alloc = GAN_FALSE;
+
+   /* mark the structure as dynamically allocated */
+   cmap->alloc = GAN_TRUE;
 
    /* allocate array of corner features */
    if ( max_ncorners > 0 )
@@ -81,7 +74,7 @@ Gan_CornerFeatureMap *
       if ( cmap->corner == NULL )
       {
          gan_err_flush_trace();
-         gan_err_register_with_number ( "gan_corner_feature_map_form", GAN_ERROR_MALLOC_FAILED, "", max_ncorners*sizeof(Gan_CornerFeature) );
+         gan_err_register_with_number ( "gan_corner_feature_map_alloc", GAN_ERROR_MALLOC_FAILED, "", max_ncorners*sizeof(Gan_CornerFeature) );
          return NULL;
       }
    }
@@ -97,14 +90,14 @@ Gan_CornerFeatureMap *
    /* create empty local feature map for this feature map */
    if ( !gan_local_feature_map_form ( &cmap->local_fmap, 0, 0, NULL ) )
    {
-      gan_err_register ( "gan_corner_feature_map_form", GAN_ERROR_FAILURE, "");
+      gan_err_register ( "gan_corner_feature_map_alloc", GAN_ERROR_FAILURE, "");
       return NULL;
    }
 
    /* clear corner feature map */
    if ( !gan_corner_feature_map_clear ( cmap, 0, 0, NULL, NULL, NULL ) )
    {
-      gan_err_register ( "gan_corner_feature_map_form", GAN_ERROR_FAILURE, "");
+      gan_err_register ( "gan_corner_feature_map_alloc", GAN_ERROR_FAILURE, "");
       return NULL;
    }
 
@@ -119,7 +112,7 @@ Gan_CornerFeatureMap *
  * Frees a previously formed/allocated structure that holds corner features.
  *
  * \return No value.
- * \sa gan_corner_feature_map_form(), gan_corner_feature_map_alloc().
+ * \sa gan_corner_feature_map_alloc().
  */
 void
  gan_corner_feature_map_free ( Gan_CornerFeatureMap *cmap )

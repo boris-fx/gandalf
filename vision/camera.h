@@ -48,6 +48,8 @@ extern "C" {
  * \{
  */
 
+struct Gan_Image;
+
 /**
  * \brief Structure containing any previous project/backproject result
  */
@@ -76,7 +78,8 @@ typedef struct Gan_CubicBSplineWeights
 {
    Gan_Vector2 weight[1 + (1 << GAN_CUBIC_BSPLINE_CAMERA_LEVEL)][1 + (1 << GAN_CUBIC_BSPLINE_CAMERA_LEVEL)];
 } Gan_CubicBSplineWeights;
-         
+  
+typedef struct Gan_Camera Gan_Camera;
 /**
  * \brief Structure containing camera parameters in double precision.
  */
@@ -176,6 +179,50 @@ typedef struct Gan_Camera
          /// Support for back-projection
          Gan_CubicBSplineSupport* support;
       } cbspline;
+
+      struct {
+         /// ST map, http://www.nukepedia.com/written-tutorials/understanding-uvmaps-warping-with-stmap-pt-1/
+         struct Gan_Image *stmap_dir;
+
+         struct Gan_Image *stmap_inv;
+      } stmap;
+
+      struct {
+         double longitude;
+         double latitude;
+         double FoV;
+         // a pointer to explicitly defined dual camera outside the Gan_Camera Struct
+         Gan_Camera* dualCamera;
+         // Cached rotation matrix, tangent of FoV/2, and direction of camera
+         struct {
+            struct {
+               double lon; // longitude used to calculate the m33 matrix, or DBL_MAX
+               double lat; // latitude used to calculate the m33 matrix, or DBL_MAX
+               Gan_Matrix33 m33;
+            } rot;
+            struct {
+               double fov; // fov used to calculate tanFoV_2, or DBL_MAX
+               double tanFoV_2;
+            } fov;
+            struct {
+               double lon; // longitude used to calculate the direction, or DBL_MAX
+               double lat; // latitude used to calculate the direction, or DBL_MAX
+               Gan_Vector3 vec;
+            } direction;
+         } cache;
+
+         // Margins to be added to image dimensions to cover the full sphere:
+         // width + left + right cover 360 degrees of longitude,
+         // height + top + bottom specify 180 degrees of latitude.
+         // Can be both positive and negative.
+         struct {
+            double left;
+            double top;
+            double right;
+            double bottom;
+         } margin;
+      } equirectangular;
+
    } nonlinear;
 
    /// point functions

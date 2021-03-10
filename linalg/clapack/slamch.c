@@ -76,7 +76,7 @@ float gan_slamch(Gan_LapackLamchFlag cmach)
       case GAN_LAMCH_EMAX: ret_val = emax; break;
       case GAN_LAMCH_RMAX: ret_val = rmax; break;
       default:
-        return DBL_MAX;
+        return FLT_MAX;
    }
 
    return ret_val;

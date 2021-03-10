@@ -48,6 +48,8 @@ extern "C" {
  * \{
  */
 
+struct Gan_Image;
+
 /**
  * \brief Structure containing any previous project/backproject result
  */
@@ -76,7 +78,8 @@ typedef struct Gan_CubicBSplineWeightsF
 {
    Gan_Vector2_f weight[1 + (1 << GAN_CUBIC_BSPLINE_CAMERA_LEVEL)][1 + (1 << GAN_CUBIC_BSPLINE_CAMERA_LEVEL)];
 } Gan_CubicBSplineWeightsF;
-         
+     
+typedef struct Gan_Camera_f Gan_Camera_f;
 /**
  * \brief Structure containing camera parameters in single precision.
  */
@@ -176,6 +179,50 @@ typedef struct Gan_Camera_f
          /// Support for back-projection
          Gan_CubicBSplineSupportF* support;
       } cbspline;
+
+      struct {
+         /// ST map, http://www.nukepedia.com/written-tutorials/understanding-uvmaps-warping-with-stmap-pt-1/
+         struct Gan_Image *stmap_dir;
+
+         struct Gan_Image *stmap_inv;
+      } stmap;
+
+      struct {
+         float longitude;
+         float latitude;
+         float FoV;
+         // a pointer to explicitly defined dual camera outside the Gan_Camera Struct
+         Gan_Camera_f* dualCamera;
+         // Cached rotation matrix, tangent of FoV/2, and direction of camera
+         struct {
+            struct {
+               float lon; // longitude used to calculate the m33 matrix, or FLT_MAX
+               float lat; // latitude used to calculate the m33 matrix, or FLT_MAX
+               Gan_Matrix33_f m33;
+            } rot;
+            struct {
+               float fov; // fov used to calculate tanFoV_2, or FLT_MAX
+               float tanFoV_2;
+            } fov;
+            struct {
+               float lon; // longitude used to calculate the direction, or FLT_MAX
+               float lat; // latitude used to calculate the direction, or FLT_MAX
+               Gan_Vector3_f vec;
+            } direction;
+         } cache;
+         // Margins to be added to image dimensions to cover the full sphere:
+         // width + left + right cover 360 degrees of longitude,
+         // height + top + bottom specify 180 degrees of latitude.
+         // Can be both positive and negative.
+         struct {
+            float left;
+            float top;
+            float right;
+            float bottom;
+         } margin;
+
+      } equirectangular;
+
    } nonlinear;
 
    /// point functions

@@ -38,6 +38,8 @@
 #include <gandalf/vision/cameraf_radial_dist1_inv.h>
 #include <gandalf/vision/cameraf_cubic_Bspline.h>
 #include <gandalf/vision/cameraf_cubic_Bspline_inv.h>
+#include <gandalf/vision/cameraf_ST_map.h>
+#include <gandalf/image/image_defs.h>
 #include <gandalf/common/numerics.h>
 
 /**
@@ -178,6 +180,13 @@ Gan_Bool
          Gan_CubicBSplineSupportF *support  = va_arg ( ap, Gan_CubicBSplineSupportF *);
 
          result = gan_cameraf_build_cubic_Bspline_inv ( camera, zh, fx, fy, x0, y0, skew, kyx, kzx, kzy, weight, support );
+      }
+      break;
+      case GAN_STMAP_CAMERA:
+      {
+         struct Gan_Image *stmap = va_arg ( ap, struct Gan_Image * );
+         struct Gan_Image *stmap_inv = va_arg ( ap, struct Gan_Image * );
+         result = gan_cameraf_build_ST_map( camera, zh, fx, fy, x0, y0, stmap, stmap_inv );
       }
       break;
 
@@ -327,6 +336,14 @@ Gan_Bool
                      camera->nonlinear.cbspline.weight,
                      camera->nonlinear.cbspline.support );
         break;
+      case GAN_STMAP_CAMERA:
+        result = gan_cameraf_build_ST_map(
+                     camera, camera->zh,
+                     camera->fx, camera->fy,
+                     camera->x0, camera->y0,
+                     camera->nonlinear.stmap.stmap_dir,
+                     camera->nonlinear.stmap.stmap_inv );
+        break;
 
       default:
         gan_err_flush_trace();
@@ -430,6 +447,10 @@ Gan_Bool
             }
       }
       break;
+      case GAN_STMAP_CAMERA:
+        gan_err_flush_trace();
+        gan_err_register ( "gan_camera_identical", GAN_ERROR_NOT_IMPLEMENTED, "" );
+        return GAN_FALSE;
         
       default:
         gan_err_flush_trace();

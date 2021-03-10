@@ -137,6 +137,8 @@ Gan_Image *
 
       dest->offset_x = source->offset_x;
       dest->offset_y = source->offset_y;
+
+      dest->premult = source->premult;
    }
 
    /* if the image is interlaced, the flipping is in-place and the height is

@@ -36,6 +36,7 @@
 #ifdef HAVE_PNG
 
 #include <png.h>
+#include <zlib.h>
 
 /**
  * \addtogroup ImagePackage
@@ -178,7 +179,7 @@ static Gan_Bool read_header(FILE *infile,
    /* Check signature */
 
    fread(sig, 1, 8, infile);
-   if (!png_check_sig(sig, 8))
+   if (png_sig_cmp(sig, 0, 8) != 0)
    {
       gan_err_flush_trace();
       gan_err_register("read_header", GAN_ERROR_CORRUPTED_FILE, "");

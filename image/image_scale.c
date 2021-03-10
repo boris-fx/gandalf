@@ -119,6 +119,8 @@ Gan_Image *
 
       dest->offset_x = source->offset_x;
       dest->offset_y = source->offset_y;
+
+      dest->premult = source->premult;
    }
 
    /* scale image */

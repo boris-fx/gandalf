@@ -78,11 +78,8 @@ extern "C" {
 /// Boolean data type
 typedef enum
 {
-    /// Boolean false value
-    GAN_FALSE=0,
-
-    /// Boolean true value
-    GAN_TRUE=1
+    GAN_FALSE = 0,  ///< Boolean false value
+    GAN_TRUE  = 1,  ///< Boolean true  value
 } Gan_Bool;
 
 /* expresion to be evaluated only if NDEBUG is not defined */
@@ -307,6 +304,15 @@ typedef double gan_float64;
 #error Inconsistent 64-bit integer size
 #endif
 #endif
+
+typedef enum
+{
+   GAN_PREMULT_UNKNOWN,
+   GAN_PREMULT_OPAQUE,
+   GAN_PREMULT_PREMULTIPLIED,
+   GAN_PREMULT_UNPREMULTIPLIED,
+   GAN_PREMULT_UNDEFINED,
+} Gan_Premult;
 
 /**
  * \brief Macro: Applies test and aborts program on false result with a message.

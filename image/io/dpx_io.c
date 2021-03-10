@@ -814,29 +814,8 @@ Gan_Image *
         break;
 
       case GAN_RGB_COLOUR_ALPHA_IMAGE:
-      {
-         gan_uint32 ui32PadTest=0;
-
          uiRowSizeInBytes = ((4*ui32PixelsPerLine+2)/3)*4;
-         /* check and adjust end-of-line padding */
-         switch((4*ui32PixelsPerLine) % 3)
-         {
-            case 0: ui32PadTest = 0; break;
-            case 1: ui32PadTest = 2; break;
-            case 2: ui32PadTest = 1; break;
-         }
-         
-         if((ui32eolPadding % 4) != ui32PadTest)
-         {
-            gan_err_flush_trace();
-            gan_err_register ( "pgiRead10BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "padding not compatible" );
-            return NULL;
-         }
-
-         // reduce pad to multiple of four bytes because we are going to read the data on each line as a multiple of four bytes
-         ui32eolPadding -= ui32PadTest;
-      }
-      break;
+         break;
 
       case GAN_YUV422:
         uiRowSizeInBytes = 2*ui32PixelsPerLine;
@@ -2820,8 +2799,8 @@ static Gan_Bool gan_read_dpx_tv_information_header ( char *acAlignedHeader, FILE
       /* reset time code if invalid */
       if(!bValidTimeCode(header->info.time_code, header->info.dpx.tv.frame_rate))
       {
-         header->info.time_code = 0;
-         header->info.user_bits = 0;
+         header->info.time_code = GAN_UINT32_MAX;
+         header->info.user_bits = GAN_UINT32_MAX;
       }
 
 #if 0  // comment out until we work out how to read the frame rate from DPX files

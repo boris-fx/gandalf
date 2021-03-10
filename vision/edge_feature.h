@@ -145,44 +145,48 @@ typedef struct Gan_EdgeFeatureMap
    Gan_Bool alloc;
 } Gan_EdgeFeatureMap;
 
-GANDALF_API Gan_EdgeFeatureMap *gan_edge_feature_map_form ( Gan_EdgeFeatureMap *emap,
-                                                unsigned max_nedges,
-                                                unsigned max_strings );
-GANDALF_API void gan_edge_feature_map_free ( Gan_EdgeFeatureMap *emap );
-GANDALF_API Gan_Bool gan_edge_feature_map_clear ( Gan_EdgeFeatureMap *emap,
-                                      unsigned height, unsigned width,
-                                      Gan_Matrix23_f *A, Gan_Camera *camera,
-                                      Gan_LocalFeatureMapParams *lpms );
-GANDALF_API Gan_EdgeFeature *gan_edge_feature_add ( Gan_EdgeFeatureMap *emap,
-                                        unsigned r, unsigned c,
-                                        float rf, float cf,
-                                        float angle, float cov,
-                                        int status, int index,
-                                        float strength );
-GANDALF_API Gan_EdgeString *gan_edge_feature_string_add ( Gan_EdgeFeatureMap *emap,
-                                              Gan_EdgeFeature *edge );
-GANDALF_API Gan_Bool gan_edge_feature_string_set_status ( Gan_EdgeString *string,
-                                              int status );
-GANDALF_API Gan_Bool gan_edge_feature_map_postprocess ( Gan_EdgeFeatureMap *emap );
 
-/// Macro: Allocates a edge feature map structure.
+/// Allocates a edge feature map structure.
 /**
  * \param max_nedges The number of edges initially to allocate for
  * \param max_nstrings The number of strings initially to allocate for
  *
  * Allocates a structure to hold edge features, and sets
- * it to be empty. This macro calls gan_edge_feature_map_form().
+ * it to be empty.
  *
  * \return non-\c NULL the allocated feature map, or \c NULL on failure.
- * \sa gan_edge_feature_map_form(), gan_edge_feature_map_free().
+ * \sa gan_edge_feature_map_free().
  */
-#ifdef GAN_GENERATE_DOCUMENTATION
-GANDALF_API Gan_EdgeFeatureMap *gan_edge_feature_map_alloc ( unsigned max_nedges,
-                                                 unsigned max_nstrings );
-#else
-#define gan_edge_feature_map_alloc(max_nedges,max_nstrings)\
-   gan_edge_feature_map_form(NULL,max_nedges,max_nstrings)
-#endif
+
+GANDALF_API Gan_EdgeFeatureMap *gan_edge_feature_map_alloc(
+   unsigned max_nedges,
+   unsigned max_strings );
+
+GANDALF_API void gan_edge_feature_map_free( Gan_EdgeFeatureMap *emap );
+
+GANDALF_API Gan_Bool gan_edge_feature_map_clear(
+   Gan_EdgeFeatureMap *emap,
+   unsigned height, unsigned width,
+   Gan_Matrix23_f *A, Gan_Camera *camera,
+   Gan_LocalFeatureMapParams *lpms );
+
+GANDALF_API Gan_EdgeFeature *gan_edge_feature_add(
+   Gan_EdgeFeatureMap *emap,
+   unsigned r, unsigned c,
+   float rf, float cf,
+   float angle, float cov,
+   int status, int index,
+   float strength );
+
+GANDALF_API Gan_EdgeString *gan_edge_feature_string_add(
+   Gan_EdgeFeatureMap *emap,
+   Gan_EdgeFeature *edge );
+
+GANDALF_API Gan_Bool gan_edge_feature_string_set_status(
+   Gan_EdgeString *string,
+   int status );
+
+GANDALF_API Gan_Bool gan_edge_feature_map_postprocess( Gan_EdgeFeatureMap *emap );
 
 /**
  * \}

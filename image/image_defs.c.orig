@@ -24,10 +24,6 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifdef __linux__
-#include <stdint.h>
-#endif
-
 #include <stdarg.h>
 #include <string.h>
 #include <gandalf/image/image_defs.h>
@@ -102,78 +98,10 @@
 #include <gandalf/image/image_gl_uint10.h>
 #include <gandalf/image/image_gl_uint12.h>
 
-GANDALF_API void gan_image_struct_init(Gan_Image * image)
-{
-   image->ref_count = 0;
-   image->format = GAN_GREY_LEVEL_IMAGE;
-   image->type = GAN_UCHAR;
-   image->height = image->width = 0;
-   image->stride = 0;
-   image->premult = GAN_PREMULT_UNKNOWN;
-
-   // How to set image->row_data?
-
-   image->row_data_ptr = NULL;
-   image->row_data_size = 0;
-   image->ba = NULL;
-   image->ba_alloc = GAN_FALSE;
-   image->offset_x = image->offset_y = 0;
-   image->row_data_alloc = GAN_FALSE;
-   image->struct_alloc = GAN_FALSE;
-   image->data_free_func = NULL;
-   image->image_free_func = NULL;
-   image->pix_data.ptr = NULL;
-   image->pix_data.size = 0;
-   image->pix_data.alloc = GAN_FALSE;
-   image->pix_data.host_suite = NULL;
-   image->pix_data.image_memory_handle = NULL;
-   image->copy = NULL;
-}
-
 /**
  * \addtogroup ImagePackage
  * \{
  */
-
-/*** \addtogroup ImageAllocate \{ */
-/**
- * \brief Returns a new image using the given \a host_suite for memory allocation.
- *
- * Allocates and returns a new image with given \a format, \a type, \a height and \a width.
- * If \host_suite is null then this function is equivalent to calling gan_image_alloc.
- *
- */
-GANDALF_API Gan_Image *gan_image_alloc_suite(
-   Gan_ImageFormat format, Gan_Type type,
-   unsigned long height, unsigned long width, unsigned long stride,
-   struct Gan_ImageHostSuite * host_suite)
-{
-   Gan_Image *img;
-
-   if (!stride)
-      stride = gan_image_min_stride(format, type, width, 0);
-   else if (stride < gan_image_min_stride(format, type, width, 0))
-      return NULL;
-
-   img = gan_malloc_object(Gan_Image);
-   /* set dynamic allocation flag */
-   img->struct_alloc = GAN_TRUE;
-   img->ref_count = 0;
-   img->pix_data.size = 0;
-   img->pix_data.ptr = NULL;
-   img->pix_data.host_suite = host_suite;
-   img->pix_data.image_memory_handle = NULL;
-   img->image_free_func = NULL;
-
-   gan_image_form_gen( img, format, type, height, width, stride,
-                       GAN_TRUE, NULL, 0, NULL, 0 );
-   // HACK. gan_image_form_gen sets struct_alloc to false!
-   img->struct_alloc = GAN_TRUE;
-
-   return img;
-}
-
-/** \} */
 
 /**
  * \addtogroup ImageAllocate
@@ -834,7 +762,7 @@ Gan_Bool
 {
    /* we can't provide a function to free the data when it was allocated
       internally using malloc() */
-   gan_err_test_bool ( !img->pix_data.alloc, "gan_image_set_data_free_func",
+   gan_err_test_bool ( !img->pix_data_alloc, "gan_image_set_data_free_func",
                        GAN_ERROR_INCOMPATIBLE, "" );
 
    /* set free function */
@@ -866,7 +794,7 @@ Gan_Bool gan_image_test_valid ( const Gan_Image *img )
       && img->type   >= 0 && img->type   < GAN_UNDEFINED_TYPE
       && img->width  >  0 && img->height > 0
       && img->stride >= gan_image_min_stride( img->format, img->type, img->width, 0 /* alignment */ )
-      && img->pix_data.ptr != NULL && img->pix_data.size > 0
+      && img->pix_data_ptr != NULL && img->pix_data_size > 0
       && ( ! img->row_data_alloc || img->row_data_ptr != NULL )
       && ( ( img->row_data_ptr == NULL ) ^ ( img->row_data_size > 0 ) )
       ) ? GAN_TRUE
@@ -890,7 +818,8 @@ Gan_Bool gan_image_test_valid ( const Gan_Image *img )
  *
  * Returns the size of an image pixel in bytes.
  */
-size_t gan_image_pixel_size( Gan_ImageFormat format, Gan_Type type )
+size_t
+ gan_image_pixel_size ( Gan_ImageFormat format, Gan_Type type )
 {
    switch ( format )
    {
@@ -1110,9 +1039,9 @@ size_t gan_image_pixel_size( Gan_ImageFormat format, Gan_Type type )
  * multiple of the \a alignment value, unless \a alignment is passed as zero,
  * in which case no padding occurs.
  */
-unsigned long gan_image_min_stride(
-   Gan_ImageFormat format, Gan_Type type,
-   unsigned long width, unsigned long alignment )
+size_t
+ gan_image_min_stride ( Gan_ImageFormat format, Gan_Type type,
+                        unsigned long width, size_t alignment )
 {
    switch ( format )
    {
@@ -1327,32 +1256,10 @@ unsigned long gan_image_min_stride(
    }
 
    /* if no alignment was specified, return without padding */
-   if ( alignment == 0 )
-      return width;
+   if ( alignment == 0 ) return width;
 
    /* pad the size out to a multiple of the byte alignment */
    return ((width + alignment - 1)/alignment)*alignment;
-}
-
-/* compute the required size of pixel data and optionally report arithmetic overflow */
-size_t gan_pix_data_size( Gan_ImageFormat format, Gan_Type type,
-                          unsigned long height, unsigned long width,
-                          Gan_Bool * overflow )
-{
-   unsigned long stride = gan_image_min_stride( format, type, width, 0 /*alignment*/ );
-   return gan_pix_data_size_with_stride( height, stride, overflow );
-}
-
-size_t gan_pix_data_size_with_stride(
-   unsigned long height, unsigned long stride, Gan_Bool *overflow )
-{
-#if ( SIZE_MAX < ULONG_MAX )
-#  error Unsuitable target platform
-#endif
-   /* detect arithmetic overflow in multiplication if image is huge and 'ulong' is shorter than 'size_t' */
-   if( overflow )
-      *overflow = !( stride && height ) || ( SIZE_MAX / stride / height ) ? GAN_FALSE : GAN_TRUE;
-   return height * (size_t)stride;
 }
 
 /**
@@ -2411,10 +2318,6 @@ Gan_Bool
                                                                                     pixel->type == GAN_BOOL)),
                           "gan_image_fill_const_window", GAN_ERROR_INCOMPATIBLE, "" );
       gan_err_test_bool ( r0+height <= img->height, "gan_image_fill_const_window", GAN_ERROR_INCOMPATIBLE, "" );
-
-      if ( r0+height > img->height )
-            return GAN_FALSE;
-
       if ( pixel == NULL || !pixel->data.gl.b )
       {
          for ( i = 0; i < height; i++ )
@@ -5056,10 +4959,10 @@ Gan_ImageWindow gan_image_union_subwindows_s ( const Gan_ImageWindow *window1, c
 {
    Gan_ImageWindow iwResult;
 
-   iwResult.c0 = gan_min2_i(window1->c0, window2->c0);
-   iwResult.r0 = gan_min2_i(window1->r0, window2->r0);
-   iwResult.width  = gan_max2_i(window1->c0+window1->width,  window2->c0+window2->width)  - iwResult.c0;
-   iwResult.height = gan_max2_i(window1->r0+window1->height, window2->r0+window2->height) - iwResult.r0;
+   iwResult.c0 = gan_min2_ui(window1->c0, window2->c0);
+   iwResult.r0 = gan_min2_ui(window1->r0, window2->r0);
+   iwResult.width  = gan_max2_ui(window1->c0+window1->width,  window2->c0+window2->width)  - iwResult.c0;
+   iwResult.height = gan_max2_ui(window1->r0+window1->height, window2->r0+window2->height) - iwResult.r0;
    return iwResult;
 }
 
@@ -6210,11 +6113,12 @@ Gan_Bool gan_image_get_maximum_pixel ( Gan_Image *image, Gan_Image *mask, Gan_Pi
 /**
  * \brief Free the memory associated with the image \a img.
  *
- * Handles \c NULL values of \a img and its \t image_free_func correctly.
+ * Handles \c NULL values of \a img and its \t free_func correctly.
  */
-void gan_image_free_s( Gan_Image *img )
+void gan_image_free_s ( Gan_Image *img )
 {
-   gan_image_free( img );
+   if ( img && img->free_func )
+      gan_image_free ( img );
 }
 
 /**

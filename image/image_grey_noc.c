@@ -48,18 +48,18 @@
 #define GAN_IMFMT gl
 
 /* forward declaration of function defined in image_common_noc.c */
-static Gan_Bool
- image_realloc ( Gan_Image *img,
-                 unsigned long height, unsigned long width,
-                 unsigned long stride, Gan_Bool alloc_pix_data );
+static Gan_Bool image_realloc(
+   Gan_Image *img,
+   unsigned long height, unsigned long width, unsigned long stride,
+   Gan_Bool alloc_pix_data );
 
 #ifdef GAN_BITMAP
 
 #ifndef NDEBUG
 
 /* set pixel value */
-static Gan_Bool
- image_set_pix ( Gan_Image *img, unsigned row, unsigned col, Gan_Bool pix )
+static Gan_Bool image_set_pix(
+   Gan_Image *img, unsigned row, unsigned col, Gan_Bool pix )
 {
    /* consistency check */
    gan_err_test_bool ( row < img->height && col < img->width, "image_set_pix", GAN_ERROR_ILLEGAL_ARGUMENT, "pixel position" );
@@ -145,9 +145,11 @@ static Gan_Bool
    if ( img->height == 0 )
       return GAN_TRUE;
    if ( img->stride == img->width*sizeof(GAN_PIXEL) )
+   {
       if ( img->row_data.gl.GAN_IMTYPE )
          /* fill all pixels in one go */
          GAN_FILL_ARRAY ( img->row_data.gl.GAN_IMTYPE[0], img->height*img->width, 1, pix );
+   }
    else
    {
       /* fill image one row at a time */
@@ -177,9 +179,9 @@ static Gan_Image *
    /* allocate image img_d if necessary */
    if ( img_d == NULL )
    {
-      img_d = GAN_IMAGE_FORM_GEN ( NULL, img_s->height, img_s->width,
-                                   gan_image_min_stride(GAN_PIXFMT, GAN_PIXTYPE, img_s->width, 0),
-                                   GAN_TRUE, NULL, 0, NULL, 0 );
+      img_d = GAN_IMAGE_FORM_GEN( NULL, img_s->height, img_s->width,
+                                  gan_image_min_stride(GAN_PIXFMT, GAN_PIXTYPE, img_s->width, 0),
+                                  GAN_TRUE, NULL, 0, NULL, 0 );
       if ( img_d == NULL )
       {
          gan_err_register("image_copy", GAN_ERROR_FAILURE, "");
@@ -229,7 +231,7 @@ static Gan_Image *
    if ( img_s->stride == img_s->width*sizeof(GAN_PIXEL) &&
         img_d->stride == img_d->width*sizeof(GAN_PIXEL) )
       /* copy all pixels in one go */
-      memcpy ( (void *)img_d->pix_data_ptr, (void *)img_s->pix_data_ptr,
+      memcpy ( (void *)img_d->pix_data.ptr, (void *)img_s->pix_data.ptr,
                img_s->height*img_s->width*sizeof(GAN_PIXEL) );
    else
    {
@@ -245,6 +247,7 @@ static Gan_Image *
 
    img_d->offset_x = img_s->offset_x;
    img_d->offset_y = img_s->offset_y;
+   img_d->premult = img_s->premult;
    return img_d;
 }
 

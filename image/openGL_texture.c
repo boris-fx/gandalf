@@ -467,13 +467,13 @@ GLenum info;
                    
                    (*sGLExtFuncPtrs.fGenBuffersARB)(1,&uiBufferID);
                    (*sGLExtFuncPtrs.fBindBufferARB)(GL_PIXEL_UNPACK_BUFFER_ARB,uiBufferID);
-                   (*sGLExtFuncPtrs.fBufferDataARB)(GL_PIXEL_UNPACK_BUFFER_ARB,pOGLTexStruct->iTextureTileSize*pOGLTexStruct->iTextureTileSize*8,pgiImage->pix_data_ptr,GL_STREAM_DRAW);
+                   (*sGLExtFuncPtrs.fBufferDataARB)(GL_PIXEL_UNPACK_BUFFER_ARB,pOGLTexStruct->iTextureTileSize*pOGLTexStruct->iTextureTileSize*8,pgiImage->pix_data.ptr,GL_STREAM_DRAW);
                    glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGB,pOGLTexStruct->iTextureTileSize,pOGLTexStruct->iTextureTileSize,
                                    0, GL_LUMINANCE, GL_UNSIGNED_BYTE, BUFFER_OFFSET(0) );
                    info = glGetError();
 #else
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, GL_RGB, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pgiImage->pix_data_ptr );
+                                  0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pgiImage->pix_data.ptr );
 #endif/*defined(GL_ARB_pixel_buffer_object)*/
                    break;
 
@@ -481,7 +481,7 @@ GLenum info;
                  case GAN_UINT12:
                  case GAN_UINT16:
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, GL_RGB, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_LUMINANCE, GL_UNSIGNED_SHORT, pgiImage->pix_data_ptr );
+                                  0, GL_LUMINANCE, GL_UNSIGNED_SHORT, pgiImage->pix_data.ptr );
                    break;
 
                  default:
@@ -496,12 +496,12 @@ GLenum info;
               {
                  case GAN_UINT8:
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, GL_RGB, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_RGB, GL_UNSIGNED_BYTE, pgiImage->pix_data_ptr );
+                                  0, GL_RGB, GL_UNSIGNED_BYTE, pgiImage->pix_data.ptr );
                    break;
 
                  case GAN_UINT16:
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, GL_RGB, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_RGB, GL_UNSIGNED_SHORT, pgiImage->pix_data_ptr );
+                                  0, GL_RGB, GL_UNSIGNED_SHORT, pgiImage->pix_data.ptr );
                    break;
 
                  default:
@@ -516,7 +516,7 @@ GLenum info;
               {
                  case GAN_UINT10:
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, GL_RGB10, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_RGBA, GL_UNSIGNED_INT_10_10_10_2, pgiImage->pix_data_ptr );
+                                  0, GL_RGBA, GL_UNSIGNED_INT_10_10_10_2, pgiImage->pix_data.ptr );
                    break;
 
                  default:
@@ -532,17 +532,17 @@ GLenum info;
               {
                  case GAN_UINT8:
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, GL_RGBA, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_RGBA, GL_UNSIGNED_BYTE, pgiImage->pix_data_ptr );
+                                  0, GL_RGBA, GL_UNSIGNED_BYTE, pgiImage->pix_data.ptr );
                    break;
 
                  case GAN_UINT12:
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, GL_RGBA, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_RGBA12, GL_UNSIGNED_SHORT, pgiImage->pix_data_ptr );
+                                  0, GL_RGBA12, GL_UNSIGNED_SHORT, pgiImage->pix_data.ptr );
                    break;
 
                  case GAN_UINT16:
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, GL_RGBA, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_RGBA, GL_UNSIGNED_SHORT, pgiImage->pix_data_ptr );
+                                  0, GL_RGBA, GL_UNSIGNED_SHORT, pgiImage->pix_data.ptr );
                    break;
 
                  default:
@@ -558,7 +558,7 @@ GLenum info;
               {
                  case GAN_UINT10:
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, GL_RGB10_A2, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_RGBA, GL_UNSIGNED_INT_10_10_10_2, pgiImage->pix_data_ptr );
+                                  0, GL_RGBA, GL_UNSIGNED_INT_10_10_10_2, pgiImage->pix_data.ptr );
                    break;
 
                  default:
@@ -578,7 +578,7 @@ GLenum info;
               {
                  case GAN_UINT8:
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, GL_RGBA, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_RGBA, GL_UNSIGNED_BYTE, pgiImage->pix_data_ptr );
+                                  0, GL_RGBA, GL_UNSIGNED_BYTE, pgiImage->pix_data.ptr );
                    break;
 
                  default:
@@ -593,7 +593,7 @@ GLenum info;
               {
                  case GAN_UINT8:
                    glTexImage2D ( pOGLTexStruct->eTextureMode, 0, 2, pOGLTexStruct->iTextureTileSize, pOGLTexStruct->iTextureTileSize,
-                                  0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, pgiImage->pix_data_ptr );
+                                  0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, pgiImage->pix_data.ptr );
                    break;
 
                  default:

@@ -51,6 +51,10 @@
 #include <gandalf/vision/cameraf_cubic_Bspline.h>
 #include <gandalf/vision/camera_cubic_Bspline_inv.h>
 #include <gandalf/vision/cameraf_cubic_Bspline_inv.h>
+#include <gandalf/vision/camera_ST_map.h>
+#include <gandalf/vision/cameraf_ST_map.h>
+#include <gandalf/vision/camera_equirectangular.h>
+#include <gandalf/vision/cameraf_equirectangular.h>
 #include <gandalf/common/allocate.h>
 
 /**
@@ -221,6 +225,28 @@ Gan_Bool
                                                            (*ppweight)->weight, *ppsupport );
       }
       break;
+
+      case GAN_STMAP_CAMERA:
+        result = gan_cameraf_build_ST_map( cameraf,
+                                           (float)camera->zh,
+                                           (float)camera->fx, (float)camera->fy,
+                                           (float)camera->x0, (float)camera->y0,
+                                           camera->nonlinear.stmap.stmap_dir,
+                                           camera->nonlinear.stmap.stmap_inv );
+        break;
+      case GAN_EQUIRECTANGULAR_CAMERA:
+         result = gan_cameraf_build_equirectangular( cameraf, 
+                                           (float)camera->zh,
+                                           (float)camera->fx, (float)camera->fy,
+                                           (float)camera->x0, (float)camera->y0,
+                                           (float)camera->nonlinear.equirectangular.longitude,
+                                           (float)camera->nonlinear.equirectangular.latitude,
+                                           (float)camera->nonlinear.equirectangular.FoV);
+         cameraf->nonlinear.equirectangular.margin.left   = (float)camera->nonlinear.equirectangular.margin.left  ;
+         cameraf->nonlinear.equirectangular.margin.top    = (float)camera->nonlinear.equirectangular.margin.top   ;
+         cameraf->nonlinear.equirectangular.margin.right  = (float)camera->nonlinear.equirectangular.margin.right ;
+         cameraf->nonlinear.equirectangular.margin.bottom = (float)camera->nonlinear.equirectangular.margin.bottom;
+         break;
 
       default:
         gan_err_flush_trace();
@@ -398,6 +424,28 @@ Gan_Bool
                                                           *ppsupport);
       }
       break;
+
+      case GAN_STMAP_CAMERA:
+        result = gan_camera_build_ST_map( camera,
+                                          (double)cameraf->zh,
+                                          (double)cameraf->fx, (double)cameraf->fy,
+                                          (double)cameraf->x0, (double)cameraf->y0,
+                                          cameraf->nonlinear.stmap.stmap_dir,
+                                          cameraf->nonlinear.stmap.stmap_inv );
+        break;
+
+      case GAN_EQUIRECTANGULAR_CAMERA:
+        result = gan_camera_build_equirectangular( camera,
+                                          (double)cameraf->zh,
+                                          (double)cameraf->fx, (double)cameraf->fy,
+                                          (double)cameraf->x0, (double)cameraf->y0,
+                                          (double)cameraf->nonlinear.equirectangular.longitude,
+                                          (double)cameraf->nonlinear.equirectangular.latitude,
+                                          (double)cameraf->nonlinear.equirectangular.FoV);
+        camera->nonlinear.equirectangular.margin.left   = cameraf->nonlinear.equirectangular.margin.left  ;
+        camera->nonlinear.equirectangular.margin.top    = cameraf->nonlinear.equirectangular.margin.top   ;
+        camera->nonlinear.equirectangular.margin.right  = cameraf->nonlinear.equirectangular.margin.right ;
+        camera->nonlinear.equirectangular.margin.bottom = cameraf->nonlinear.equirectangular.margin.bottom;
 
       default:
         gan_err_flush_trace();
