@@ -37,6 +37,7 @@
 
 #include <png.h>
 #include <zlib.h>
+#include <string.h>
 
 /**
  * \addtogroup ImagePackage
