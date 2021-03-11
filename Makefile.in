@@ -18,6 +18,9 @@ include config
 
 TOPLEVEL = .
 
+# Main target to build
+all: gandalf
+
 # Gandalf source directories
 SRCDIRS = common linalg image vision
 
@@ -37,9 +40,6 @@ gandalf: subdirs
 		image/*$(OBJECT_SUFFIX).lo image/io/*$(OBJECT_SUFFIX).lo \
 		vision/*$(OBJECT_SUFFIX).lo \
 		-version-info 2:1:1 -rpath $(DESTDIR)$(libdir) $(LDFLAGS) $(LIBS)
-
-# Rule for compiling Gandalf library and test programs
-all: gandalf
 
 distclean: clean
 
