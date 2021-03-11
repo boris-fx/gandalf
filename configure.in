@@ -5,7 +5,7 @@ dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
-dnl AC_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 
 dnl ------------------------------------------
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -218,7 +218,21 @@ dnl Check sizes of various simple types
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(int)
+
+dnl Handle Mac universal headers
+dnl If on Mac, don't use a hard-coded SIZEOF_LONG
+AC_MSG_CHECKING([for __APPLE__])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#ifndef __APPLE__
+#error
+#endif
+]])], [
+AC_MSG_RESULT([yes])
+], [
+AC_MSG_RESULT([no])
 AC_CHECK_SIZEOF(long)
+])
+
 AC_CHECK_SIZEOF(long long)
 AC_CHECK_SIZEOF(long long long long)
 AC_CHECK_SIZEOF(float)
