@@ -21,9 +21,14 @@ TOPLEVEL = .
 # Gandalf source directories
 SRCDIRS = common linalg image vision
 
+# Rules to build subdirectories
+.PHONY: subdirs $(SRCDIRS)
+subdirs: $(SRCDIRS)
+$(SRCDIRS):
+	$(MAKE) -C $@
+
 # Rule for compiling Gandalf library
-gandalf:
-	for f in $(SRCDIRS); do (cd $$f; $(MAKE)); done
+gandalf: subdirs
 	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o libgandalf.la \
 		common/*$(OBJECT_SUFFIX).lo linalg/*$(OBJECT_SUFFIX).lo \
 		linalg/cblas/*$(OBJECT_SUFFIX).lo \
@@ -34,8 +39,7 @@ gandalf:
 		-version-info 2:1:1 -rpath $(DESTDIR)$(libdir) $(LDFLAGS) $(LIBS)
 
 # Rule for compiling Gandalf library and test programs
-all:
-	for f in $(SRCDIRS); do (cd $$f; $(MAKE) all;) done
+all: gandalf
 
 distclean: clean
 
