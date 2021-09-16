@@ -3029,7 +3029,30 @@ Gan_Image *
 void gan_initialise_dpx_header_struct(Gan_DPXHeaderStruct *octrlstr, Gan_ImageFormat image_format, Gan_Type type)
 {
    memset(octrlstr, 0xff, sizeof(Gan_DPXHeaderStruct));
-   octrlstr->generic.encryption_key = 0xffffffff;
+
+   octrlstr->generic.version[0] = 0;
+   octrlstr->generic.file_name[0] = 0;
+   octrlstr->generic.create_time[0] = 0;
+   octrlstr->generic.creator[0] = 0;
+   octrlstr->generic.project[0] = 0;
+   octrlstr->generic.copyright[0] = 0;
+
+   octrlstr->image_info.description[0] = 0;
+
+   octrlstr->orientation.file_name[0] = 0;
+   octrlstr->orientation.creation_time[0] = 0;
+   octrlstr->orientation.input_dev[0] = 0;
+   octrlstr->orientation.input_serial[0] = 0;
+
+   octrlstr->film.film_mfg_id[0] = 0;
+   octrlstr->film.film_type[0] = 0;
+   octrlstr->film.offset[0] = 0;
+   octrlstr->film.prefix[0] = 0;
+   octrlstr->film.count[0] = 0;
+   octrlstr->film.format[0] = 0;
+   octrlstr->film.frame_id[0] = 0;
+   octrlstr->film.slate_info[0] = 0;
+
    switch(type)
    {
       case GAN_BOOL:
