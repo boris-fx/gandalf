@@ -28,6 +28,7 @@
 #define _GAN_IMAGE_DPX_IO_H
 
 #include <stdio.h>
+#include <stdint.h>
 #include <gandalf/common/misc_defs.h>
 #include <gandalf/common/i18n.h>
 #include <gandalf/image/image_defs.h>

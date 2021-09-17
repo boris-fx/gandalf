@@ -25,6 +25,7 @@
 */
 
 #include <string.h>
+#include <stdint.h>
 #include <gandalf/image/io/cineon_io.h>
 #include <gandalf/image/io/dpx_io.h>
 #include <gandalf/image/io/image_io.h>

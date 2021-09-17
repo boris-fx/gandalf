@@ -25,6 +25,7 @@
 */
 
 #include <string.h>
+#include <stdint.h>
 #include <gandalf/image/io/targa_io.h>
 #include <gandalf/image/io/image_io.h>
 #include <gandalf/image/image_rgb_uint8.h>
