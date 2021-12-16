@@ -886,7 +886,13 @@ Gan_Bool
       TIFFSetField ( tif, TIFFTAG_IMAGELENGTH, image->height );
       TIFFSetField ( tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG );
       TIFFSetField ( tif, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+      TIFFSetField ( tif, TIFFTAG_RESOLUTIONUNIT, 2);
+      TIFFSetField ( tif, TIFFTAG_XRESOLUTION, 300.0f);
+      TIFFSetField ( tif, TIFFTAG_YRESOLUTION, 300.0f);
    }
+
+   unsigned int chanSize = 0;
+   unsigned int numChans = 0;
 
    switch ( image->format )
    {
@@ -895,6 +901,7 @@ Gan_Bool
         {
            TIFFSetField ( tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK );
            TIFFSetField ( tif, TIFFTAG_SAMPLESPERPIXEL, 1 );
+           numChans = 1;
         }
 
         break;
@@ -907,6 +914,7 @@ Gan_Bool
            TIFFSetField ( tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK );
            TIFFSetField ( tif, TIFFTAG_SAMPLESPERPIXEL, 2 );
            TIFFSetField ( tif, TIFFTAG_EXTRASAMPLES, 1, &aui16SampleInfo );
+           numChans = 2;
         }
 
         break;
@@ -916,6 +924,7 @@ Gan_Bool
         {
            TIFFSetField ( tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB );
            TIFFSetField ( tif, TIFFTAG_SAMPLESPERPIXEL, 3 );
+           numChans = 3;
         }
 
         break;
@@ -928,6 +937,7 @@ Gan_Bool
            TIFFSetField ( tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB );
            TIFFSetField ( tif, TIFFTAG_SAMPLESPERPIXEL, 4 );
            TIFFSetField ( tif, TIFFTAG_EXTRASAMPLES, 1, &aui16SampleInfo );
+           numChans = 4;
         }
 
         break;
@@ -950,6 +960,7 @@ Gan_Bool
         {
            TIFFSetField ( tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_UINT );
            TIFFSetField ( tif, TIFFTAG_BITSPERSAMPLE, 8 );
+           chanSize = 1;
         }
 
         break;
@@ -959,6 +970,7 @@ Gan_Bool
         {
            TIFFSetField ( tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_UINT );
            TIFFSetField ( tif, TIFFTAG_BITSPERSAMPLE, 16 );
+           chanSize = 2;
         }
 
         break;
@@ -970,6 +982,7 @@ Gan_Bool
            TIFFSetField ( tif, TIFFTAG_MINSAMPLEVALUE, 0 );
            TIFFSetField ( tif, TIFFTAG_MAXSAMPLEVALUE, 1 );
            TIFFSetField ( tif, TIFFTAG_BITSPERSAMPLE, 32 );
+           chanSize = 4;
         }
                 
         break;
@@ -983,6 +996,15 @@ Gan_Bool
         }
 
         return GAN_FALSE;
+   }
+
+   if(tif != NULL)
+   {
+      unsigned int rowSize = image->width * chanSize * numChans;
+      unsigned int rowsPerStrip = 2;
+      if (rowSize > 0)
+         rowsPerStrip = ((1 << 17) + rowSize-1)/rowSize;
+      TIFFSetField ( tif, TIFFTAG_ROWSPERSTRIP, rowsPerStrip );
    }
 
    if(tif == NULL) return GAN_TRUE;
