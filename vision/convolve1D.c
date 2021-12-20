@@ -4510,6 +4510,9 @@ static Gan_Image *
    int i;
    unsigned int dwidth;
 
+   Gan_Bool zeroOutsideRGB = image->premult == GAN_PREMULT_PREMULTIPLIED ?
+                             GAN_TRUE : GAN_FALSE;
+
    gan_err_test_ptr ( image->format == GAN_RGB_COLOUR_ALPHA_IMAGE,
                       "image_convolve1Dx_rgba_rgba", GAN_ERROR_INCOMPATIBLE,
                       "" );
@@ -4557,17 +4560,17 @@ static Gan_Image *
         for ( i = (int)dest->height-1; i >= 0; i-- )
            if ( !gan_convolve1D_d (
                      &gan_image_get_pixptr_rgba_d(image,i,0)->R, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_d(dest,i,0)->R,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_d (
                      &gan_image_get_pixptr_rgba_d(image,i,0)->G, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_d(dest,i,0)->G,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_d (
                      &gan_image_get_pixptr_rgba_d(image,i,0)->B, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_d(dest,i,0)->B,  4,
                      mask, (int)dwidth ) ||
                 (bConvolveInAlphaChannel &&
@@ -4584,17 +4587,17 @@ static Gan_Image *
         for ( i = (int)dest->height-1; i >= 0; i-- )
            if ( !gan_convolve1D_f (
                      &gan_image_get_pixptr_rgba_f(image,i,0)->R, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_f(dest,i,0)->R,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_f (
                      &gan_image_get_pixptr_rgba_f(image,i,0)->G, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_f(dest,i,0)->G,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_f (
                      &gan_image_get_pixptr_rgba_f(image,i,0)->B, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_f(dest,i,0)->B,  4,
                      mask, (int)dwidth ) ||
                 (bConvolveInAlphaChannel &&
@@ -4611,17 +4614,17 @@ static Gan_Image *
         for ( i = (int)dest->height-1; i >= 0; i-- )
            if ( !gan_convolve1D_i (
                      &gan_image_get_pixptr_rgba_i(image,i,0)->R, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_i(dest,i,0)->R,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_i (
                      &gan_image_get_pixptr_rgba_i(image,i,0)->G, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_i(dest,i,0)->G,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_i (
                      &gan_image_get_pixptr_rgba_i(image,i,0)->B, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_i(dest,i,0)->B,  4,
                      mask, (int)dwidth ) ||
                 (bConvolveInAlphaChannel &&
@@ -4638,17 +4641,17 @@ static Gan_Image *
         for ( i = (int)dest->height-1; i >= 0; i-- )
            if ( !gan_convolve1D_ui (
                      &gan_image_get_pixptr_rgba_ui(image,i,0)->R, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_ui(dest,i,0)->R,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_ui (
                      &gan_image_get_pixptr_rgba_ui(image,i,0)->G, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_ui(dest,i,0)->G,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_ui (
                      &gan_image_get_pixptr_rgba_ui(image,i,0)->B, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_ui(dest,i,0)->B,  4,
                      mask, (int)dwidth ) ||
                 (bConvolveInAlphaChannel &&
@@ -4665,17 +4668,17 @@ static Gan_Image *
         for ( i = (int)dest->height-1; i >= 0; i-- )
            if ( !gan_convolve1D_uc (
                      &gan_image_get_pixptr_rgba_uc(image,i,0)->R, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_uc(dest,i,0)->R,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_uc (
                      &gan_image_get_pixptr_rgba_uc(image,i,0)->G, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_uc(dest,i,0)->G,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_uc (
                      &gan_image_get_pixptr_rgba_uc(image,i,0)->B, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_uc(dest,i,0)->B,  4,
                      mask, (int)dwidth ) ||
                 (bConvolveInAlphaChannel &&
@@ -4692,17 +4695,17 @@ static Gan_Image *
         for ( i = (int)dest->height-1; i >= 0; i-- )
            if ( !gan_convolve1D_us (
                      &gan_image_get_pixptr_rgba_us(image,i,0)->R, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_us(dest,i,0)->R,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_us (
                      &gan_image_get_pixptr_rgba_us(image,i,0)->G, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_us(dest,i,0)->G,  4,
                      mask, (int)dwidth ) ||
                 !gan_convolve1D_us (
                      &gan_image_get_pixptr_rgba_us(image,i,0)->B, 4,
-                     eEdgeBehaviour, GAN_FALSE,
+                     eEdgeBehaviour, zeroOutsideRGB,
                      &gan_image_get_pixptr_rgba_us(dest,i,0)->B,  4,
                      mask, (int)dwidth ) ||
                 (bConvolveInAlphaChannel &&
