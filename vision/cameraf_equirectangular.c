@@ -175,6 +175,13 @@ static Gan_Bool point_distort(
       gan_cameraf_equirect_xy2latlong( x.x, x.y, width, height, &longitude, &latitude, camera );
       cLat = cos(latitude);
 
+      // Check longitude is not too close to pi/2 or -pi/2. If so clamp it to prevent
+      // errors in the calculation
+      const double threshold = M_PI*2.0/1.0e6;
+      if (fabs(longitude - M_PI/2.0) < threshold)
+         longitude = longitude < M_PI/2.0 ? M_PI/2.0 - threshold : M_PI/2.0 + threshold;
+      else if (fabs(longitude + M_PI/2.0) < threshold)
+         longitude = longitude < -M_PI/2.0 ? -M_PI/2.0 - threshold : -M_PI/2.0 + threshold;
       q.x = sin(longitude)*cLat;
       q.y = sin(latitude);
       q.z = cos(longitude)*cLat;
