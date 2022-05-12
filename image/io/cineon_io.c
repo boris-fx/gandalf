@@ -256,8 +256,6 @@ Gan_Image *
       case 12:
       case 16:
         eType = GAN_UINT16;
-        eType = GAN_UINT16;
-        eType = GAN_UINT16;
         break;
 
       default:

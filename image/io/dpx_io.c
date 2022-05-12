@@ -1257,10 +1257,6 @@ Gan_Image *
    unsigned int uiRowSizeInBytes, uiInternalHeight;
    char *acBuffer, *acAlignedBuffer;
 
-   gan_err_flush_trace();
-   gan_err_register ( "pgiRead12BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "");
-   return NULL;
-
    if(eType != GAN_UINT16)
    {
       gan_err_flush_trace();
@@ -1364,84 +1360,153 @@ Gan_Image *
    switch(eFormat)
    {
       case GAN_RGB_COLOUR_IMAGE:
-        for(uiRow = 0; uiRow<ui32LinesPerImageEle; uiRow++)
-        {
-           Gan_RGBPixel_ui16* pui16rgbPix;
-           gan_uint32* pui32Pix;
+      {
+         for (uiRow = 0; uiRow < ui32LinesPerImageEle; uiRow++)
+         {
+            Gan_RGBPixel_ui16 * dst;
+            Gan_RGBPixel_ui16 * src;
 
-           if(bSingleField)
-           {
-              /* only transfer even rows for upper field, or odd rows for upper field */
-              if((bUpper && (uiRow % 2) == 0) || (!bUpper && (uiRow % 2) == 1))
-              {
-                 if ( fread ( acAlignedBuffer, 1, uiRowSizeInBytes, pfInFile ) != uiRowSizeInBytes )
-                 {
-                    if(bAllocatedImage) gan_image_free(pgiImage);
-                    gan_err_flush_trace();
-                    gan_err_register ( "pgiRead12BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
-                    return NULL;
-                 }
+            if (bSingleField)
+            {
+               /* only transfer even rows for upper field, or odd rows for upper field */
+               if ((bUpper && (uiRow % 2) == 0) || (!bUpper && (uiRow % 2) == 1))
+               {
+                  if (fread(acAlignedBuffer, 1, uiRowSizeInBytes, pfInFile) != uiRowSizeInBytes)
+                  {
+                     if (bAllocatedImage) gan_image_free(pgiImage);
+                     gan_err_flush_trace();
+                     gan_err_register("pgiRead12BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file");
+                     return NULL;
+                  }
 
-                 for(iCol=(int)ui32PixelsPerLine-1,
-                     pui16rgbPix = gan_image_get_pixptr_rgb_ui16(pgiImage, bWholeImage ? (bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow) : (bFlip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), iCol),
-                     pui32Pix = ((gan_uint32*)acAlignedBuffer) + iCol; iCol >= 0; iCol--, pui16rgbPix--, pui32Pix--)
-                 {
-                    if(bReversedEndianness)
-                       vReverseEndianness32(pui32Pix);
+                  for (iCol = (int)ui32PixelsPerLine - 1,
+                     dst = gan_image_get_pixptr_rgb_ui16(pgiImage, bWholeImage ? (bFlip ? (ui32LinesPerImageEle - uiRow - 1) : uiRow) : (bFlip ? (uiInternalHeight - uiRow / 2 - 1) : uiRow / 2), iCol),
+                     src = ((Gan_RGBPixel_ui16*)acAlignedBuffer) + iCol; iCol >= 0; --iCol, --dst, --src)
+                  {
+                     if (bReversedEndianness)
+                        vReverseEndiannessArray16((gan_uint16*)src, 3);
+                     *dst = *src;
+                  }
+               }
+               /* otherwise ignore this scanline */
+               else if (fseek(pfInFile, uiRowSizeInBytes, SEEK_CUR) != 0)
+               {
+                  if (bAllocatedImage) gan_image_free(pgiImage);
+                  gan_err_flush_trace();
+                  gan_err_register("pgiRead12BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file");
+                  return NULL;
+               }
+            }
+            else
+            {
+               if (fread (acAlignedBuffer, 1, uiRowSizeInBytes, pfInFile) != uiRowSizeInBytes)
+               {
+                  if (bAllocatedImage) gan_image_free(pgiImage);
+                  gan_err_flush_trace();
+                  gan_err_register("pgiRead12BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file");
+                  return NULL;
+               }
 
-                    pui16rgbPix->R = (gan_uint16)(((*pui32Pix) & 0xffc00000) >> 16);
-                    pui16rgbPix->G = (gan_uint16)(((*pui32Pix) &   0x3ff000) >>  6);
-                    pui16rgbPix->B = (gan_uint16)(((*pui32Pix) &      0xffc) <<  4);
-                 }
-              }
-              /* otherwise ignore this scanline */
-              else if(fseek(pfInFile, uiRowSizeInBytes, SEEK_CUR) != 0)
-              {
-                 if(bAllocatedImage) gan_image_free(pgiImage);
-                 gan_err_flush_trace();
-                 gan_err_register ( "pgiRead12BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
-                 return NULL;
-              }
-           }
-           else
-           {
-              if ( fread ( acAlignedBuffer, 1, uiRowSizeInBytes, pfInFile ) != uiRowSizeInBytes )
-              {
-                 if(bAllocatedImage) gan_image_free(pgiImage);
-                 gan_err_flush_trace();
-                 gan_err_register ( "pgiRead12BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
-                 return NULL;
-              }
+               for (iCol = (int)ui32PixelsPerLine - 1,
+                  dst = gan_image_get_pixptr_rgb_ui16(pgiImage, bFlip ? (ui32LinesPerImageEle - uiRow - 1) : uiRow, iCol),
+                  src = ((Gan_RGBPixel_ui16*)acAlignedBuffer) + iCol; iCol >= 0; --iCol, --dst, --src)
+               {
+                  if (bReversedEndianness)
+                     vReverseEndiannessArray16((gan_uint16*)src, 3);
+                  *dst = *src;
+               }
+            }
 
-              for(iCol=(int)ui32PixelsPerLine-1,
-                  pui16rgbPix = gan_image_get_pixptr_rgb_ui16(pgiImage, bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow, iCol),
-                  pui32Pix = ((gan_uint32*)acAlignedBuffer) + iCol; iCol >= 0; iCol--, pui16rgbPix--, pui32Pix--)
-              {
-                 if(bReversedEndianness)
-                    vReverseEndianness32(pui32Pix);
+            // allow for padding at end of line
+            if (fseek(pfInFile, ui32eolPadding, SEEK_CUR) != 0)
+            {
+               if (bAllocatedImage) gan_image_free(pgiImage);
+               gan_err_flush_trace();
+               gan_err_register("pgiRead12BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)");
+               return NULL;
+            }
 
-                 pui16rgbPix->R = (gan_uint16)(((*pui32Pix) & 0xffc00000) >> 16);
-                 pui16rgbPix->G = (gan_uint16)(((*pui32Pix) &   0x3ff000) >>  6);
-                 pui16rgbPix->B = (gan_uint16)(((*pui32Pix) &      0xffc) <<  4);
-              }
-           }
+            /* check for abort every 10 rows */
+            if (abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+               break;
+         }
+         break;
+      }
+      case GAN_RGB_COLOUR_ALPHA_IMAGE:
+      {
+         for(uiRow = 0; uiRow<ui32LinesPerImageEle; uiRow++)
+         {
+            Gan_RGBAPixel_ui16 * dst;
+            Gan_RGBAPixel_ui16 * src;
 
-           // allow for padding at end of line
-           if(fseek(pfInFile, ui32eolPadding, SEEK_CUR) != 0)
-           {
-              if(bAllocatedImage) gan_image_free(pgiImage);
-              gan_err_flush_trace();
-              gan_err_register ( "pgiRead12BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
-              return NULL;
-           }
+            if(bSingleField)
+            {
+               /* only transfer even rows for upper field, or odd rows for upper field */
+               if((bUpper && (uiRow % 2) == 0) || (!bUpper && (uiRow % 2) == 1))
+               {
+                  if ( fread ( acAlignedBuffer, 1, uiRowSizeInBytes, pfInFile ) != uiRowSizeInBytes )
+                  {
+                     if(bAllocatedImage) gan_image_free(pgiImage);
+                     gan_err_flush_trace();
+                     gan_err_register("pgiRead12BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
+                     return NULL;
+                  }
 
-           /* check for abort every 10 rows */
-           if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
-              break;
-        }
+                  for(iCol=(int)ui32PixelsPerLine-1,
+                     dst = gan_image_get_pixptr_rgba_ui16(pgiImage, bWholeImage ? (bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow) : (bFlip ? (uiInternalHeight-uiRow/2-1) : uiRow/2), iCol),
+                     src = ((Gan_RGBAPixel_ui16*)acAlignedBuffer) + iCol; iCol >= 0; --iCol, --dst, --src)
+                  {
+                     if (bReversedEndianness)
+                        vReverseEndiannessArray16((gan_uint16*)src, 4);
+                     *dst = *src;
+                  }
+               }
+               /* otherwise ignore this scanline */
+               else if(fseek(pfInFile, uiRowSizeInBytes, SEEK_CUR) != 0)
+               {
+                  if(bAllocatedImage)
+                     gan_image_free(pgiImage);
+                  gan_err_flush_trace();
+                  gan_err_register( "pgiRead12BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
+                  return NULL;
+               }
+            }
+            else
+            {
+               if ( fread ( acAlignedBuffer, 1, uiRowSizeInBytes, pfInFile ) != uiRowSizeInBytes )
+               {
+                  if(bAllocatedImage)
+                     gan_image_free(pgiImage);
+                  gan_err_flush_trace();
+                  gan_err_register( "pgiRead12BitDPXImageData", GAN_ERROR_TRUNCATED_FILE, "truncated DPX file" );
+                  return NULL;
+               }
 
-        break;
+               for(iCol=(int)ui32PixelsPerLine-1,
+                  dst = gan_image_get_pixptr_rgba_ui16(pgiImage, bFlip ? (ui32LinesPerImageEle-uiRow-1) : uiRow, iCol),
+                  src = ((Gan_RGBAPixel_ui16*)acAlignedBuffer) + iCol; iCol >= 0; --iCol, --dst, --src)
+               {
+                  if (bReversedEndianness)
+                     vReverseEndiannessArray16((gan_uint16*)src, 4);
+                  *dst = *src;
+               }
+            }
 
+            // allow for padding at end of line
+            if(fseek(pfInFile, ui32eolPadding, SEEK_CUR) != 0)
+            {
+               if(bAllocatedImage) gan_image_free(pgiImage);
+               gan_err_flush_trace();
+               gan_err_register( "pgiRead12BitDPXImageData", GAN_ERROR_CORRUPTED_FILE, "corrupted DPX data (truncated file?)" );
+               return NULL;
+            }
+
+            /* check for abort every 10 rows */
+            if(abortRequested != NULL && (uiRow % 10) == 0 && GAN_TRUE == abortRequested(abortObj))
+               break;
+         }
+         break;
+      }
       default:
         if(bAllocatedImage) gan_image_free(pgiImage);
         gan_err_flush_trace();
@@ -2556,7 +2621,7 @@ static Gan_Bool gan_read_dpx_image_information_header ( Gan_Bool native_type,
 
       case 12:
         if(native_type)
-           *peType = GAN_UINT10;
+           *peType = GAN_UINT12;
         else
            *peType = GAN_UINT16;
 
@@ -2867,6 +2932,14 @@ Gan_Image *
                                              header))
    {
       gan_err_register ( "gan_read_dpx_image_stream", GAN_ERROR_FAILURE, "" );
+      return NULL;
+   }
+
+   /* 12-bit packed DPX is currently not supported */
+   if (bPacked && header->info.dpx.image_info.bit_size == 12)
+   {
+      gan_err_flush_trace();
+      gan_err_register( "gan_read_dpx_image_stream", GAN_ERROR_NOT_IMPLEMENTED, "12-bit packed DPX format not supported" );
       return NULL;
    }
 
@@ -3829,7 +3902,7 @@ Gan_Bool
    if(bPacked)
    {
       gan_err_flush_trace();
-      gan_err_register ( "pgiWrite12BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "12 bit packed format not supported" );
+      gan_err_register ( "pgiWrite12BitDPXImageData", GAN_ERROR_NOT_IMPLEMENTED, "12-bit packed DPX format not supported" );
       return GAN_FALSE;
    }
 
