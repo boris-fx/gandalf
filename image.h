@@ -121,4 +121,3 @@
 #include <gandalf/image/openGL_texture.h>
 #include <gandalf/image/pixel.h>
 #include <gandalf/image/tiled_image.h>
-#include <gandalf/image/tiled_image.h>

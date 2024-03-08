@@ -59,7 +59,7 @@ HFILES = $(patsubst %.c,%.h,$(CFILES)) io.h \
 	 image_bgr_uint8.h  image_bgr_uint16.h  image_bgr_uint32.h  image_bgr_float32.h  image_bgr_float64.h  image_bgr_int32.h \
 	 image_bgra_uint8.h image_bgra_uint16.h image_bgra_uint32.h image_bgra_float32.h image_bgra_float64.h image_bgra_int32.h \
 	 image_vfield2D_int16.h image_vfield2D_int32.h image_vfield2D_float32.h image_vfield2D_float64.h \
-	 image_vfield3D_int16.h image_vfield3D_int32.h image_vfield3D_float32.h image_vfield3D_float64.h tiled_image.h
+	 image_vfield3D_int16.h image_vfield3D_int32.h image_vfield3D_float32.h image_vfield3D_float64.h
 
 # header files not to be included by themselves
 EXTRA_HFILES = image_grey_noc.h image_colour_noc.h
