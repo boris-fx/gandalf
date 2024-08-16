@@ -205,8 +205,11 @@ fi
 # Check for OpenGL extensions
 #
 have_glext='no'
-AC_CHECK_LIB(GL, glXGetProcAddressARB, AC_DEFINE(HAVE_OPENGL_EXT)
-	     have_glext=yes, have_glext=no, -lXmu -lXi -lX11 -lpthread -lm)
+if test "$have_opengl" == 'yes'
+then
+  AC_CHECK_LIB(GL, glXGetProcAddressARB, AC_DEFINE(HAVE_OPENGL_EXT)
+  	     have_glext=yes, have_glext=no, -lXmu -lXi -lX11 -lpthread -lm)
+fi
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
