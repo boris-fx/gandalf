@@ -219,7 +219,7 @@ static Gan_Bool read_header(FILE *infile,
    png_set_sig_bytes(*png_ptr, 8); 
 
    /* Read image info */
-   png_read_info(*png_ptr, *info_ptr); 
+   png_read_info(*png_ptr, *info_ptr);
 
    /* Extract necessary image info */
    //printf("Sizeof(int)=%d sizeof(long)=%d sizeof(png_uint_32)=%d\n",(int)sizeof(int), (int)sizeof(long), (int)sizeof(png_uint_32));
@@ -228,7 +228,7 @@ static Gan_Bool read_header(FILE *infile,
                   NULL, NULL, NULL );
    *pwidth  = (unsigned int)pngui32Width;
    *pheight = (unsigned int)pngui32Height;
-        
+
    return GAN_TRUE;
 }
 
@@ -290,13 +290,13 @@ Gan_Image *
    double file_gamma;
    Gan_ImageFormat format;
    Gan_Type type;
-   unsigned int uiHeight, uiWidth, uiInternalHeight;
-   int iColourType, iBitDepth;
+   unsigned int height, width, internalHeight;
+   int colourType, bitDepth;
    png_structp png_ptr = NULL;
    png_infop info_ptr = NULL;
    Gan_Bool flip=GAN_FALSE, single_field=GAN_FALSE, upper=GAN_FALSE, whole_image=GAN_FALSE;
 
-   if ( !read_header ( infile, &png_ptr, &info_ptr, &iColourType, &iBitDepth, &uiHeight, &uiWidth ) )
+   if ( !read_header( infile, &png_ptr, &info_ptr, &colourType, &bitDepth, &height, &width ) )
    {
       read_cleanup(NULL, png_ptr, info_ptr);
       /* ErrorMessage set in read_header */
@@ -304,15 +304,6 @@ Gan_Image *
       return NULL;
    }
 
-   /* Establish the Gandalf format and type of image needed */
-   if(!decode_header_info(iColourType, iBitDepth, &format, &type))
-   {
-      read_cleanup(NULL, png_ptr, info_ptr);
-      /* ErrorMessage set in decode_header_info */
-      gan_err_register("gan_read_png_image_stream", GAN_ERROR_FAILURE, "");
-      return NULL;
-   }
-   
    /* setjmp() call */
    if (setjmp(png_jmpbuf(png_ptr)))
    {
@@ -324,12 +315,12 @@ Gan_Image *
 
    /* Transformations */
    /* Expand palette images to RGB */
-   if (iColourType == PNG_COLOR_TYPE_PALETTE)
+   if (colourType == PNG_COLOR_TYPE_PALETTE)
       png_set_expand(png_ptr);
    
    /* Expand 2,4 and 6 bit grey level to 8 bits */
-   if (iColourType == PNG_COLOR_TYPE_GRAY &&
-       (1 < iBitDepth) && (iBitDepth < 8))
+   if (colourType == PNG_COLOR_TYPE_GRAY &&
+       (1 < bitDepth) && (bitDepth < 8))
       png_set_expand(png_ptr);
 
    /* Expand transparency bits to full alpha channel;*/
@@ -342,19 +333,26 @@ Gan_Image *
 
 #ifndef WORDS_BIGENDIAN
    /* swap bytes if little endian architecture */
-   if(iBitDepth == 16)
-   {
+   if (bitDepth == 16)
       png_set_swap(png_ptr);
-   }
-   else
-      if (iBitDepth == 1)
-      {
-         png_set_packswap(png_ptr);
-      }
+   else if (bitDepth == 1)
+      png_set_packswap(png_ptr);
 #endif
 
    /* Update info_ptr data */
    png_read_update_info(png_ptr, info_ptr);
+
+   /* Get updated bit depth and color type */
+   png_get_IHDR(png_ptr, info_ptr, NULL, NULL, &bitDepth, &colourType, NULL, NULL, NULL);
+
+   /* Establish the Gandalf format and type of image needed */
+   if (!decode_header_info(colourType, bitDepth, &format, &type))
+   {
+      read_cleanup(NULL, png_ptr, info_ptr);
+      /* ErrorMessage set in decode_header_info */
+      gan_err_register("gan_read_png_image_stream", GAN_ERROR_FAILURE, "");
+      return NULL;
+   }
 
    /* read elements of control structure if one was provided */
    if(ictrlstr != NULL)
@@ -369,7 +367,7 @@ Gan_Image *
    /* interlaced frames must have even height */
    if(single_field)
    {
-      if((uiHeight % 2) != 0)
+      if((height % 2) != 0)
       {
          read_cleanup(NULL, png_ptr, info_ptr);
          gan_err_flush_trace();
@@ -377,16 +375,16 @@ Gan_Image *
          return NULL;
       }
 
-      uiInternalHeight = uiHeight/2;
+      internalHeight = height/2;
    }
    else
-      uiInternalHeight = uiHeight;
-      
+      internalHeight = height;
+
    if(header != NULL)
    {
       header->file_format = GAN_PNG_FORMAT;
-      header->width = uiWidth;
-      header->height = whole_image ? uiHeight : uiInternalHeight;
+      header->width = width;
+      header->height = whole_image ? height : internalHeight;
       header->format = format;
       header->type = type;
    }
@@ -400,7 +398,7 @@ Gan_Image *
    if(image == NULL)
    {
       /* Allocate memory for the new image */
-      image = gan_image_alloc(format, type, whole_image ? uiHeight : uiInternalHeight, (unsigned long) uiWidth);
+      image = gan_image_alloc(format, type, whole_image ? height : internalHeight, (unsigned long) width);
       if(image == NULL)
       {
          read_cleanup(image, NULL, NULL);
@@ -411,7 +409,7 @@ Gan_Image *
    else
    {
       /*Use an already allocated image struct*/
-      if ( gan_image_set_format_type_dims(image, format, type, whole_image ? uiHeight : uiInternalHeight, uiWidth) == NULL )
+      if ( gan_image_set_format_type_dims(image, format, type, whole_image ? height : internalHeight, width) == NULL )
       {
          read_cleanup(image, NULL, NULL);
          gan_err_register("gan_read_png_image_stream",GAN_ERROR_FAILURE, "");
@@ -430,7 +428,7 @@ Gan_Image *
       Gan_Image *imbuf;
 
       /* allocate a one row image */
-      imbuf = gan_image_alloc(format, type, 1, (unsigned long) uiWidth);
+      imbuf = gan_image_alloc(format, type, 1, (unsigned long) width);
       if(imbuf == NULL)
       {
          read_cleanup(NULL, png_ptr, info_ptr);
@@ -438,11 +436,11 @@ Gan_Image *
          return NULL;
       }
 
-      for(uiRow=0; uiRow<uiHeight; uiRow++)
+      for(uiRow=0; uiRow<height; uiRow++)
       {
          /* only transfer even rows for upper field, or odd rows for upper field */
          if((upper && (uiRow % 2) == 0) || (!upper && (uiRow % 2) == 1))
-            png_read_row(png_ptr, ((png_bytepp)image->row_data_ptr)[whole_image ? (flip ? (uiHeight-uiRow-1) : uiRow) : (flip ? (uiInternalHeight-uiRow/2-1) : uiRow/2)], NULL);
+            png_read_row(png_ptr, ((png_bytepp)image->row_data_ptr)[whole_image ? (flip ? (height-uiRow-1) : uiRow) : (flip ? (internalHeight-uiRow/2-1) : uiRow/2)], NULL);
          else
             png_read_row(png_ptr, ((png_bytepp)imbuf->row_data_ptr)[0], NULL);
 
@@ -460,7 +458,7 @@ Gan_Image *
          /* flip the image */
          int row;
 
-         for(row=(int)uiHeight-1; row>=0; row--)
+         for(row=(int)height-1; row>=0; row--)
          {
             png_read_row(png_ptr, ((png_bytepp)image->row_data_ptr)[row], NULL);
 
@@ -477,7 +475,7 @@ Gan_Image *
          {
             unsigned int row;
 
-            for(row=0; row<uiHeight; row++)
+            for(row=0; row<height; row++)
             {
                png_read_row(png_ptr, ((png_bytepp)image->row_data_ptr)[row], NULL);
 
