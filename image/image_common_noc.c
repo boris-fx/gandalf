@@ -431,8 +431,9 @@ Gan_Image * GAN_IMAGE_FORM_GEN(
    {
       /* dynamically allocate image */
       img = gan_malloc_object(Gan_Image);
-      /* set dynamic allocation flag */
       img->ref_count = 0;
+      img->monitor_count = 0;
+      /* set dynamic allocation flag */
       img->struct_alloc = GAN_TRUE;
       img->pix_data.size = 0;
       img->pix_data.ptr = NULL;

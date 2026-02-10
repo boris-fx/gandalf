@@ -28,6 +28,7 @@
 #define _GAN_IMAGE_DEFS_H
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <gandalf/image/pixel.h>
 #include <gandalf/common/misc_defs.h>
 
@@ -92,7 +93,9 @@ struct Gan_ImageHostSuite
 /// structure definition for image
 typedef struct Gan_Image
 {
-   int ref_count;
+   int32_t ref_count;
+
+   int32_t monitor_count; // Can be used to monitor an image instance for debugging purposes.
 
    /// format of image: grey-level, RGB colour etc.
    Gan_ImageFormat format;

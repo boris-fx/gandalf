@@ -105,6 +105,7 @@
 GANDALF_API void gan_image_struct_init(Gan_Image * image)
 {
    image->ref_count = 0;
+   image->monitor_count = 0;
    image->format = GAN_GREY_LEVEL_IMAGE;
    image->type = GAN_UCHAR;
    image->height = image->width = 0;
@@ -159,6 +160,7 @@ GANDALF_API Gan_Image *gan_image_alloc_suite(
    /* set dynamic allocation flag */
    img->struct_alloc = GAN_TRUE;
    img->ref_count = 0;
+   img->monitor_count = 0;
    img->pix_data.size = 0;
    img->pix_data.ptr = NULL;
    img->pix_data.host_suite = host_suite;
